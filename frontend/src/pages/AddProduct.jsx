@@ -4,6 +4,27 @@ import React, { useState } from "react";
 import { Sparkles, Loader2, Save } from "lucide-react";
 import api from "../utils/api.js";
 
+const AUDIENCES = [
+  "Gen-Z fashionistas",
+  "Tech enthusiasts",
+  "Fitness & health conscious",
+  "Working professionals",
+  "Parents & families",
+  "Eco-conscious shoppers",
+  "Students & youth"
+];
+
+const KEYWORDS_PRESETS = [
+  "Eco-friendly, sustainable",
+  "Premium quality, durable",
+  "High performance, fast",
+  "Minimalist, sleek design",
+  "Waterproof, weather-resistant",
+  "Ergonomic, comfortable",
+  "Smart, IoT connected",
+  "Budget-friendly, value"
+];
+
 const AddProduct = () => {
   const [form, setForm] = useState({
     name: "",
@@ -24,6 +45,11 @@ const AddProduct = () => {
     tone: "friendly, conversion-focused",
     keywords: "",
   });
+
+  const [audienceSelection, setAudienceSelection] = useState("");
+  const [customAudience, setCustomAudience] = useState("");
+  const [keywordSelection, setKeywordSelection] = useState("");
+  const [customKeywords, setCustomKeywords] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -49,12 +75,15 @@ const AddProduct = () => {
     setMessage("");
     setAiLoading(true);
     try {
+      const audienceVal = audienceSelection === "other" ? customAudience : audienceSelection;
+      const keywordsVal = keywordSelection === "other" ? customKeywords : keywordSelection;
+
       const res = await api.post("/api/ai/generate", {
         productName: form.name,
         productType: aiContext.productType || form.category || "General E-commerce Product",
-        audience: aiContext.audience || "General Audience",
+        audience: audienceVal || "General Audience",
         tone: aiContext.tone || "friendly, conversion-focused",
-        keywords: aiContext.keywords,
+        keywords: keywordsVal,
       });
 
       const { description, tags, captions } = res.data;
@@ -161,6 +190,10 @@ const AddProduct = () => {
         tone: "friendly, conversion-focused",
         keywords: "",
       });
+      setAudienceSelection("");
+      setCustomAudience("");
+      setKeywordSelection("");
+      setCustomKeywords("");
     } catch (err) {
       console.error("Create product error:", err);
       setMessage(
@@ -359,17 +392,31 @@ const AddProduct = () => {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="mb-1.5 block text-xs text-slate-300">
                   Target Audience
                 </label>
-                <input
-                  type="text"
-                  name="audience"
-                  className="input"
-                  placeholder="E.g. Gen-Z fashionistas, professional runners"
-                  value={aiContext.audience}
-                  onChange={handleAiContextChange}
-                />
+                <select
+                  name="audienceSelection"
+                  className="input select mb-2"
+                  value={audienceSelection}
+                  onChange={(e) => setAudienceSelection(e.target.value)}
+                >
+                  <option value="">Select target audience...</option>
+                  {AUDIENCES.map((aud) => (
+                    <option key={aud} value={aud}>{aud}</option>
+                  ))}
+                  <option value="other">Other (Custom)...</option>
+                </select>
+                {audienceSelection === "other" && (
+                  <input
+                    type="text"
+                    name="customAudience"
+                    className="input mt-1 animate-fadeIn"
+                    placeholder="Enter custom target audience (e.g. Gamer dads)"
+                    value={customAudience}
+                    onChange={(e) => setCustomAudience(e.target.value)}
+                  />
+                )}
               </div>
               <div>
                 <label className="mb-1 block text-xs text-slate-300">
@@ -388,17 +435,31 @@ const AddProduct = () => {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="mb-1.5 block text-xs text-slate-300">
                   Key Features / Keywords
                 </label>
-                <input
-                  type="text"
-                  name="keywords"
-                  className="input"
-                  placeholder="E.g. 100% organic cotton, waterproof"
-                  value={aiContext.keywords}
-                  onChange={handleAiContextChange}
-                />
+                <select
+                  name="keywordSelection"
+                  className="input select mb-2"
+                  value={keywordSelection}
+                  onChange={(e) => setKeywordSelection(e.target.value)}
+                >
+                  <option value="">Select preset key features...</option>
+                  {KEYWORDS_PRESETS.map((kw) => (
+                    <option key={kw} value={kw}>{kw}</option>
+                  ))}
+                  <option value="other">Other (Custom)...</option>
+                </select>
+                {keywordSelection === "other" && (
+                  <input
+                    type="text"
+                    name="customKeywords"
+                    className="input mt-1 animate-fadeIn"
+                    placeholder="Enter custom keywords (comma-separated)"
+                    value={customKeywords}
+                    onChange={(e) => setCustomKeywords(e.target.value)}
+                  />
+                )}
               </div>
             </div>
           </div>
