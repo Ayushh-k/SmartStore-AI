@@ -284,62 +284,62 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      {/* Banner / Header */}
-      <div className="glass-panel p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-left border-slate-900">
-        <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shadow-lg shadow-primary/5 shrink-0">
-            <User className="h-7 w-7" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold tracking-tight text-slate-100">{user?.name}</h1>
-            <p className="text-xs text-slate-450 mt-0.5">{user?.email}</p>
-          </div>
+    <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
+      {/* Profile Header */}
+      <div className="border-b border-neutral-800 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
+        <div>
+          <span className="text-[10px] tracking-[0.25em] uppercase text-neutral-500 font-medium block mb-1">Account</span>
+          <h1 className="text-3xl font-serif tracking-wide text-white uppercase">{user?.name}</h1>
+          <p className="text-xs tracking-[0.1em] text-neutral-400 mt-1 font-sans">{user?.email}</p>
         </div>
-        <div className="flex items-center gap-2.5 self-start md:self-center">
-          <span className="rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[10px] text-slate-400 font-semibold tracking-wide uppercase">
-            Role: {user?.role || "user"}
-          </span>
-          <span className="rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[10px] text-slate-400 font-semibold tracking-wide">
-            Joined: {new Date(user?.createdAt).toLocaleDateString()}
-          </span>
+        <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-[0.25em] uppercase text-neutral-500 font-sans">
+          <div>
+            <span className="text-neutral-600 mr-2">Role //</span>
+            <span className="text-neutral-300 font-medium">{user?.role || "user"}</span>
+          </div>
+          <div className="hidden md:block text-neutral-700">|</div>
+          <div>
+            <span className="text-neutral-600 mr-2">Member Since //</span>
+            <span className="text-neutral-300 font-medium">{new Date(user?.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</span>
+          </div>
         </div>
       </div>
 
       {successMessage && (
-        <div className="rounded-lg border border-emerald-500/40 bg-emerald-950/20 p-4 text-xs text-emerald-350 text-left animate-fadeIn">
+        <div className="rounded-none border border-emerald-500/40 bg-emerald-950/15 p-4 text-xs text-emerald-300 text-left animate-fadeIn">
           {successMessage}
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg border border-rose-500/40 bg-rose-950/20 p-4 text-xs text-rose-350 text-left animate-fadeIn">
+        <div className="rounded-none border border-rose-500/40 bg-rose-950/15 p-4 text-xs text-rose-350 text-left animate-fadeIn">
           {error}
         </div>
       )}
 
       {/* Tabs Switcher */}
-      <div className="flex border-b border-slate-850 overflow-x-auto no-scrollbar scroll-smooth">
+      <div className="flex gap-8 border-b border-neutral-800 overflow-x-auto no-scrollbar scroll-smooth justify-start md:justify-center py-2">
         {[
-          { id: "orders", label: "Order History", icon: ClipboardList },
-          { id: "wishlist", label: "My Wishlist", icon: Heart },
-          { id: "addresses", label: "Address Book", icon: MapPin },
-          { id: "settings", label: "Profile Settings", icon: Settings }
+          { id: "orders", label: "Orders" },
+          { id: "wishlist", label: "Wishlist" },
+          { id: "addresses", label: "Addresses" },
+          { id: "settings", label: "Settings" }
         ].map(tab => {
-          const TabIcon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3 border-b-2 text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`pb-3 text-[11px] font-medium tracking-[0.25em] uppercase whitespace-nowrap transition-all cursor-pointer relative ${
                 isActive 
-                  ? "border-primary text-primary" 
-                  : "border-transparent text-slate-400 hover:text-slate-200"
+                  ? "text-white font-semibold" 
+                  : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
-              <TabIcon className="h-4 w-4" />
-              <span>{tab.label}</span>
+              {tab.label}
+              {isActive && (
+                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-white animate-fadeIn" />
+              )}
             </button>
           );
         })}
