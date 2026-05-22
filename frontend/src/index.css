@@ -15,7 +15,7 @@ body,
 }
 
 body {
-  @apply bg-background text-slate-100 antialiased;
+  @apply bg-white dark:bg-[#0a0a0a] text-black dark:text-slate-100 antialiased;
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", sans-serif;
@@ -51,16 +51,16 @@ body {
 
 /* Button styles */
 .btn-primary {
-  @apply inline-flex items-center justify-center px-6 py-3 rounded-none bg-white text-black hover:bg-neutral-200 text-xs font-semibold uppercase tracking-widest transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center px-6 py-3 rounded-none bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 text-xs font-semibold uppercase tracking-widest transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed;
 }
 
 .btn-outline {
-  @apply inline-flex items-center justify-center px-6 py-3 rounded-none border border-white/20 text-white bg-transparent hover:bg-white hover:text-black text-xs font-semibold uppercase tracking-widest transition-all duration-300;
+  @apply inline-flex items-center justify-center px-6 py-3 rounded-none border border-black/20 dark:border-white/20 text-black dark:text-white bg-transparent hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-xs font-semibold uppercase tracking-widest transition-all duration-300;
 }
 
 /* Input styles */
 .input {
-  @apply w-full rounded-none border-b border-white/20 bg-transparent px-0 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-white transition-colors duration-300;
+  @apply w-full rounded-none border-b border-black/15 dark:border-white/20 bg-transparent px-0 py-2.5 text-sm text-black dark:text-white placeholder:text-neutral-500 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300;
 }
 
 /* Animations */

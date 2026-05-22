@@ -303,12 +303,12 @@ const AddProduct = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn text-left">
-      <div className="flex items-center justify-between border-b border-neutral-900 pb-5">
+      <div className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 pb-5">
         <div>
-          <h2 className="font-serif text-xl tracking-widest uppercase text-white">
+          <h2 className="font-serif text-xl tracking-widest uppercase text-black dark:text-white">
             Create Product
           </h2>
-          <p className="text-[9px] uppercase tracking-widest text-neutral-500 mt-0.5">
+          <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
             Auto-generate high-converting copy, SEO tags, and social captions with AI.
           </p>
         </div>
@@ -316,7 +316,7 @@ const AddProduct = () => {
           type="button"
           onClick={handleGenerateWithAI}
           disabled={aiLoading || !form.name}
-          className="border border-white hover:bg-white hover:text-black text-white px-4 py-2.5 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors inline-flex items-center gap-2"
+          className="border border-black dark:border-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black text-black dark:text-white px-4 py-2.5 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {aiLoading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -331,10 +331,10 @@ const AddProduct = () => {
         <div
           className={`border p-4 text-[9px] uppercase tracking-widest rounded-none ${
             messageType === "success"
-              ? "border-white text-white bg-neutral-900"
+              ? "border-black dark:border-white text-black dark:text-white bg-gray-50 dark:bg-neutral-900"
               : messageType === "error"
-              ? "border-rose-900 text-rose-500 bg-black"
-              : "border-neutral-900 text-neutral-400 bg-black"
+              ? "border-rose-300 dark:border-rose-900 text-rose-600 dark:text-rose-500 bg-rose-50 dark:bg-black"
+              : "border-gray-200 dark:border-neutral-900 text-neutral-600 dark:text-neutral-400 bg-gray-50 dark:bg-black"
           }`}
         >
           {message}
@@ -347,37 +347,37 @@ const AddProduct = () => {
       >
         {/* Left column: core product info */}
         <div className="space-y-6">
-          <div className="border border-neutral-900 bg-black p-6 rounded-none">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
+          <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white border-b border-gray-200 dark:border-neutral-900 pb-3 mb-4">
               Product details
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Product Name *
                 </label>
                 <input
                   type="text"
                   name="name"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. Linen Blend Oversized Shirt"
                   value={form.name}
                   onChange={handleChange}
                   required
                 />
-                <p className="mt-1.5 text-[8px] uppercase tracking-wider text-neutral-500">
+                <p className="mt-1.5 text-[8px] uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                   AI uses this as the primary context for copy generation.
                 </p>
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   SKU / Serial
                 </label>
                 <input
                   type="text"
                   name="sku"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="SKU-001"
                   value={form.sku}
                   onChange={handleChange}
@@ -385,13 +385,13 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Category *
                 </label>
                 <input
                   type="text"
                   name="category"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="Apparel · Streetwear"
                   value={form.category}
                   onChange={handleChange}
@@ -400,13 +400,13 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Brand
                 </label>
                 <input
                   type="text"
                   name="brand"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. Saint Laurent"
                   value={form.brand}
                   onChange={handleChange}
@@ -414,7 +414,7 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Price (USD) *
                 </label>
                 <input
@@ -422,7 +422,7 @@ const AddProduct = () => {
                   name="price"
                   min="0"
                   step="0.01"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="120.00"
                   value={form.price}
                   onChange={handleChange}
@@ -431,14 +431,14 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Initial Stock *
                 </label>
                 <input
                   type="number"
                   name="stock"
                   min="0"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="50"
                   value={form.stock}
                   onChange={handleChange}
@@ -447,20 +447,20 @@ const AddProduct = () => {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Sizes (type and press Enter)
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {sizes.map((size, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-neutral-800 text-white text-[10px] uppercase tracking-wider bg-transparent rounded-none"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-gray-200 dark:border-neutral-800 text-black dark:text-white text-[10px] uppercase tracking-wider bg-gray-50 dark:bg-transparent rounded-none"
                     >
                       {size}
                       <button
                         type="button"
                         onClick={() => removeSize(idx)}
-                        className="text-neutral-500 hover:text-white focus:outline-none font-bold"
+                        className="text-neutral-450 dark:text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none font-bold"
                       >
                         ×
                       </button>
@@ -472,26 +472,26 @@ const AddProduct = () => {
                   value={sizeInput}
                   onChange={(e) => setSizeInput(e.target.value)}
                   onKeyDown={handleSizeKeyDown}
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. S, M, L, XL"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Colors (type and press Enter)
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {colors.map((color, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-neutral-800 text-white text-[10px] uppercase tracking-wider bg-transparent rounded-none"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-gray-200 dark:border-neutral-800 text-black dark:text-white text-[10px] uppercase tracking-wider bg-gray-50 dark:bg-transparent rounded-none"
                     >
                       {color}
                       <button
                         type="button"
                         onClick={() => removeColor(idx)}
-                        className="text-neutral-500 hover:text-white focus:outline-none font-bold"
+                        className="text-neutral-450 dark:text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none font-bold"
                       >
                         ×
                       </button>
@@ -503,17 +503,17 @@ const AddProduct = () => {
                   value={colorInput}
                   onChange={(e) => setColorInput(e.target.value)}
                   onKeyDown={handleColorKeyDown}
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. Black, White, Charcoal"
                 />
               </div>
 
               <div className="sm:col-span-2 space-y-3">
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Product Images
                 </label>
                 <div className="flex flex-col sm:flex-row gap-4 items-center">
-                  <label className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 border border-neutral-800 hover:border-white bg-transparent text-neutral-400 hover:text-white transition-all text-[9px] tracking-widest uppercase font-bold rounded-none cursor-pointer">
+                  <label className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-neutral-800 hover:border-black dark:hover:border-white bg-transparent text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-all text-[9px] tracking-widest uppercase font-bold rounded-none cursor-pointer">
                     <span>Upload Images</span>
                     <input
                       type="file"
@@ -523,7 +523,7 @@ const AddProduct = () => {
                       onChange={handleImageUpload}
                     />
                   </label>
-                  <p className="text-[9px] uppercase tracking-widest text-neutral-500">
+                  <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
                     JPG, PNG, WEBP formats. Multiple images supported.
                   </p>
                 </div>
@@ -531,7 +531,7 @@ const AddProduct = () => {
                 {uploadedImages.length > 0 && (
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 pt-2">
                     {uploadedImages.map((img, idx) => (
-                      <div key={idx} className="relative h-16 border border-neutral-900 bg-[#050505] rounded-none overflow-hidden group">
+                      <div key={idx} className="relative h-16 border border-gray-200 dark:border-neutral-900 bg-gray-50 dark:bg-[#050505] rounded-none overflow-hidden group">
                         <img src={img} alt="Upload preview" className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -548,31 +548,31 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="border border-neutral-900 bg-black p-6 rounded-none space-y-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
+          <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white border-b border-gray-200 dark:border-neutral-900 pb-3 mb-4">
               Description & Tags
             </h3>
             <div>
-              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                 Product Description
               </label>
               <textarea
                 name="description"
                 rows="5"
-                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-32 resize-none"
+                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none h-32 resize-none"
                 placeholder="A compelling, detailed description of your product..."
                 value={form.description}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                 SEO Tags (comma-separated)
               </label>
               <input
                 type="text"
                 name="tags"
-                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                 placeholder="silk, designer, premium, summer"
                 value={form.tags}
                 onChange={handleChange}
@@ -583,45 +583,45 @@ const AddProduct = () => {
 
         {/* Right column: AI prompt tuning & Social Captions */}
         <div className="space-y-6">
-          <div className="border border-neutral-900 bg-black p-6 rounded-none">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
+          <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white border-b border-gray-200 dark:border-neutral-900 pb-3 mb-4">
               AI Prompt Tuning
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Product Type
                 </label>
                 <input
                   type="text"
                   name="productType"
-                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. Trench Coat"
                   value={aiContext.productType}
                   onChange={handleAiContextChange}
                 />
               </div>
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1.5">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1.5">
                   Target Audience
                 </label>
                 <select
                   name="audienceSelection"
-                  className="w-full bg-black border-b border-neutral-850 text-xs py-2 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                   value={audienceSelection}
                   onChange={(e) => setAudienceSelection(e.target.value)}
                 >
-                  <option value="" className="bg-black text-white">Select target audience...</option>
+                  <option value="" className="bg-white dark:bg-black text-black dark:text-white">Select target audience...</option>
                   {dbAudiences.map((aud) => (
-                    <option key={aud} value={aud} className="bg-black text-white">{aud}</option>
+                    <option key={aud} value={aud} className="bg-white dark:bg-black text-black dark:text-white">{aud}</option>
                   ))}
-                  <option value="other" className="bg-black text-white">Other (Custom)...</option>
+                  <option value="other" className="bg-white dark:bg-black text-black dark:text-white">Other (Custom)...</option>
                 </select>
                 {audienceSelection === "other" && (
                   <input
                     type="text"
                     name="customAudience"
-                    className="w-full bg-black border-b border-neutral-805 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none mt-2 animate-fadeIn"
+                    className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none mt-2 animate-fadeIn"
                     placeholder="Enter custom audience (e.g. Minimalist design aficionados)"
                     value={customAudience}
                     onChange={(e) => setCustomAudience(e.target.value)}
@@ -629,42 +629,42 @@ const AddProduct = () => {
                 )}
               </div>
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                   Tone of Voice
                 </label>
                 <select
                   name="tone"
-                  className="w-full bg-black border-b border-neutral-850 text-xs py-2 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                   value={aiContext.tone}
                   onChange={handleAiContextChange}
                 >
-                  <option value="friendly, conversion-focused" className="bg-black text-white">Friendly & Persuasive</option>
-                  <option value="professional, authoritative" className="bg-black text-white">Professional & Clear</option>
-                  <option value="witty, engaging" className="bg-black text-white">Witty & Bold</option>
-                  <option value="minimalist, luxury" className="bg-black text-white">Minimalist & Luxury</option>
+                  <option value="friendly, conversion-focused" className="bg-white dark:bg-black text-black dark:text-white">Friendly & Persuasive</option>
+                  <option value="professional, authoritative" className="bg-white dark:bg-black text-black dark:text-white">Professional & Clear</option>
+                  <option value="witty, engaging" className="bg-white dark:bg-black text-black dark:text-white">Witty & Bold</option>
+                  <option value="minimalist, luxury" className="bg-white dark:bg-black text-black dark:text-white">Minimalist & Luxury</option>
                 </select>
               </div>
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1.5">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1.5">
                   Key Features / Keywords
                 </label>
                 <select
                   name="keywordSelection"
-                  className="w-full bg-black border-b border-neutral-850 text-xs py-2 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                   value={keywordSelection}
                   onChange={(e) => setKeywordSelection(e.target.value)}
                 >
-                  <option value="" className="bg-black text-white">Select preset key features...</option>
+                  <option value="" className="bg-white dark:bg-black text-black dark:text-white">Select preset key features...</option>
                   {dbKeywords.map((kw) => (
-                    <option key={kw} value={kw} className="bg-black text-white">{kw}</option>
+                    <option key={kw} value={kw} className="bg-white dark:bg-black text-black dark:text-white">{kw}</option>
                   ))}
-                  <option value="other" className="bg-black text-white">Other (Custom)...</option>
+                  <option value="other" className="bg-white dark:bg-black text-black dark:text-white">Other (Custom)...</option>
                 </select>
                 {keywordSelection === "other" && (
                   <input
                     type="text"
                     name="customKeywords"
-                    className="w-full bg-black border-b border-neutral-805 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none mt-2 animate-fadeIn"
+                    className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none mt-2 animate-fadeIn"
                     placeholder="Enter keywords (comma-separated)"
                     value={customKeywords}
                     onChange={(e) => setCustomKeywords(e.target.value)}
@@ -674,44 +674,44 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="border border-neutral-900 bg-black p-6 rounded-none space-y-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
+          <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white border-b border-gray-200 dark:border-neutral-900 pb-3 mb-4">
               Social Media Captions (AI Generated)
             </h3>
             <div>
-              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                 Instagram Caption
               </label>
               <textarea
                 name="captionsInstagram"
                 rows="2"
-                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
+                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
                 placeholder="Instagram copy..."
                 value={form.captionsInstagram}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                 Facebook Caption
               </label>
               <textarea
                 name="captionsFacebook"
                 rows="2"
-                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
+                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
                 placeholder="Facebook copy..."
                 value={form.captionsFacebook}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
                 Twitter Caption
               </label>
               <textarea
                 name="captionsTwitter"
                 rows="2"
-                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
+                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
                 placeholder="Twitter copy..."
                 value={form.captionsTwitter}
                 onChange={handleChange}
@@ -723,7 +723,7 @@ const AddProduct = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-white text-black hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2"
+              className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

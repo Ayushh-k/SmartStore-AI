@@ -138,22 +138,22 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-neutral-100 relative font-sans">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] text-black dark:text-neutral-100 relative font-sans transition-colors duration-300">
       {/* Toast Alert Popup */}
       {toast.show && (
-        <div className="fixed top-6 right-6 z-[9999] w-80 border border-white bg-black p-4 shadow-2xl flex items-start gap-3 animate-slideIn rounded-none">
-          <div className="text-white shrink-0 mt-0.5">
+        <div className="fixed top-6 right-6 z-[9999] w-80 border border-black dark:border-white bg-white dark:bg-black p-4 shadow-2xl flex items-start gap-3 animate-slideIn rounded-none text-black dark:text-white">
+          <div className="text-black dark:text-white shrink-0 mt-0.5">
             <ShoppingBag className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <h4 className="text-[10px] font-bold tracking-widest uppercase text-white">New Sale Recorded</h4>
-            <p className="text-[11px] text-neutral-400 mt-1 leading-normal">
+            <h4 className="text-[10px] font-bold tracking-widest uppercase text-black dark:text-white">New Sale Recorded</h4>
+            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-1 leading-normal">
               {toast.message}
             </p>
           </div>
           <button
             onClick={() => setToast({ show: false, message: "" })}
-            className="text-neutral-500 hover:text-white cursor-pointer transition-colors"
+            className="text-neutral-500 hover:text-black dark:hover:text-white cursor-pointer transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -162,16 +162,16 @@ const AdminLayout = () => {
 
       <div className="mx-auto flex h-screen max-w-7xl gap-6 px-4 py-4 sm:px-6 lg:px-8">
         {/* Sidebar */}
-        <aside className="w-64 border border-neutral-900 bg-black flex flex-col p-6 rounded-none">
-          <div className="mb-8 flex items-center gap-3 border-b border-neutral-900 pb-5">
-            <div className="text-white shrink-0">
+        <aside className="w-64 border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black flex flex-col p-6 rounded-none transition-colors duration-300">
+          <div className="mb-8 flex items-center gap-3 border-b border-gray-200 dark:border-neutral-900 pb-5">
+            <div className="text-black dark:text-white shrink-0">
               <ShoppingBag className="h-5 w-5" />
             </div>
             <div className="text-left">
-              <div className="font-serif text-sm font-semibold tracking-widest uppercase text-white">
+              <div className="font-serif text-sm font-semibold tracking-widest uppercase text-black dark:text-white">
                 SmartStore
               </div>
-              <div className="text-[8px] uppercase tracking-widest text-neutral-500 mt-0.5">
+              <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
                 Admin Console
               </div>
             </div>
@@ -190,8 +190,8 @@ const AdminLayout = () => {
                     [
                       "flex items-center gap-3 px-3 py-2.5 transition-all text-[10px] uppercase tracking-widest rounded-none",
                       isActive
-                        ? "bg-white text-black font-semibold"
-                        : "text-neutral-400 hover:bg-neutral-900 hover:text-white",
+                        ? "bg-black dark:bg-white text-white dark:text-black font-semibold"
+                        : "text-neutral-600 dark:text-neutral-400 hover:bg-gray-100 dark:hover:bg-neutral-900 hover:text-black dark:hover:text-white",
                     ].join(" ")
                   }
                 >
@@ -203,16 +203,16 @@ const AdminLayout = () => {
           </nav>
 
           {/* Footer */}
-          <div className="mt-4 border-t border-neutral-900 pt-4">
+          <div className="mt-4 border-t border-gray-200 dark:border-neutral-900 pt-4">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center justify-between px-2 py-2 text-neutral-400 hover:text-white transition-colors cursor-pointer rounded-none animate-none"
+              className="flex w-full items-center justify-between px-2 py-2 text-neutral-650 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer rounded-none animate-none"
             >
               <span className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-semibold">
                 <LogOut className="h-4 w-4" />
                 Logout
               </span>
-              <span className="text-[8px] uppercase tracking-widest text-neutral-600">
+              <span className="text-[8px] uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
                 Admin
               </span>
             </button>
@@ -220,13 +220,13 @@ const AdminLayout = () => {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 border border-neutral-900 bg-black flex flex-col overflow-hidden rounded-none">
-          <header className="flex items-center justify-between border-b border-neutral-900 px-6 py-5">
+        <main className="flex-1 border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black flex flex-col overflow-hidden rounded-none text-black dark:text-white transition-colors duration-300">
+          <header className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 px-6 py-5 bg-white dark:bg-black">
             <div className="text-left">
-              <h1 className="font-serif text-lg tracking-widest uppercase text-white">
+              <h1 className="font-serif text-lg tracking-widest uppercase text-black dark:text-white">
                 Admin Portal
               </h1>
-              <p className="text-[9px] uppercase tracking-widest text-neutral-500 mt-0.5">
+              <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
                 SmartStore AI Engine
               </p>
             </div>
@@ -235,12 +235,12 @@ const AdminLayout = () => {
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="relative border border-neutral-900 bg-black p-2.5 text-neutral-400 hover:text-white hover:border-neutral-700 transition-all cursor-pointer rounded-none"
+                  className="relative border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black p-2.5 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:border-gray-400 dark:hover:border-neutral-700 transition-all cursor-pointer rounded-none"
                   title="Notifications"
                 >
                   <Bell className="h-4.5 w-4.5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center bg-white text-[8px] font-bold text-black ring-1 ring-black">
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center bg-black dark:bg-white text-[8px] font-bold text-white dark:text-black ring-1 ring-white dark:ring-black">
                       {unreadCount}
                     </span>
                   )}
@@ -248,37 +248,37 @@ const AdminLayout = () => {
 
                 {/* Dropdown Popover */}
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-80 border border-neutral-900 bg-black shadow-2xl z-50 overflow-hidden rounded-none animate-fadeIn">
-                    <div className="flex items-center justify-between border-b border-neutral-900 px-4 py-3 bg-[#0a0a0a]">
-                      <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Notifications</span>
+                  <div className="absolute right-0 mt-2 w-80 border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black shadow-2xl z-50 overflow-hidden rounded-none animate-fadeIn text-black dark:text-white">
+                    <div className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 px-4 py-3 bg-gray-50 dark:bg-[#0a0a0a]">
+                      <span className="text-[9px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">Notifications</span>
                       {unreadCount > 0 && (
                         <button
                           onClick={handleMarkAllRead}
-                          className="text-[9px] text-white hover:underline uppercase tracking-widest font-semibold flex items-center gap-1 cursor-pointer"
+                          className="text-[9px] text-black dark:text-white hover:underline uppercase tracking-widest font-semibold flex items-center gap-1 cursor-pointer"
                         >
                           <Check className="h-3 w-3" />
                           Mark all read
                         </button>
                       )}
                     </div>
-                    <div className="max-h-72 overflow-y-auto divide-y divide-neutral-900">
+                    <div className="max-h-72 overflow-y-auto divide-y divide-gray-200 dark:divide-neutral-900">
                       {notifications.length === 0 ? (
-                        <div className="px-4 py-8 text-center text-[10px] text-neutral-500 uppercase tracking-widest">
+                        <div className="px-4 py-8 text-center text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
                           No notifications
                         </div>
                       ) : (
                         notifications.map((n) => (
                           <div
                             key={n._id}
-                            className={`px-4 py-3.5 hover:bg-neutral-900 transition-colors flex gap-3 items-start ${
-                              !n.read ? "bg-neutral-900/40" : ""
+                            className={`px-4 py-3.5 hover:bg-gray-100 dark:hover:bg-neutral-900 transition-colors flex gap-3 items-start ${
+                              !n.read ? "bg-gray-50 dark:bg-neutral-900/40" : ""
                             }`}
                           >
-                            <div className="mt-0.5 text-neutral-400 shrink-0">
+                            <div className="mt-0.5 text-neutral-500 dark:text-neutral-400 shrink-0">
                               <ShoppingBag className="h-3.5 w-3.5" />
                             </div>
                             <div className="flex-1 min-w-0 text-left">
-                              <p className="text-[11px] text-neutral-300 leading-normal break-words">
+                              <p className="text-[11px] text-neutral-800 dark:text-neutral-300 leading-normal break-words">
                                 {n.message}
                               </p>
                               <span className="text-[9px] text-neutral-500 uppercase tracking-wider mt-1.5 block">
@@ -286,7 +286,7 @@ const AdminLayout = () => {
                               </span>
                             </div>
                             {!n.read && (
-                              <span className="h-1.5 w-1.5 bg-white shrink-0 mt-1.5" />
+                              <span className="h-1.5 w-1.5 bg-black dark:bg-white shrink-0 mt-1.5" />
                             )}
                           </div>
                         ))
@@ -298,7 +298,7 @@ const AdminLayout = () => {
 
               <Link
                 to="/products/new"
-                className="bg-white text-black hover:bg-neutral-200 tracking-widest uppercase font-bold py-2.5 px-4 text-[10px] rounded-none transition-colors inline-flex items-center gap-2"
+                className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 tracking-widest uppercase font-bold py-2.5 px-4 text-[10px] rounded-none transition-colors inline-flex items-center gap-2"
               >
                 <PackagePlus className="h-3.5 w-3.5" />
                 Add Product
@@ -306,7 +306,7 @@ const AdminLayout = () => {
             </div>
           </header>
 
-          <section className="h-[calc(100%-4rem)] overflow-y-auto px-6 py-6 bg-black">
+          <section className="h-[calc(100%-4rem)] overflow-y-auto px-6 py-6 bg-white dark:bg-black">
             <Outlet />
           </section>
         </main>
