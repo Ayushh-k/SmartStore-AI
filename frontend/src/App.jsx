@@ -58,7 +58,7 @@ const UserLayout = () => {
   const location = useLocation();
   const isStorefront = location.pathname === "/";
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-slate-100 transition-colors duration-300 flex flex-col">
       <UserNavbar />
       <main className={`flex-1 ${isStorefront ? "" : "pt-28"}`}>
         <Outlet />

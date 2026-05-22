@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingBag, ShoppingCart, LogOut, LayoutDashboard, User, Heart } from "lucide-react";
+import { ShoppingCart, LogOut, LayoutDashboard, User, Heart } from "lucide-react";
 import api from "../utils/api.js";
+import ThemeToggle from "./ThemeToggle.jsx";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -61,37 +62,76 @@ const UserNavbar = () => {
   };
 
   const isWishlistPage = location.pathname === "/profile" && location.search.includes("tab=wishlist");
+  const isStorefront = location.pathname === "/";
+
+  // Dynamic colors depending on whether navbar is overlaying storefront dark hero image
+  const navContainerClass = `absolute top-0 left-0 w-full z-50 bg-transparent py-8 px-6 sm:px-12 flex items-center justify-between border-b ${
+    isStorefront
+      ? "text-white border-white/5"
+      : "text-black dark:text-white border-black/5 dark:border-white/5"
+  }`;
+
+  const getLinkClass = (isActive) => {
+    const base = "font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1";
+    if (isStorefront) {
+      if (isActive) {
+        return `${base} text-white border-b border-white`;
+      }
+      return `${base} text-neutral-400 hover:text-white`;
+    } else {
+      if (isActive) {
+        return `${base} text-black dark:text-white border-b border-black dark:border-white`;
+      }
+      return `${base} text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white`;
+    }
+  };
+
+  const wishlinkClass = () => {
+    const base = "font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5";
+    if (isStorefront) {
+      if (isWishlistPage) {
+        return `${base} text-white border-b border-white`;
+      }
+      return `${base} text-neutral-400 hover:text-white`;
+    } else {
+      if (isWishlistPage) {
+        return `${base} text-black dark:text-white border-b border-black dark:border-white`;
+      }
+      return `${base} text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white`;
+    }
+  };
+
+  const logoClass = `font-serif text-lg sm:text-2xl tracking-[0.35em] uppercase transition-colors duration-300 font-medium whitespace-nowrap ${
+    isStorefront ? "text-white hover:text-white/80" : "text-black dark:text-white hover:opacity-80"
+  }`;
+
+  const actionClass = isStorefront
+    ? "font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-white transition-colors duration-300 flex items-center gap-1.5"
+    : "font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white transition-colors duration-300 flex items-center gap-1.5";
+
+  const logoutClass = isStorefront
+    ? "font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-rose-400 transition-colors duration-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0"
+    : "font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-500 hover:text-rose-600 dark:text-neutral-450 dark:hover:text-rose-450 transition-colors duration-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0";
+
+  const signInClass = isStorefront
+    ? "font-montserrat text-[11px] tracking-[0.2em] uppercase bg-white text-black px-5 py-2 font-semibold hover:bg-neutral-200 transition-colors duration-300"
+    : "font-montserrat text-[11px] tracking-[0.2em] uppercase bg-black text-white dark:bg-white dark:text-black px-5 py-2 font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors duration-300";
+
+  const themeToggleClass = isStorefront
+    ? "text-neutral-400 hover:text-white transition-colors duration-300 p-1 bg-transparent border-none flex items-center justify-center cursor-pointer focus:outline-none"
+    : "text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white transition-colors duration-300 p-1 bg-transparent border-none flex items-center justify-center cursor-pointer focus:outline-none";
 
   return (
-    <nav className="absolute top-0 left-0 w-full z-50 bg-transparent py-8 px-6 sm:px-12 flex items-center justify-between text-white border-b border-white/5">
+    <nav className={navContainerClass}>
       <div className="grid grid-cols-3 w-full items-center">
         {/* Left Side: Navigation Links */}
         <div className="flex items-center gap-8 justify-start">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 ${
-                isActive && !isWishlistPage
-                  ? "text-white border-b border-white"
-                  : "text-neutral-400 hover:text-white"
-              }`
-            }
-          >
+          <NavLink to="/" end className={({ isActive }) => getLinkClass(isActive && !isWishlistPage)}>
             Shop
           </NavLink>
 
           {user && (
-            <NavLink
-              to="/profile?tab=wishlist"
-              className={() =>
-                `font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
-                  isWishlistPage
-                    ? "text-white border-b border-white"
-                    : "text-neutral-400 hover:text-white"
-                }`
-              }
-            >
+            <NavLink to="/profile?tab=wishlist" className={wishlinkClass}>
               <Heart className="h-3.5 w-3.5 stroke-[1.5]" />
               <span className="hidden sm:inline">Wishlist</span>
             </NavLink>
@@ -100,7 +140,7 @@ const UserNavbar = () => {
           {user && user.role === "admin" && (
             <Link
               to="/dashboard"
-              className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-neutral-800 dark:hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
             >
               <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
               <span>Admin</span>
@@ -110,24 +150,16 @@ const UserNavbar = () => {
 
         {/* Center: Luxury Serif Brand Logo */}
         <div className="flex justify-center">
-          <Link
-            to="/"
-            className="font-serif text-lg sm:text-2xl tracking-[0.35em] uppercase text-white hover:text-white/80 transition-colors duration-300 font-medium whitespace-nowrap"
-          >
+          <Link to="/" className={logoClass}>
             SmartStore
           </Link>
         </div>
 
-        {/* Right Side: Cart, Profile & Actions */}
-        <div className="flex items-center gap-8 justify-end">
-          <NavLink
-            to="/cart"
-            className={({ isActive }) =>
-              `font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
-                isActive ? "text-white border-b border-white" : "text-neutral-400 hover:text-white"
-              }`
-            }
-          >
+        {/* Right Side: Theme Toggle, Cart, Profile & Actions */}
+        <div className="flex items-center gap-6 sm:gap-8 justify-end">
+          <ThemeToggle className={themeToggleClass} />
+
+          <NavLink to="/cart" className={({ isActive }) => getLinkClass(isActive)}>
             <ShoppingCart className="h-3.5 w-3.5 stroke-[1.5]" />
             <span className="hidden sm:inline">Cart</span>
             {cartCount > 0 && (
@@ -139,26 +171,17 @@ const UserNavbar = () => {
 
           {user ? (
             <div className="flex items-center gap-6">
-              <Link
-                to="/profile"
-                className="font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-white transition-colors duration-300 flex items-center gap-1.5"
-              >
+              <Link to="/profile" className={actionClass}>
                 <User className="h-3.5 w-3.5 stroke-[1.5]" />
                 <span className="hidden md:inline">{user.name.split(" ")[0]}</span>
               </Link>
-              <button
-                onClick={handleLogout}
-                className="font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-rose-400 transition-colors duration-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0"
-              >
+              <button onClick={handleLogout} className={logoutClass}>
                 <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
                 <span className="hidden lg:inline">Logout</span>
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="font-montserrat text-[11px] tracking-[0.2em] uppercase bg-white text-black px-5 py-2 font-semibold hover:bg-neutral-200 transition-colors duration-300"
-            >
+            <Link to="/login" className={signInClass}>
               Sign In
             </Link>
           )}

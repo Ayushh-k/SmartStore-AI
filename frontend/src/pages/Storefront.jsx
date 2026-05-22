@@ -89,7 +89,7 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
   return (
     <div className="group flex flex-col justify-between overflow-hidden text-left relative">
       {/* 3:4 Portrait Image Frame */}
-      <div className="aspect-[3/4] bg-neutral-900 overflow-hidden relative flex items-center justify-center">
+      <div className="aspect-[3/4] bg-neutral-100 dark:bg-neutral-900 overflow-hidden relative flex items-center justify-center">
         {/* Wishlist Heart Icon Overlay */}
         <button
           onClick={(e) => {
@@ -115,7 +115,7 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
           />
         ) : null}
         
-        <div className={`fallback-icon flex flex-col items-center justify-center text-neutral-700 absolute inset-0 ${product.images && product.images[currentImgIndex] ? 'hidden' : ''}`}>
+        <div className={`fallback-icon flex flex-col items-center justify-center text-neutral-450 dark:text-neutral-700 absolute inset-0 ${product.images && product.images[currentImgIndex] ? 'hidden' : ''}`}>
           <Package className="h-10 w-10 mb-2 stroke-[1.2]" />
           <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-medium">No Image</span>
         </div>
@@ -168,7 +168,7 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
         </div>
 
         <Link to={`/product/${product._id}`} className="block">
-          <h3 className="text-sm font-serif tracking-wide text-white uppercase line-clamp-1 hover:text-neutral-400 transition-colors duration-300">
+          <h3 className="text-sm font-serif tracking-wide text-black dark:text-white uppercase line-clamp-1 hover:text-neutral-500 dark:hover:text-neutral-400 transition-colors duration-300">
             {product.name}
           </h3>
         </Link>
@@ -179,7 +179,7 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
           </span>
           <button 
             onClick={() => setSelectedProduct(product)}
-            className="text-[9px] tracking-widest uppercase text-neutral-500 hover:text-white font-sans transition-colors duration-300 flex items-center gap-1"
+            className="text-[9px] tracking-widest uppercase text-neutral-500 hover:text-black dark:hover:text-white font-sans transition-colors duration-300 flex items-center gap-1"
           >
             <Eye className="h-3 w-3 stroke-[1.2]" />
             <span>AI Copy</span>
@@ -510,7 +510,7 @@ const Storefront = () => {
   // ==================== RENDERING LOGGED-OUT LUXURY LANDING ====================
   if (!isLoggedIn) {
     return (
-      <div className="bg-black text-white min-h-screen">
+      <div className="bg-white dark:bg-[#0a0a0a] text-black dark:text-white min-h-screen">
         
         {/* Edge-to-Edge Luxury Hero Section */}
         <div className="relative h-[85vh] w-full overflow-hidden bg-neutral-950 flex items-center justify-center md:justify-start">
@@ -542,11 +542,11 @@ const Storefront = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-12 py-16 space-y-16">
           
           {/* Borderless text category navigation links */}
-          <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-white/5">
+          <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-black/5 dark:border-white/5">
             {CATEGORIES.map((cat, idx) => (
               <button
                 key={idx}
-                className="font-sans text-[11px] uppercase tracking-[0.2em] text-neutral-500 hover:text-white pb-1.5 transition-colors duration-300"
+                className="font-sans text-[11px] uppercase tracking-[0.2em] text-neutral-500 hover:text-black dark:hover:text-white pb-1.5 transition-colors duration-300"
                 onClick={() => alert("Please sign in or register to browse products.")}
               >
                 {cat.name}
@@ -558,7 +558,7 @@ const Storefront = () => {
           <div className="space-y-12">
             <div className="text-center space-y-2">
               <span className="font-sans text-[9px] tracking-[0.25em] text-gold uppercase block">Featured Offers</span>
-              <h3 className="font-serif text-2xl uppercase tracking-wider text-white">Deals of the Season</h3>
+              <h3 className="font-serif text-2xl uppercase tracking-wider text-black dark:text-white">Deals of the Season</h3>
             </div>
 
             <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
@@ -568,7 +568,7 @@ const Storefront = () => {
                   className="group flex flex-col justify-between overflow-hidden cursor-pointer text-left"
                   onClick={() => alert("Please sign in or register to browse the real-time AI product catalog.")}
                 >
-                  <div className="aspect-[3/4] bg-neutral-900 overflow-hidden relative mb-4">
+                  <div className="aspect-[3/4] bg-neutral-100 dark:bg-neutral-900 overflow-hidden relative mb-4">
                     <img 
                       src={deal.image} 
                       alt={deal.name} 
@@ -585,7 +585,7 @@ const Storefront = () => {
                   </div>
                   <div className="space-y-1">
                     <span className="font-sans text-[9px] tracking-[0.2em] text-gold uppercase">{deal.category}</span>
-                    <h4 className="font-serif text-sm tracking-wide text-white uppercase line-clamp-1 group-hover:text-neutral-400 transition-colors">
+                    <h4 className="font-serif text-sm tracking-wide text-black dark:text-white uppercase line-clamp-1 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
                       {deal.name}
                     </h4>
                     <p className="font-sans text-xs text-neutral-500">{deal.tagline}</p>
@@ -596,20 +596,20 @@ const Storefront = () => {
           </div>
 
           {/* Luxury Sign-in CTA Block */}
-          <div className="py-24 border-t border-white/5 flex flex-col items-center justify-center text-center space-y-6">
-            <div className="h-10 w-10 border border-white/20 flex items-center justify-center text-white mb-2">
+          <div className="py-24 border-t border-black/5 dark:border-white/5 flex flex-col items-center justify-center text-center space-y-6">
+            <div className="h-10 w-10 border border-black/20 dark:border-white/20 flex items-center justify-center text-black dark:text-white mb-2">
               <ShoppingCart className="h-4 w-4 stroke-[1.2]" />
             </div>
             <div className="space-y-3 max-w-xl">
-              <h2 className="font-serif text-3xl text-white uppercase tracking-wider">
+              <h2 className="font-serif text-3xl text-black dark:text-white uppercase tracking-wider">
                 Unlock the AI Catalog
               </h2>
-              <p className="text-xs text-neutral-400 tracking-wider uppercase leading-relaxed font-sans max-w-md mx-auto">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 tracking-wider uppercase leading-relaxed font-sans max-w-md mx-auto">
                 Welcome to SmartStore AI. Sign in to explore our real-time database catalog, generate AI marketing copy, manage your cart, and experience customized features.
               </p>
             </div>
             <div className="pt-4">
-              <Link to="/login" className="bg-white text-black px-12 py-4 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+              <Link to="/login" className="bg-black text-white dark:bg-white dark:text-black px-12 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors duration-300">
                 Sign In / Register
               </Link>
             </div>
@@ -622,7 +622,7 @@ const Storefront = () => {
 
   // ==================== RENDERING LOGGED-IN LUXURY STOREFRONT ====================
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="bg-white dark:bg-[#0a0a0a] text-black dark:text-white min-h-screen">
       
       {/* Edge-to-Edge Hero section */}
       <div className="relative h-[85vh] w-full overflow-hidden bg-neutral-950 flex items-center justify-center md:justify-start">
@@ -654,7 +654,7 @@ const Storefront = () => {
       <div id="catalog" className="max-w-7xl mx-auto px-6 sm:px-12 py-12 space-y-10 scroll-mt-24">
         
         {/* Sleek, borderless category navigation */}
-        <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-white/5">
+        <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-black/5 dark:border-white/5">
           <button
             onClick={() => {
               setSearch("");
@@ -663,8 +663,8 @@ const Storefront = () => {
             }}
             className={`font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
               search === ""
-                ? "text-white border-b border-white"
-                : "text-neutral-500 hover:text-white"
+                ? "text-black dark:text-white border-b border-black dark:border-white"
+                : "text-neutral-500 hover:text-black dark:hover:text-white"
             }`}
           >
             All Collections
@@ -679,8 +679,8 @@ const Storefront = () => {
               }}
               className={`font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
                 search === cat.name
-                  ? "text-white border-b border-white"
-                  : "text-neutral-500 hover:text-white"
+                  ? "text-black dark:text-white border-b border-black dark:border-white"
+                  : "text-neutral-500 hover:text-black dark:hover:text-white"
               }`}
             >
               {cat.name}
@@ -694,15 +694,15 @@ const Storefront = () => {
             <input
               type="text"
               placeholder="Vibe Search (e.g. cold trekking gear) + Enter"
-              className="w-full border-b border-white/10 bg-transparent focus:outline-none focus:border-white px-0 py-3.5 text-white placeholder-neutral-700 font-serif text-lg tracking-wide transition-colors duration-300"
+              className="w-full border-b border-black/10 dark:border-white/10 bg-transparent focus:outline-none focus:border-black dark:focus:border-white px-0 py-3.5 text-black dark:text-white placeholder-neutral-400 dark:placeholder-neutral-700 font-serif text-lg tracking-wide transition-colors duration-300"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
             <button
               type="submit"
-              className="absolute right-0 p-2 text-gold hover:text-white transition-colors cursor-pointer"
+              className="absolute right-0 p-2 text-gold hover:text-black dark:hover:text-white transition-colors cursor-pointer"
             >
-              <Sparkles className="h-5 w-5 animate-pulse" />
+              <Sparkles className="h-5 w-5" />
             </button>
           </form>
           <div className="w-full max-w-lg flex justify-between items-center text-[10px] text-neutral-500 uppercase tracking-widest mt-3">
@@ -732,7 +732,7 @@ const Storefront = () => {
         {/* Product Grid */}
         {(loading || aiSearchLoading) ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black dark:border-white"></div>
             <span className="text-[10px] tracking-widest uppercase text-neutral-500">
               {aiSearchLoading ? "AI matching products..." : "Loading products..."}
             </span>
@@ -740,7 +740,7 @@ const Storefront = () => {
         ) : filteredProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 text-center space-y-4">
             <Package className="h-12 w-12 text-neutral-800 stroke-[1.2]" />
-            <h3 className="font-serif text-lg text-white uppercase tracking-wider">No products found</h3>
+            <h3 className="font-serif text-lg text-black dark:text-white uppercase tracking-wider">No products found</h3>
             <p className="text-xs text-neutral-500 uppercase tracking-widest max-w-sm">
               We couldn't find any products matching your selection.
             </p>
@@ -854,27 +854,27 @@ const Storefront = () => {
       {/* Shared Cart Import Dialog */}
       {showImportDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
-          <div className="bg-neutral-900 w-full max-w-md p-8 space-y-6 border border-white/5 text-left">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
-              <h3 className="font-serif text-lg text-white uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-white dark:bg-neutral-900 w-full max-w-md p-8 space-y-6 border border-black/5 dark:border-white/5 text-left">
+            <div className="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-4">
+              <h3 className="font-serif text-lg text-black dark:text-white uppercase tracking-wider flex items-center gap-2">
                 <ShoppingCart className="h-4 w-4 stroke-[1.2]" />
                 <span>Import Cart</span>
               </h3>
               <button
                 onClick={handleCancelImport}
-                className="text-neutral-500 hover:text-white"
+                className="text-neutral-500 hover:text-black dark:hover:text-white"
               >
                 <X className="h-5 w-5 stroke-[1.5]" />
               </button>
             </div>
 
-            <div className="text-xs text-neutral-400 space-y-3 leading-relaxed uppercase tracking-wider font-sans">
+            <div className="text-xs text-neutral-500 dark:text-neutral-400 space-y-3 leading-relaxed uppercase tracking-wider font-sans">
               <p>
                 A shopping cart containing{" "}
-                <span className="font-bold text-white">{sharedCartItems?.length || 0}</span> product line item(s) has been shared.
+                <span className="font-bold text-black dark:text-white">{sharedCartItems?.length || 0}</span> product line item(s) has been shared.
               </p>
               {isLoggedIn ? (
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-[11px] text-neutral-550">
                   Select import method for your current shopping bag.
                 </p>
               ) : (
@@ -890,14 +890,14 @@ const Storefront = () => {
                   <button
                     onClick={() => handleImportCart(false)}
                     disabled={importingCart}
-                    className="w-full bg-white text-black py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors"
+                    className="w-full bg-black text-white dark:bg-white dark:text-black py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
                   >
                     Merge Carts
                   </button>
                   <button
                     onClick={() => handleImportCart(true)}
                     disabled={importingCart}
-                    className="w-full border border-white/20 text-white py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors"
+                    className="w-full border border-black/20 dark:border-white/20 text-black dark:text-white py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                   >
                     Replace Cart
                   </button>
@@ -908,14 +908,14 @@ const Storefront = () => {
                     const sharedCartData = new URLSearchParams(window.location.search).get("importCart");
                     navigate(`/login?importCart=${sharedCartData}`);
                   }}
-                  className="w-full bg-white text-black py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors"
+                  className="w-full bg-black text-white dark:bg-white dark:text-black py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
                 >
                   Sign In to Import
                 </button>
               )}
               <button
                 onClick={handleCancelImport}
-                className="text-neutral-500 hover:text-white text-[10px] uppercase tracking-widest py-2 text-center"
+                className="text-neutral-500 hover:text-black dark:hover:text-white text-[10px] uppercase tracking-widest py-2 text-center"
               >
                 Cancel
               </button>
@@ -926,7 +926,7 @@ const Storefront = () => {
 
       {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed bottom-6 right-6 z-[200] bg-neutral-900 border border-white/10 text-white px-6 py-4 rounded-none shadow-2xl flex items-center gap-3 animate-fadeIn">
+        <div className="fixed bottom-6 right-6 z-[200] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 text-black dark:text-white px-6 py-4 rounded-none shadow-2xl flex items-center gap-3 animate-fadeIn">
           <Sparkles className="h-4 w-4 text-gold animate-pulse" />
           <span className="text-[11px] uppercase tracking-widest font-sans font-semibold">{toast.message}</span>
         </div>
