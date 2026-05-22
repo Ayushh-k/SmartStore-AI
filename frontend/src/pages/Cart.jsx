@@ -158,8 +158,8 @@ const Cart = () => {
   if (orderReceipt) {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-white dark:bg-[#0a0a0a] border border-emerald-250 dark:border-emerald-500/20 p-8 text-center space-y-5 shadow-xl shadow-emerald-500/5 rounded-none text-black dark:text-white">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-650 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-emerald-200 dark:border-emerald-500/20 p-8 text-center space-y-5 shadow-xl shadow-emerald-500/5 rounded-none text-black dark:text-white">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
             <CheckCircle2 className="h-8 w-8 animate-bounce" />
           </div>
           <div className="space-y-1">
@@ -169,22 +169,22 @@ const Cart = () => {
             </p>
           </div>
 
-          <div className="border-t border-b border-gray-250 dark:border-white/10 py-3.5 text-left text-xs space-y-2 text-gray-600 dark:text-gray-400">
+          <div className="border-t border-b border-gray-200 dark:border-white/10 py-3.5 text-left text-xs space-y-2 text-gray-600 dark:text-gray-400">
             <div className="flex justify-between">
-              <span className="text-gray-550 dark:text-gray-450">Order ID:</span>
-              <span className="font-mono text-gray-805 dark:text-gray-200 font-semibold">{orderReceipt._id}</span>
+              <span className="text-gray-500 dark:text-gray-400">Order ID:</span>
+              <span className="font-mono text-gray-800 dark:text-gray-200 font-semibold">{orderReceipt._id}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-550 dark:text-gray-455">Payment Status:</span>
+              <span className="text-gray-500 dark:text-gray-400">Payment Status:</span>
               <span className="font-semibold text-emerald-600 dark:text-emerald-400 capitalize">{orderReceipt.status}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-550 dark:text-gray-455">Total Items:</span>
-              <span className="font-semibold text-gray-805 dark:text-gray-205">
+              <span className="text-gray-500 dark:text-gray-400">Total Items:</span>
+              <span className="font-semibold text-gray-800 dark:text-gray-200">
                 {orderReceipt.products?.reduce((acc, curr) => acc + curr.quantity, 0)} items
               </span>
             </div>
-            <div className="flex justify-between text-sm border-t border-gray-250 dark:border-white/10 pt-2 font-bold text-gray-900 dark:text-white">
+            <div className="flex justify-between text-sm border-t border-gray-200 dark:border-white/10 pt-2 font-bold text-gray-900 dark:text-white">
               <span>Total Paid:</span>
               <span>${Number(orderReceipt.totalAmount).toFixed(2)}</span>
             </div>
@@ -225,8 +225,8 @@ const Cart = () => {
       )}
 
       {cart.length === 0 ? (
-        <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 flex flex-col items-center justify-center py-20 text-center text-gray-500 dark:text-gray-450 rounded-none animate-fadeIn">
-          <ShoppingCart className="h-12 w-12 text-gray-305 dark:text-neutral-700 mb-3" />
+        <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 flex flex-col items-center justify-center py-20 text-center text-gray-500 dark:text-gray-400 rounded-none animate-fadeIn">
+          <ShoppingCart className="h-12 w-12 text-gray-300 dark:text-neutral-700 mb-3" />
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Your cart is empty</h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-6 max-w-xs">
             Add items from our catalog to get started.
@@ -252,7 +252,7 @@ const Cart = () => {
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-1">{product.name}</h4>
-                        <span className="rounded-none bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 px-1.5 py-0.5 text-[9px] text-gray-600 dark:text-gray-450">
+                        <span className="rounded-none bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 px-1.5 py-0.5 text-[9px] text-gray-600 dark:text-gray-400">
                           {product.category || "General"}
                         </span>
                       </div>
@@ -277,14 +277,14 @@ const Cart = () => {
                         <button
                           onClick={() => handleUpdateQuantity(product._id, item.selectedSize, item.selectedColor, item.quantity, -1)}
                           disabled={item.quantity <= 1}
-                          className="bg-gray-100 dark:bg-[#121212] border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-455 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
+                          className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
                         <span className="text-xs font-semibold font-mono w-4 text-center">{item.quantity}</span>
                         <button
                           onClick={() => handleUpdateQuantity(product._id, item.selectedSize, item.selectedColor, item.quantity, 1)}
-                          className="bg-gray-100 dark:bg-[#121212] border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-455 hover:text-black dark:hover:text-white cursor-pointer rounded-none animate-none"
+                          className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white cursor-pointer rounded-none animate-none"
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </button>
@@ -292,12 +292,12 @@ const Cart = () => {
 
                       <div className="text-right min-w-[70px]">
                         <span className="text-xs font-bold text-gray-900 dark:text-white">${(product.price * item.quantity).toFixed(2)}</span>
-                        <span className="text-[10px] text-gray-500 dark:text-gray-455 block">${Number(product.price).toFixed(2)} each</span>
+                        <span className="text-[10px] text-gray-500 dark:text-gray-400 block">${Number(product.price).toFixed(2)} each</span>
                       </div>
 
                       <button
                         onClick={() => handleRemoveItem(product._id, item.selectedSize, item.selectedColor)}
-                        className="p-1.5 text-gray-450 hover:text-rose-600 dark:hover:text-rose-400 transition-all cursor-pointer rounded-none"
+                        className="p-1.5 text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 transition-all cursor-pointer rounded-none"
                         title="Remove Item"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -316,14 +316,14 @@ const Cart = () => {
                 Order Summary
               </h3>
 
-              <div className="space-y-2.5 text-xs text-gray-600 dark:text-gray-405">
+              <div className="space-y-2.5 text-xs text-gray-600 dark:text-gray-400">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
                   <span className="font-semibold text-gray-900 dark:text-white">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping:</span>
-                  <span className="text-emerald-650 dark:text-emerald-400 font-semibold uppercase">Free</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold uppercase">Free</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax:</span>
@@ -354,12 +354,12 @@ const Cart = () => {
               >
                 {copiedCartLink ? (
                   <>
-                    <Check className="h-3.5 w-3.5 text-emerald-650 dark:text-emerald-400 animate-pulse" />
-                    <span className="text-emerald-655 dark:text-emerald-400">Cart Link Copied!</span>
+                    <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                    <span className="text-emerald-600 dark:text-emerald-400">Cart Link Copied!</span>
                   </>
                 ) : (
                   <>
-                    <Share2 className="h-3.5 w-3.5 text-gray-500 dark:text-slate-350" />
+                    <Share2 className="h-3.5 w-3.5 text-gray-500 dark:text-slate-300" />
                     <span>Share Cart</span>
                   </>
                 )}
@@ -375,7 +375,7 @@ const Cart = () => {
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-gray-500 dark:text-white animate-pulse" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">AI Stylist Recommends</h2>
-            <span className="text-[9px] border border-gray-350 dark:border-white/25 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 uppercase tracking-widest font-semibold">Frequently Bought Together</span>
+            <span className="text-[9px] border border-gray-300 dark:border-white/25 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 uppercase tracking-widest font-semibold">Frequently Bought Together</span>
           </div>
 
           {recLoading ? (
@@ -393,7 +393,7 @@ const Cart = () => {
                   <div key={prod._id} className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 p-4 flex flex-col justify-between hover:border-neutral-400 dark:hover:border-white/30 transition-all group overflow-hidden text-left rounded-none">
                     <div className="flex gap-4">
                       {/* Image Frame */}
-                      <div className="h-16 w-16 bg-gray-55 dark:bg-neutral-900 border border-gray-200 dark:border-white/5 overflow-hidden flex items-center justify-center shrink-0 rounded-none">
+                      <div className="h-16 w-16 bg-gray-50 dark:bg-neutral-900 border border-gray-200 dark:border-white/5 overflow-hidden flex items-center justify-center shrink-0 rounded-none">
                         {prod.images && prod.images[0] ? (
                           <img src={prod.images[0]} alt={prod.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         ) : (
@@ -403,7 +403,7 @@ const Cart = () => {
                       
                       {/* Meta */}
                       <div className="space-y-1">
-                        <span className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 px-2 py-0.5 text-[8px] font-bold text-gray-500 dark:text-gray-450 uppercase tracking-wider rounded-none">
+                        <span className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 px-2 py-0.5 text-[8px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider rounded-none">
                           {prod.category || "General"}
                         </span>
                         <h4 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-neutral-600 dark:group-hover:text-neutral-350 transition-colors">{prod.name}</h4>

@@ -5,6 +5,7 @@ import User from "../models/User.js";
 import Order from "../models/Order.js";
 import Sale from "../models/Sale.js";
 import Notification from "../models/Notification.js";
+import { sendOrderConfirmationEmail } from "../utils/mailer.js";
 
 /**
   Fetch all active/available products for the storefront.
@@ -196,6 +197,14 @@ export const checkout = async (req, res) => {
     // Clear user's cart
     user.cart = [];
     await user.save();
+
+    // Send luxury order confirmation email (non-blocking)
+    try {
+      const populatedOrder = await Order.findById(order._id).populate("products.product");
+      sendOrderConfirmationEmail(user.email, user.name, populatedOrder);
+    } catch (mailError) {
+      console.error("Mail dispatch error (non-critical):", mailError);
+    }
 
     res.status(201).json({
       message: "Order placed successfully!",

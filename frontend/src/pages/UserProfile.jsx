@@ -264,11 +264,11 @@ const UserProfile = () => {
   const getOrderStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "border-emerald-500/30 text-emerald-600 dark:text-emerald-450 bg-transparent";
+        return "border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-transparent";
       case "processing":
         return "border-amber-500/30 text-amber-600 dark:text-amber-400 bg-transparent";
       case "cancelled":
-        return "border-rose-500/30 text-rose-600 dark:text-rose-450 bg-transparent";
+        return "border-rose-500/30 text-rose-600 dark:text-rose-400 bg-transparent";
       default:
         return "border-gray-200 dark:border-neutral-800 text-gray-500 dark:text-neutral-400 bg-transparent";
     }
@@ -295,24 +295,24 @@ const UserProfile = () => {
         <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-[0.25em] uppercase text-neutral-500 font-sans">
           <div>
             <span className="text-neutral-600 mr-2">Role //</span>
-            <span className="text-neutral-805 dark:text-neutral-300 font-medium">{user?.role || "user"}</span>
+            <span className="text-neutral-800 dark:text-neutral-300 font-medium">{user?.role || "user"}</span>
           </div>
           <div className="hidden md:block text-neutral-300 dark:text-neutral-700">|</div>
           <div>
             <span className="text-neutral-600 mr-2">Member Since //</span>
-            <span className="text-neutral-805 dark:text-neutral-300 font-medium">{new Date(user?.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</span>
+            <span className="text-neutral-800 dark:text-neutral-300 font-medium">{new Date(user?.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</span>
           </div>
         </div>
       </div>
 
       {successMessage && (
-        <div className="rounded-none border border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/15 p-4 text-xs text-emerald-700 dark:text-emerald-305 text-left animate-fadeIn">
+        <div className="rounded-none border border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/15 p-4 text-xs text-emerald-700 dark:text-emerald-300 text-left animate-fadeIn">
           {successMessage}
         </div>
       )}
 
       {error && (
-        <div className="rounded-none border border-rose-500/40 bg-rose-50 dark:bg-rose-950/15 p-4 text-xs text-rose-700 dark:text-rose-350 text-left animate-fadeIn">
+        <div className="rounded-none border border-rose-500/40 bg-rose-50 dark:bg-rose-950/15 p-4 text-xs text-rose-700 dark:text-rose-300 text-left animate-fadeIn">
           {error}
         </div>
       )}
@@ -354,7 +354,7 @@ const UserProfile = () => {
             {orders.length === 0 ? (
               <div className="border border-gray-200 dark:border-white/10 py-20 text-center text-neutral-500 space-y-4 bg-white dark:bg-[#0a0a0a]">
                 <ClipboardList className="h-8 w-8 text-neutral-400 dark:text-neutral-700 mx-auto stroke-[1]" />
-                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-350">No orders placed yet</h3>
+                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-300">No orders placed yet</h3>
                 <p className="text-[10px] tracking-wide text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto">
                   Your order log is currently empty.
                 </p>
@@ -430,7 +430,7 @@ const UserProfile = () => {
                     {/* Shipping Address Footer */}
                     {order.shippingAddress && (
                       <div className="bg-gray-50 dark:bg-neutral-950/40 border-t border-gray-200 dark:border-white/10 px-5 py-3 text-[10px] text-neutral-500 flex flex-wrap gap-2 items-center uppercase tracking-widest">
-                        <MapPin className="h-3.5 w-3.5 text-neutral-405 dark:text-neutral-600" />
+                        <MapPin className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-600" />
                         <span className="font-semibold text-neutral-600 dark:text-neutral-400">Shipped To:</span>
                         <span className="font-sans normal-case tracking-normal text-neutral-600 dark:text-neutral-400">{order.shippingAddress.street}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.zipCode}, {order.shippingAddress.country}</span>
                       </div>
@@ -447,7 +447,7 @@ const UserProfile = () => {
           <div className="space-y-6 animate-fadeIn">            {!user?.wishlist || user.wishlist.length === 0 ? (
               <div className="border border-gray-200 dark:border-white/10 py-20 text-center text-neutral-500 space-y-4 bg-white dark:bg-[#0a0a0a]">
                 <Heart className="h-8 w-8 text-neutral-400 dark:text-neutral-700 mx-auto stroke-[1]" />
-                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-350">Your wishlist is empty</h3>
+                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-300">Your wishlist is empty</h3>
                 <p className="text-[10px] tracking-wide text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto">
                   Save items to your wishlist to view them later.
                 </p>
@@ -473,7 +473,7 @@ const UserProfile = () => {
                         </button>
 
                         {/* Image frame (3:4 aspect ratio) */}
-                        <div className="w-full aspect-[3/4] bg-gray-50 dark:bg-neutral-955/40 overflow-hidden relative border-b border-gray-200 dark:border-white/10">
+                        <div className="w-full aspect-[3/4] bg-gray-50 dark:bg-neutral-900 overflow-hidden relative border-b border-gray-200 dark:border-white/10">
                           {product.images && product.images[0] ? (
                             <img 
                               src={product.images[0]} 
@@ -481,7 +481,7 @@ const UserProfile = () => {
                               className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
                             />
                           ) : (
-                            <div className="h-full w-full flex items-center justify-center text-neutral-400 dark:text-neutral-800 bg-gray-50 dark:bg-neutral-955/40">
+                            <div className="h-full w-full flex items-center justify-center text-neutral-400 dark:text-neutral-800 bg-gray-50 dark:bg-neutral-900">
                               <Heart className="h-8 w-8 stroke-[1]" />
                             </div>
                           )}
@@ -666,9 +666,9 @@ const UserProfile = () => {
             )}
 
             {!user?.addresses || user.addresses.length === 0 ? (
-              <div className="border border-gray-205 dark:border-white/10 py-16 text-center text-neutral-500 space-y-2 bg-white dark:bg-[#0a0a0a]">
+              <div className="border border-gray-200 dark:border-white/10 py-16 text-center text-neutral-500 space-y-2 bg-white dark:bg-[#0a0a0a]">
                 <MapPin className="h-8 w-8 text-neutral-400 dark:text-neutral-700 mx-auto stroke-[1]" />
-                <h4 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-350">No saved addresses</h4>
+                <h4 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-300">No saved addresses</h4>
                 <p className="text-[10px] text-neutral-500 dark:text-neutral-400 tracking-wide max-w-xs mx-auto">
                   Add shipping addresses for faster checkout experiences.
                 </p>
@@ -686,7 +686,7 @@ const UserProfile = () => {
                   >
                     <div>
                       <div className="flex justify-between items-start pb-2 border-b border-gray-200 dark:border-white/10">
-                        <span className="text-[10px] font-bold tracking-widest uppercase text-neutral-800 dark:text-neutral-250">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-neutral-800 dark:text-neutral-200">
                           {addr.isDefault ? "Primary Address" : "Address"}
                         </span>
                         {addr.isDefault && (
@@ -696,20 +696,20 @@ const UserProfile = () => {
                       <div className="mt-4 text-neutral-600 dark:text-neutral-400 space-y-1 font-sans text-xs tracking-wide leading-relaxed">
                         <p className="text-black dark:text-white font-medium">{addr.street}</p>
                         <p>{addr.city}, {addr.state} - {addr.zipCode}</p>
-                        <p className="text-neutral-500 dark:text-neutral-455 uppercase tracking-widest text-[9px] pt-1">{addr.country}</p>
+                        <p className="text-neutral-500 dark:text-neutral-400 uppercase tracking-widest text-[9px] pt-1">{addr.country}</p>
                       </div>
                     </div>
 
                     <div className="flex justify-end gap-4 mt-6 pt-3 border-t border-gray-200 dark:border-white/10">
                       <button
                         onClick={() => handleEditAddressClick(addr)}
-                        className="text-neutral-505 hover:text-black dark:hover:text-white transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
+                        className="text-neutral-500 hover:text-black dark:hover:text-white transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteAddress(addr._id)}
-                        className="text-neutral-505 hover:text-rose-600 dark:hover:text-rose-455 transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
+                        className="text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
                       >
                         Delete
                       </button>
@@ -764,7 +764,7 @@ const UserProfile = () => {
                       Language
                     </label>
                     <select
-                      className="w-full bg-white dark:bg-black border-b border-gray-300 dark:border-neutral-850 text-xs py-2.5 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
+                      className="w-full bg-white dark:bg-black border-b border-gray-300 dark:border-neutral-800 text-xs py-2.5 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                       value={settingsForm.language}
                       onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
                     >

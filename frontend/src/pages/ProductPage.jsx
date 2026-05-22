@@ -371,8 +371,8 @@ const ProductPage = () => {
   // Loader screen
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-48 space-y-4 text-neutral-400 bg-black min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      <div className="flex flex-col items-center justify-center py-48 space-y-4 text-neutral-400 bg-white dark:bg-black min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-black dark:text-white" />
         <span className="text-[10px] uppercase tracking-widest">Fetching Atelier Catalog...</span>
       </div>
     );
@@ -381,14 +381,14 @@ const ProductPage = () => {
   // Error screen
   if (error || !product) {
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center px-6">
-        <div className="max-w-md w-full border border-white/10 p-8 space-y-6 text-center">
+      <div className="bg-white dark:bg-black min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md w-full border border-gray-200 dark:border-white/10 p-8 space-y-6 text-center">
           <h2 className="font-serif text-xl uppercase tracking-wider text-red-500">Failed to load product</h2>
-          <p className="text-xs text-neutral-400 leading-relaxed uppercase tracking-wider">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed uppercase tracking-wider">
             {error || "Product details could not be found. Return to catalog storefront."}
           </p>
           <div className="pt-2">
-            <Link to="/" className="bg-white text-black px-8 py-3 text-xs font-semibold uppercase tracking-widest inline-block hover:bg-neutral-250 transition-colors">
+            <Link to="/" className="bg-black dark:bg-white text-white dark:text-black px-8 py-3 text-xs font-semibold uppercase tracking-widest inline-block hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">
               Return Storefront
             </Link>
           </div>
@@ -661,7 +661,7 @@ const ProductPage = () => {
                           }}
                           className={`flex items-center gap-2 px-3 py-2 border transition-all duration-200 cursor-pointer rounded-none text-xs uppercase tracking-wider font-sans ${
                             isSelected
-                              ? "border-black dark:border-white bg-black/5 dark:bg-white/10 font-semibold"
+                              ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-semibold"
                               : "border-neutral-200 dark:border-white/20 bg-transparent text-neutral-900 dark:text-white hover:border-black dark:hover:border-white"
                           }`}
                         >
