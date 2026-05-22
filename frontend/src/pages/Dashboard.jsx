@@ -37,8 +37,8 @@ const Dashboard = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      setLoading(true);
+    const fetchDashboard = async (showLoading = false) => {
+      if (showLoading) setLoading(true);
       setError("");
       try {
         const res = await api.get("/api/dashboard");
@@ -47,16 +47,26 @@ const Dashboard = () => {
         setRecentSales(res.data.recentSales || []);
       } catch (err) {
         console.error("Dashboard fetch error:", err);
-        setError(
-          err?.response?.data?.message ||
-            "Failed to load dashboard data. Check if backend is running."
-        );
+        if (showLoading) {
+          setError(
+            err?.response?.data?.message ||
+              "Failed to load dashboard data. Check if backend is running."
+          );
+        }
       } finally {
-        setLoading(false);
+        if (showLoading) setLoading(false);
       }
     };
 
-    fetchDashboard();
+    fetchDashboard(true);
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchDashboard(false);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const chartData = {

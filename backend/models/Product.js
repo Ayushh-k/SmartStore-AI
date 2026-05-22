@@ -73,9 +73,54 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    priceHistory: [
+      {
+        price: {
+          type: Number,
+          required: true,
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    reviews: [
+      {
+        user: {
+          type: String,
+          required: true,
+        },
+        rating: {
+          type: Number,
+          required: true,
+          min: 1,
+          max: 5,
+        },
+        comment: {
+          type: String,
+          default: "",
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
+
+// Pre-save middleware to log price history
+productSchema.pre("save", function (next) {
+  if (this.isNew || this.isModified("price")) {
+    this.priceHistory.push({
+      price: this.price,
+      date: new Date(),
+    });
+  }
+  next();
+});
 
 const Product = mongoose.model("Product", productSchema);
 export default Product;

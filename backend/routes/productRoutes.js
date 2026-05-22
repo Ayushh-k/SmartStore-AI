@@ -13,7 +13,8 @@ const router = express.Router();
 // Create product
 router.post("/", protect, admin, async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const product = new Product(req.body);
+    await product.save();
     res.status(201).json(product);
   } catch (error) {
     console.error("Create product error:", error);
@@ -64,12 +65,12 @@ router.get("/:id", protect, admin, async (req, res) => {
 // Update product
 router.put("/:id", protect, admin, async (req, res) => {
   try {
-    const prod = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const prod = await Product.findById(req.params.id);
     if (!prod) {
       return res.status(404).json({ message: "Product not found." });
     }
+    Object.assign(prod, req.body);
+    await prod.save();
     res.json(prod);
   } catch (error) {
     console.error("Update product error:", error);

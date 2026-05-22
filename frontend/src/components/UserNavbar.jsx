@@ -24,6 +24,7 @@ const UserNavbar = () => {
 
   // Poll or retrieve cart count from server periodically
   const fetchCartCount = async () => {
+    if (document.visibilityState === "hidden") return;
     const token = localStorage.getItem("smartstoretoken");
     if (!token) return;
     try {

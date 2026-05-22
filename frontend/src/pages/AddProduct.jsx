@@ -37,8 +37,29 @@ const AddProduct = () => {
     captionsInstagram: "",
     captionsFacebook: "",
     captionsTwitter: "",
-    imageUrl: "",
   });
+
+  const [uploadedImages, setUploadedImages] = useState([]);
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files || files.length === 0) return;
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImages((prev) => {
+          if (prev.includes(reader.result)) return prev;
+          return [...prev, reader.result];
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeUploadedImage = (index) => {
+    setUploadedImages((prev) => prev.filter((_, idx) => idx !== index));
+  };
 
   const [aiContext, setAiContext] = useState({
     productType: "",
@@ -174,7 +195,7 @@ const AddProduct = () => {
         category: form.category || undefined,
         audience: audienceVal,
         keywords: keywordsVal,
-        images: form.imageUrl ? [form.imageUrl] : [],
+        images: uploadedImages,
         description: form.description,
         tags: form.tags
           .split(",")
@@ -212,8 +233,8 @@ const AddProduct = () => {
         captionsInstagram: "",
         captionsFacebook: "",
         captionsTwitter: "",
-        imageUrl: "",
       });
+      setUploadedImages([]);
       setAiContext({
         productType: "",
         audience: "",
@@ -369,21 +390,42 @@ const AddProduct = () => {
                 />
               </div>
 
-              <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-slate-300">
-                  Product Image URL
+              <div className="sm:col-span-2 space-y-2">
+                <label className="mb-1 block text-xs text-slate-350 font-semibold">
+                  Product Images
                 </label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  className="input"
-                  placeholder="E.g. https://images.unsplash.com/... or a local asset path"
-                  value={form.imageUrl}
-                  onChange={handleChange}
-                />
-                <p className="mt-1 text-[10px] text-slate-500">
-                  Provide an external photo URL (e.g. from Unsplash) to render the item on the storefront.
-                </p>
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <label className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-slate-700 hover:border-primary bg-slate-900/40 text-slate-300 text-xs font-semibold cursor-pointer hover:bg-slate-900/70 transition-all">
+                    <span>Select Image Files</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
+                  <p className="text-[10px] text-slate-500">
+                    Upload multiple images of your product. Supported formats: JPG, PNG, WEBP.
+                  </p>
+                </div>
+
+                {uploadedImages.length > 0 && (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 pt-2">
+                    {uploadedImages.map((img, idx) => (
+                      <div key={idx} className="relative h-16 rounded border border-slate-800 bg-slate-950/60 overflow-hidden group">
+                        <img src={img} alt="Upload preview" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeUploadedImage(idx)}
+                          className="absolute inset-0 bg-rose-950/80 text-rose-200 text-[10px] font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

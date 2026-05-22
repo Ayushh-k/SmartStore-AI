@@ -1,7 +1,7 @@
 // frontend/src/pages/Login.jsx
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ShoppingBag, Lock, Mail, User, Loader2, UserCheck } from "lucide-react";
 import api from "../utils/api.js";
 
@@ -43,7 +43,13 @@ const Login = () => {
       if (res.data.user.role === "admin") {
         navigate("/dashboard");
       } else {
-        navigate("/");
+        const urlParams = new URLSearchParams(window.location.search);
+        const importCart = urlParams.get("importCart");
+        if (importCart) {
+          navigate(`/?importCart=${importCart}`);
+        } else {
+          navigate("/");
+        }
       }
     } catch (err) {
       console.error("Auth error:", err);
@@ -179,18 +185,26 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-xs">
+        <div className="mt-6 text-center text-xs flex flex-col items-center gap-3">
           <button
             onClick={() => {
               setIsRegister(!isRegister);
               setError("");
             }}
-            className="text-slate-400 hover:text-primary transition-colors focus:outline-none"
+            className="text-slate-400 hover:text-primary transition-colors focus:outline-none cursor-pointer"
           >
             {isRegister
               ? "Already have an account? Sign In"
               : "Don't have an account? Sign Up"}
           </button>
+          <div className="border-t border-slate-800/80 w-full pt-3 mt-1">
+            <Link
+              to="/"
+              className="text-slate-500 hover:text-primary font-medium transition-all inline-flex items-center gap-1.5 focus:outline-none cursor-pointer"
+            >
+              Browse as Guest / Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>

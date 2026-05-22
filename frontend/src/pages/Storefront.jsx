@@ -1,7 +1,7 @@
 // frontend/src/pages/Storefront.jsx
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Package, 
   Search, 
@@ -16,9 +16,16 @@ import {
   Home as HomeIcon,
   Clock,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Share2,
+  Check,
+  X
 } from "lucide-react";
 import api from "../utils/api.js";
+import ProductDetails from "../components/ProductDetails.jsx";
 import heroBanner from "../assets/flipkart_hero_banner.png";
 
 const CATEGORIES = [
@@ -56,11 +63,158 @@ const MOCK_DEALS = [
     image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&q=80",
     discount: "Extra 15% Off",
     category: "Office Furniture",
-    tagline: "Special Clearance"
+    tagline: "Best Seller"
   }
 ];
 
+const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCart }) => {
+  const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  const isOutOfStock = Number(product.stock) <= 0;
+  const hasMultipleImages = product.images && product.images.length > 1;
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    if (hasMultipleImages) {
+      setCurrentImgIndex((prev) => (prev + 1) % product.images.length);
+    }
+  };
+
+  const prevImage = (e) => {
+    e.stopPropagation();
+    if (hasMultipleImages) {
+      setCurrentImgIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
+  return (
+    <div className="glass-panel flex flex-col justify-between hover:border-primary/45 hover:shadow-primary/5 transition-all group overflow-hidden">
+      {/* Product Image Frame */}
+      <div className="h-44 bg-slate-950 overflow-hidden relative border-b border-slate-900/60 flex items-center justify-center">
+        {product.images && product.images[currentImgIndex] ? (
+          <img
+            src={product.images[currentImgIndex]}
+            alt={product.name}
+            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentNode.querySelector('.fallback-icon').classList.remove('hidden');
+            }}
+          />
+        ) : null}
+        
+        <div className={`fallback-icon flex flex-col items-center justify-center text-slate-700 ${product.images && product.images[currentImgIndex] ? 'hidden' : ''}`}>
+          <Package className="h-10 w-10 mb-2" />
+          <span className="text-[9px] text-slate-500 font-medium">No Product Image</span>
+        </div>
+
+        {/* Hover Slider Controls */}
+        {hasMultipleImages && (
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={prevImage}
+              className="rounded-full bg-slate-950/70 border border-slate-800 p-1 text-slate-350 hover:text-white transition-all cursor-pointer"
+            >
+              <ChevronLeft className="h-3 w-3" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="rounded-full bg-slate-950/70 border border-slate-800 p-1 text-slate-350 hover:text-white transition-all cursor-pointer"
+            >
+              <ChevronRight className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+
+        {/* Bullet indicators if multiple images */}
+        {hasMultipleImages && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 bg-slate-950/60 px-2 py-0.5 rounded-full backdrop-blur-xs">
+            {product.images.map((_, idx) => (
+              <span
+                key={idx}
+                className={`h-1.5 w-1.5 rounded-full transition-all ${
+                  idx === currentImgIndex ? 'bg-primary scale-110' : 'bg-slate-650'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Product Meta */}
+      <div className="p-5 flex-1 flex flex-col justify-between space-y-3.5 text-left">
+        <div className="space-y-3.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-[9px] font-medium text-slate-450 uppercase">
+              {product.category || "General"}
+            </span>
+            <span
+              className={`text-[9px] font-bold uppercase tracking-wider ${
+                isOutOfStock
+                  ? "text-rose-450"
+                  : Number(product.stock) <= 5
+                  ? "text-amber-450"
+                  : "text-emerald-450"
+              }`}
+            >
+              {isOutOfStock ? "Out of Stock" : `${product.stock} Left`}
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold tracking-tight text-slate-200 group-hover:text-primary transition-colors line-clamp-1">
+              {product.name}
+            </h3>
+            <p className="text-[11px] text-slate-455 line-clamp-3 leading-relaxed min-h-[48px]">
+              {product.description || "AI-generated description pending for this catalog item."}
+            </p>
+          </div>
+
+          {product.tags && product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {product.tags.slice(0, 3).map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="flex items-center gap-0.5 rounded bg-primary/5 border border-primary/10 px-1.5 py-0.5 text-[9px] text-primary/80"
+                >
+                  <Tag className="h-2 w-2" />
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pricing and Actions */}
+      <div className="px-5 pb-5 pt-3 border-t border-slate-800/40 bg-slate-900/15 flex items-center justify-between gap-3">
+        <div>
+          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Price</span>
+          <span className="text-sm font-bold text-slate-100">${Number(product.price).toFixed(2)}</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSelectedProduct(product)}
+            className="rounded border border-slate-800 bg-slate-950/70 p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer"
+            title="View AI Copywriting"
+          >
+            <Eye className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => handleAddToCart(product._id)}
+            disabled={isOutOfStock || addingToCart[product._id]}
+            className="btn-primary inline-flex items-center gap-1.5 text-xs py-1.5 px-3.5 cursor-pointer"
+          >
+            <ShoppingCart className="h-3.5 w-3.5" />
+            <span>{addingToCart[product._id] ? "Adding..." : "Add to Cart"}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Storefront = () => {
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("smartstoretoken"));
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +222,167 @@ const Storefront = () => {
   const [search, setSearch] = useState("");
   const [addingToCart, setAddingToCart] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // AI search states
+  const [searchMode, setSearchMode] = useState("text"); // text or ai
+  const [aiSearchResults, setAiSearchResults] = useState([]);
+  const [aiSearchLoading, setAiSearchLoading] = useState(false);
+
+  // Sharing states
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [sharedCartItems, setSharedCartItems] = useState(null);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importingCart, setImportingCart] = useState(false);
+
+  // Lightbox States
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const [lightboxScale, setLightboxScale] = useState(1);
+  const [lightboxOffset, setLightboxOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  // Lightbox Handlers
+  const handleZoomIn = () => {
+    setLightboxScale((prev) => Math.min(prev + 0.5, 4));
+  };
+
+  const handleZoomOut = () => {
+    setLightboxScale((prev) => Math.max(prev - 0.5, 1));
+  };
+
+  const handleResetZoom = () => {
+    setLightboxScale(1);
+    setLightboxOffset({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = (e) => {
+    if (lightboxScale === 1) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - lightboxOffset.x, y: e.clientY - lightboxOffset.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setLightboxOffset({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e) => {
+    if (lightboxScale === 1 || e.touches.length !== 1) return;
+    setIsDragging(true);
+    const touch = e.touches[0];
+    setDragStart({ x: touch.clientX - lightboxOffset.x, y: touch.clientY - lightboxOffset.y });
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    setLightboxOffset({
+      x: touch.clientX - dragStart.x,
+      y: touch.clientY - dragStart.y,
+    });
+  };
+
+  // Shared Link Handlers
+  const handleShareProduct = () => {
+    if (!selectedProduct) return;
+    const shareUrl = `${window.location.origin}/?product=${selectedProduct._id}`;
+    navigator.clipboard.writeText(shareUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const closeDetailsModal = () => {
+    setSelectedProduct(null);
+    const url = new URL(window.location);
+    url.searchParams.delete("product");
+    window.history.replaceState({}, document.title, url.pathname);
+  };
+
+  const handleImportCart = async (replace) => {
+    if (!isLoggedIn) {
+      alert("Please sign in or register to import shared cart items.");
+      return;
+    }
+
+    setImportingCart(true);
+    try {
+      await api.post("/api/store/cart/batch", {
+        items: sharedCartItems,
+        replace,
+      });
+
+      // Clear importCart param from URL
+      const url = new URL(window.location);
+      url.searchParams.delete("importCart");
+      window.history.replaceState({}, document.title, url.pathname);
+
+      setShowImportDialog(false);
+      setSharedCartItems(null);
+
+      // Trigger navbar updates
+      window.dispatchEvent(new Event("cartUpdated"));
+      alert("Cart imported successfully!");
+    } catch (err) {
+      console.error("Cart import error:", err);
+      alert(err?.response?.data?.message || "Failed to import shared cart.");
+    } finally {
+      setImportingCart(false);
+    }
+  };
+
+  const handleCancelImport = () => {
+    // Just remove from URL
+    const url = new URL(window.location);
+    url.searchParams.delete("importCart");
+    window.history.replaceState({}, document.title, url.pathname);
+
+    setShowImportDialog(false);
+    setSharedCartItems(null);
+  };
+
+  // Handle shared product and shared cart query parameters on load
+  useEffect(() => {
+    const handleQueryParams = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedProductId = urlParams.get("product");
+      const sharedCartData = urlParams.get("importCart");
+
+      if (sharedProductId) {
+        try {
+          const res = await api.get(`/api/store/products/${sharedProductId}`);
+          if (res.data) {
+            setSelectedProduct(res.data);
+            setActiveImageIndex(0);
+          }
+        } catch (err) {
+          console.error("Error loading shared product:", err);
+        }
+      }
+
+      if (sharedCartData) {
+        try {
+          const decoded = JSON.parse(atob(sharedCartData));
+          if (Array.isArray(decoded) && decoded.length > 0) {
+            setSharedCartItems(decoded);
+            setShowImportDialog(true);
+          }
+        } catch (err) {
+          console.error("Error parsing shared cart data:", err);
+        }
+      }
+    };
+
+    handleQueryParams();
+  }, [isLoggedIn]);
 
   const slides = [
     {
@@ -107,6 +421,36 @@ const Storefront = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleVibeSearch = async (e) => {
+    if (e) e.preventDefault();
+    if (!search.trim()) {
+      setSearchMode("text");
+      setAiSearchResults([]);
+      return;
+    }
+
+    setAiSearchLoading(true);
+    setError("");
+    try {
+      const res = await api.post("/api/ai/user/search", { query: search });
+      setAiSearchResults(res.data || []);
+      setSearchMode("ai");
+    } catch (err) {
+      console.error("Vibe search failed:", err);
+      setError("AI Search failed. Showing standard filter results instead.");
+      setSearchMode("text");
+    } finally {
+      setAiSearchLoading(false);
+    }
+  };
+
+  const handleResetSearch = () => {
+    setSearch("");
+    setSearchMode("text");
+    setAiSearchResults([]);
+    setError("");
   };
 
   useEffect(() => {
@@ -153,13 +497,15 @@ const Storefront = () => {
     }
   };
 
-  const filteredProducts = products.filter((p) => {
-    const query = search.toLowerCase();
-    return (
-      (p.name || "").toLowerCase().includes(query) ||
-      (p.category || "").toLowerCase().includes(query)
-    );
-  });
+  const filteredProducts = searchMode === "ai"
+    ? aiSearchResults
+    : products.filter((p) => {
+        const query = search.toLowerCase();
+        return (
+          (p.name || "").toLowerCase().includes(query) ||
+          (p.category || "").toLowerCase().includes(query)
+        );
+      });
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -356,7 +702,11 @@ const Storefront = () => {
             <div 
               key={idx}
               className={`flex flex-col items-center gap-2 cursor-pointer group shrink-0 ${search === cat.name ? 'scale-105' : ''}`}
-              onClick={() => setSearch(search === cat.name ? "" : cat.name)}
+              onClick={() => {
+                setSearch(search === cat.name ? "" : cat.name);
+                setSearchMode("text");
+                setAiSearchResults([]);
+              }}
             >
               <div className={`h-14 w-14 rounded-full border bg-slate-950 flex items-center justify-center transition-all ${
                 search === cat.name 
@@ -380,7 +730,7 @@ const Storefront = () => {
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="space-y-2 z-10">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[10px] text-primary uppercase font-bold tracking-wide">
-            <Sparkles className="h-3 w-3" />
+            <Sparkles className="h-3 w-3 animate-pulse" />
             AI-Enhanced Shopping
           </div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">SmartStore Showcase</h1>
@@ -388,21 +738,40 @@ const Storefront = () => {
             Explore our curated catalog featuring high-converting product descriptions, tags, and titles generated automatically by our AI core.
           </p>
         </div>
-        <div className="flex flex-col gap-2 min-w-[200px] z-10">
+        <form onSubmit={handleVibeSearch} className="flex flex-col gap-2 min-w-[280px] z-10">
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search products..."
-              className="input !pl-10 text-xs py-2 w-full"
+              placeholder="Vibe Search (e.g. cold trekking gear) + Enter"
+              className="input !pl-10 !pr-16 text-xs py-2 w-full border-primary/20 focus:border-primary/50 shadow-inner"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <Sparkles className="absolute left-3 top-2.5 h-4 w-4 text-primary animate-pulse" />
+            <button
+              type="submit"
+              className="absolute right-1 top-1 bg-primary/25 border border-primary/30 hover:bg-primary/45 text-[9px] font-bold text-primary px-2.5 py-1 rounded transition-all cursor-pointer"
+            >
+              Search
+            </button>
           </div>
-          <div className="text-[10px] text-slate-500 text-right">
-            Showing {filteredProducts.length} of {products.length} products
+          <div className="flex justify-between items-center text-[10px] text-slate-500">
+            {searchMode === "ai" ? (
+              <button 
+                type="button"
+                onClick={handleResetSearch}
+                className="text-primary hover:underline font-semibold"
+              >
+                Clear AI Filter
+              </button>
+            ) : (
+              <span>Standard Filter active</span>
+            )}
+            <span>
+              Showing {filteredProducts.length} of {products.length} products
+            </span>
           </div>
-        </div>
+        </form>
       </div>
 
       {error && (
@@ -412,9 +781,10 @@ const Storefront = () => {
       )}
 
       {/* Product Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center py-24 text-xs text-slate-400">
-          Loading storefront products...
+      {(loading || aiSearchLoading) ? (
+        <div className="flex flex-col items-center justify-center py-24 text-xs text-slate-400 space-y-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span>{aiSearchLoading ? "Smart AI matching products..." : "Loading storefront products..."}</span>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="glass-panel flex flex-col items-center justify-center py-20 text-center text-slate-500">
@@ -426,234 +796,174 @@ const Storefront = () => {
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map((p) => {
-            const isOutOfStock = Number(p.stock) <= 0;
-            return (
-              <div
-                key={p._id}
-                className="glass-panel flex flex-col justify-between hover:border-primary/45 hover:shadow-primary/5 transition-all group overflow-hidden"
-              >
-                {/* Product Image Frame */}
-                <div className="h-44 bg-slate-950 overflow-hidden relative border-b border-slate-900/60 flex items-center justify-center">
-                  {p.images && p.images[0] ? (
-                    <img
-                      src={p.images[0]}
-                      alt={p.name}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.parentNode.querySelector('.fallback-icon').classList.remove('hidden');
-                      }}
-                    />
-                  ) : null}
-                  <div className={`fallback-icon flex flex-col items-center justify-center text-slate-700 ${p.images && p.images[0] ? 'hidden' : ''}`}>
-                    <Package className="h-10 w-10 mb-2" />
-                    <span className="text-[9px] text-slate-500 font-medium">No Product Image</span>
-                  </div>
-                </div>
-
-                {/* Product Meta */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-3.5">
-                  <div className="space-y-3.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-[9px] font-medium text-slate-450 uppercase">
-                        {p.category || "General"}
-                      </span>
-                      <span
-                        className={`text-[9px] font-bold uppercase tracking-wider ${
-                          isOutOfStock
-                            ? "text-rose-400"
-                            : Number(p.stock) <= 5
-                            ? "text-amber-400"
-                            : "text-emerald-400"
-                        }`}
-                      >
-                        {isOutOfStock ? "Out of Stock" : `${p.stock} Left`}
-                      </span>
-                    </div>
-
-                    <div className="space-y-1">
-                      <h3 className="text-sm font-semibold tracking-tight text-slate-200 group-hover:text-primary transition-colors line-clamp-1">
-                        {p.name}
-                      </h3>
-                      <p className="text-[11px] text-slate-450 line-clamp-3 leading-relaxed min-h-[48px]">
-                        {p.description || "AI-generated description pending for this catalog item."}
-                      </p>
-                    </div>
-
-                    {p.tags && p.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {p.tags.slice(0, 3).map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className="flex items-center gap-0.5 rounded bg-primary/5 border border-primary/10 px-1.5 py-0.5 text-[9px] text-primary/80"
-                          >
-                            <Tag className="h-2 w-2" />
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Pricing and Actions */}
-                <div className="px-5 pb-5 pt-3 border-t border-slate-800/40 bg-slate-900/15 flex items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Price</span>
-                    <span className="text-sm font-bold text-slate-100">${Number(p.price).toFixed(2)}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setSelectedProduct(p)}
-                      className="rounded border border-slate-800 bg-slate-950/70 p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
-                      title="View AI Copywriting"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleAddToCart(p._id)}
-                      disabled={isOutOfStock || addingToCart[p._id]}
-                      className="btn-primary inline-flex items-center gap-1.5 text-xs py-1.5 px-3.5"
-                    >
-                      <ShoppingCart className="h-3.5 w-3.5" />
-                      <span>{addingToCart[p._id] ? "Adding..." : "Add to Cart"}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {filteredProducts.map((p) => (
+            <ProductCard
+              key={p._id}
+              product={p}
+              handleAddToCart={handleAddToCart}
+              setSelectedProduct={(prod) => {
+                setSelectedProduct(prod);
+                setActiveImageIndex(0);
+              }}
+              addingToCart={addingToCart}
+            />
+          ))}
         </div>
       )}
 
       {/* Modal for Details */}
       {selectedProduct && (
+        <ProductDetails
+          product={selectedProduct}
+          onClose={closeDetailsModal}
+          onAddToCart={handleAddToCart}
+          onShareProduct={handleShareProduct}
+          copiedLink={copiedLink}
+          setLightboxImage={setLightboxImage}
+          setLightboxScale={setLightboxScale}
+          setLightboxOffset={setLightboxOffset}
+        />
+      )}
+
+      {/* Lightbox for Zoomable Image */}
+      {lightboxImage && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md">
+          {/* Top Header Panel */}
+          <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10 bg-slate-950/40 backdrop-blur-sm border-b border-slate-900/60">
+            <span className="text-xs text-slate-400 font-medium">
+              {selectedProduct?.name || "Product Image"}
+            </span>
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="rounded bg-slate-900 hover:bg-slate-800 p-2 text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
+              title="Close Zoom View"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Floating Control Toolbar */}
+          <div className="absolute bottom-6 flex items-center gap-4 px-4 py-2.5 rounded-full bg-slate-900/80 border border-slate-800/80 backdrop-blur-md z-10 shadow-2xl">
+            <button
+              onClick={handleZoomOut}
+              disabled={lightboxScale <= 1}
+              className="p-2 text-slate-400 hover:text-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              title="Zoom Out"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </button>
+            <span className="text-xs text-slate-300 font-semibold font-mono select-none px-1">
+              {Math.round(lightboxScale * 100)}%
+            </span>
+            <button
+              onClick={handleZoomIn}
+              disabled={lightboxScale >= 4}
+              className="p-2 text-slate-400 hover:text-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              title="Zoom In"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </button>
+            <div className="w-[1px] h-4 bg-slate-800"></div>
+            <button
+              onClick={handleResetZoom}
+              className="p-2 text-slate-400 hover:text-slate-100 cursor-pointer transition-colors"
+              title="Reset Zoom"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Image Display Container */}
+          <div 
+            className="w-full h-full flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing select-none"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleMouseUp}
+          >
+            <img
+              src={lightboxImage}
+              alt="High Resolution Zoom"
+              draggable="false"
+              className="max-w-[90%] max-h-[80vh] object-contain select-none pointer-events-none transition-transform duration-100 ease-out"
+              style={{
+                transform: `translate(${lightboxOffset.x}px, ${lightboxOffset.y}px) scale(${lightboxScale})`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Shared Cart Import Dialog */}
+      {showImportDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-xl max-h-[85vh] flex flex-col p-6 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-4">
-              <div>
-                <h3 className="text-sm font-semibold tracking-tight text-slate-200">
-                  {selectedProduct.name}
-                </h3>
-                <p className="text-[10px] text-slate-400">
-                  Category: {selectedProduct.category || "General"} · SKU: {selectedProduct.sku || "—"}
-                </p>
-              </div>
+          <div className="glass-panel w-full max-w-md p-6 space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-700/60 pb-3">
+              <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 text-primary" />
+                <span>Import Shared Cart</span>
+              </h3>
               <button
-                onClick={() => setSelectedProduct(null)}
-                className="rounded bg-slate-900 hover:bg-slate-800 px-2.5 py-1 text-xs text-slate-450 hover:text-slate-200 cursor-pointer"
+                onClick={handleCancelImport}
+                className="rounded bg-slate-900 hover:bg-slate-800 p-1 text-slate-450 hover:text-slate-200 cursor-pointer"
               >
-                Close
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs leading-relaxed text-slate-350">
-              
-              {/* Product Info & Image Block */}
-              <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
-                <div className="glass-panel-soft p-2 flex items-center justify-center bg-slate-950/45 border border-slate-800/60 rounded-lg min-h-[160px]">
-                  {selectedProduct.images && selectedProduct.images[0] ? (
-                    <img 
-                      src={selectedProduct.images[0]} 
-                      alt={selectedProduct.name}
-                      className="max-h-[140px] max-w-full rounded object-contain"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-slate-600 text-center p-4">
-                      <Package className="h-8 w-8 mb-2" />
-                      <span className="text-[9px] text-slate-500">No Image</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 p-3 bg-slate-950/45 rounded-lg border border-slate-800/80 h-fit">
-                  <div>
-                    <span className="text-[10px] text-slate-505 uppercase block font-semibold">Storefront Price</span>
-                    <p className="text-sm font-bold text-slate-100">${Number(selectedProduct.price).toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-505 uppercase block font-semibold">Stock Availability</span>
-                    <p
-                      className={`font-semibold mt-0.5 ${
-                        Number(selectedProduct.stock) <= 0
-                          ? "text-rose-450"
-                          : Number(selectedProduct.stock) <= 5
-                          ? "text-amber-450"
-                          : "text-emerald-450"
-                      }`}
-                    >
-                      {Number(selectedProduct.stock) <= 0 ? "Out of Stock" : `${selectedProduct.stock} units`}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-primary uppercase text-[10px] tracking-wider mb-1">
-                  AI Product Description
-                </h4>
-                <p className="rounded-lg bg-slate-950/50 border border-slate-850 p-3 whitespace-pre-wrap leading-relaxed text-slate-300">
-                  {selectedProduct.description || "No description provided."}
+            <div className="text-xs text-slate-350 space-y-3 leading-relaxed">
+              <p>
+                Someone shared their shopping cart containing{" "}
+                <span className="font-bold text-slate-200">{sharedCartItems?.length || 0}</span> product line item(s) with you.
+              </p>
+              {isLoggedIn ? (
+                <p className="text-[11px] text-slate-400">
+                  Choose how you want to import these items into your current shopping cart.
                 </p>
-              </div>
-
-              {selectedProduct.audience && (
-                <div>
-                  <h4 className="font-semibold text-primary uppercase text-[10px] tracking-wider mb-1">
-                    Target Audience
-                  </h4>
-                  <p className="rounded-lg bg-slate-950/50 border border-slate-855 p-2 px-3 text-slate-300">
-                    {selectedProduct.audience}
-                  </p>
-                </div>
+              ) : (
+                <p className="text-[11px] text-amber-400 font-medium">
+                  You need to sign in or sign up first to import these items into your cart.
+                </p>
               )}
-
-              {selectedProduct.keywords && (
-                <div>
-                  <h4 className="font-semibold text-primary uppercase text-[10px] tracking-wider mb-1">
-                    Key Features / Keywords
-                  </h4>
-                  <p className="rounded-lg bg-slate-950/50 border border-slate-855 p-2 px-3 text-slate-300">
-                    {selectedProduct.keywords}
-                  </p>
-                </div>
-              )}
-
-              <div>
-                <h4 className="font-semibold text-primary uppercase text-[10px] tracking-wider mb-1.5">
-                  Platform Copywriting Tags
-                </h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedProduct.tags && selectedProduct.tags.length > 0 ? (
-                    selectedProduct.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="rounded bg-primary/10 px-2 py-0.5 text-[10px] text-primary"
-                      >
-                        {tag}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-slate-500 text-[10px]">No tag catalog assets.</span>
-                  )}
-                </div>
-              </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-800/40 flex justify-end">
+            <div className="flex flex-col gap-2.5 pt-2">
+              {isLoggedIn ? (
+                <>
+                  <button
+                    onClick={() => handleImportCart(false)}
+                    disabled={importingCart}
+                    className="btn-primary w-full py-2 text-xs font-semibold cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <span>Merge with my Cart</span>
+                  </button>
+                  <button
+                    onClick={() => handleImportCart(true)}
+                    disabled={importingCart}
+                    className="btn-outline w-full py-2 text-xs font-semibold cursor-pointer flex items-center justify-center gap-1.5 hover:bg-rose-950/20 hover:border-rose-900/50 hover:text-rose-200"
+                  >
+                    <span>Replace my Cart</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    const sharedCartData = new URLSearchParams(window.location.search).get("importCart");
+                    navigate(`/login?importCart=${sharedCartData}`);
+                  }}
+                  className="btn-primary w-full py-2 text-xs font-semibold cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span>Sign In to Import Cart</span>
+                </button>
+              )}
               <button
-                onClick={() => {
-                  handleAddToCart(selectedProduct._id);
-                  setSelectedProduct(null);
-                }}
-                disabled={Number(selectedProduct.stock) <= 0}
-                className="btn-primary w-full inline-flex items-center justify-center gap-1.5 py-2"
+                onClick={handleCancelImport}
+                className="text-slate-500 hover:text-slate-350 text-[11px] py-1 cursor-pointer transition-colors"
               >
-                <ShoppingCart className="h-4 w-4" />
-                <span>
-                  {Number(selectedProduct.stock) <= 0 ? "Out of Stock" : "Add Product to Cart"}
-                </span>
+                Cancel
               </button>
             </div>
           </div>

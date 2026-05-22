@@ -2,6 +2,7 @@
 
 import Product from "../models/Product.js";
 import Sale from "../models/Sale.js";
+import Notification from "../models/Notification.js";
 
 /**
   GET /api/dashboard
@@ -106,5 +107,33 @@ export const getDashboardData = async (req, res) => {
   } catch (error) {
     console.error("Dashboard data error:", error);
     res.status(500).json({ message: "Failed to load dashboard data." });
+  }
+};
+
+/**
+  GET /api/dashboard/notifications
+  Fetch all admin notifications sorted by latest first.
+ */
+export const getNotifications = async (req, res) => {
+  try {
+    const notifications = await Notification.find({}).sort({ createdAt: -1 }).limit(50);
+    res.json(notifications);
+  } catch (error) {
+    console.error("Fetch notifications error:", error);
+    res.status(500).json({ message: "Failed to fetch notifications." });
+  }
+};
+
+/**
+  PUT /api/dashboard/notifications/read
+  Mark all notifications as read.
+ */
+export const markNotificationsRead = async (req, res) => {
+  try {
+    await Notification.updateMany({ read: false }, { $set: { read: true } });
+    res.json({ message: "All notifications marked as read." });
+  } catch (error) {
+    console.error("Mark notifications read error:", error);
+    res.status(500).json({ message: "Failed to update notifications status." });
   }
 };

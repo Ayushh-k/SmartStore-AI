@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Trash2, ShoppingCart, Loader2, ArrowRight, CheckCircle2, PackageMinus, Plus, Minus } from "lucide-react";
+import { Trash2, ShoppingCart, Loader2, ArrowRight, CheckCircle2, PackageMinus, Plus, Minus, Share2, Check, Sparkles } from "lucide-react";
 import api from "../utils/api.js";
 
 const Cart = () => {
@@ -12,6 +12,58 @@ const Cart = () => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info"); // success, error
   const [orderReceipt, setOrderReceipt] = useState(null);
+  const [copiedCartLink, setCopiedCartLink] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recLoading, setRecLoading] = useState(false);
+
+  const cartIdsString = (cart || [])
+    .map(item => item.product?._id)
+    .filter(Boolean)
+    .sort()
+    .join(",");
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!cart || cart.length === 0) {
+        setRecommendations([]);
+        return;
+      }
+      setRecLoading(true);
+      try {
+        const res = await api.post("/api/ai/user/stylist", { cartItems: cart });
+        setRecommendations(res.data || []);
+      } catch (err) {
+        console.error("Stylist recommendations error:", err);
+      } finally {
+        setRecLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [cartIdsString]);
+
+  const handleShareCart = () => {
+    if (!cart || cart.length === 0) return;
+    try {
+      const items = cart
+        .filter(item => item.product)
+        .map(item => ({
+          id: item.product._id,
+          q: item.quantity
+        }));
+      const jsonStr = JSON.stringify(items);
+      const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
+      
+      const shareUrl = `${window.location.origin}/?importCart=${base64Data}`;
+      navigator.clipboard.writeText(shareUrl);
+      setCopiedCartLink(true);
+      setTimeout(() => setCopiedCartLink(false), 2000);
+    } catch (err) {
+      console.error("Failed to generate cart share link:", err);
+      setMessage("Failed to copy cart link. Please try again.");
+      setMessageType("error");
+    }
+  };
 
   const fetchCart = async () => {
     setLoading(true);
@@ -286,8 +338,94 @@ const Cart = () => {
                   </>
                 )}
               </button>
+
+              <button
+                onClick={handleShareCart}
+                className="btn-outline w-full py-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer border border-slate-800/80 hover:bg-slate-900/60 mt-2"
+                title="Share your cart with a friend"
+              >
+                {copiedCartLink ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+                    <span className="text-emerald-400">Cart Link Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-3.5 w-3.5 text-slate-350" />
+                    <span>Share Cart</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* AI Stylist Recommendations */}
+      {cart.length > 0 && (
+        <div className="border-t border-slate-800/80 pt-8 mt-8 space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-200">AI Stylist Recommends</h2>
+            <span className="text-[9px] bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 rounded px-1.5 py-0.5 font-bold tracking-tight">Frequently Bought Together</span>
+          </div>
+
+          {recLoading ? (
+            <div className="flex items-center justify-center py-12 text-xs text-slate-500 gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              <span>Generating recommendations...</span>
+            </div>
+          ) : recommendations.length === 0 ? (
+            <p className="text-xs text-slate-500 italic py-2">No stylist recommendations available for this selection.</p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {recommendations.map((prod) => {
+                const isOutOfStock = Number(prod.stock) <= 0;
+                return (
+                  <div key={prod._id} className="glass-panel p-4 flex flex-col justify-between hover:border-primary/45 hover:shadow-primary/5 transition-all group overflow-hidden text-left bg-slate-950/80 border border-slate-800/80">
+                    <div className="flex gap-4">
+                      {/* Image Frame */}
+                      <div className="h-16 w-16 bg-slate-950 rounded border border-slate-900 overflow-hidden flex items-center justify-center shrink-0">
+                        {prod.images && prod.images[0] ? (
+                          <img src={prod.images[0]} alt={prod.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <PackageMinus className="h-6 w-6 text-slate-700" />
+                        )}
+                      </div>
+                      
+                      {/* Meta */}
+                      <div className="space-y-1">
+                        <span className="rounded-full bg-slate-900 border border-slate-850 px-2 py-0.5 text-[8px] font-bold text-slate-400 uppercase">
+                          {prod.category || "General"}
+                        </span>
+                        <h4 className="text-xs font-bold text-slate-200 line-clamp-1 group-hover:text-primary transition-colors">{prod.name}</h4>
+                        <p className="text-[10px] text-slate-100 font-bold">${Number(prod.price).toFixed(2)}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          await api.post("/api/store/cart", { productId: prod._id, quantity: 1 });
+                          // refresh cart
+                          const res = await api.get("/api/store/cart");
+                          setCart(res.data || []);
+                          window.dispatchEvent(new Event("cartUpdated"));
+                        } catch (err) {
+                          console.error("Add rec to cart error:", err);
+                        }
+                      }}
+                      disabled={isOutOfStock}
+                      className="btn-primary w-full py-1.5 text-[10px] font-bold mt-4 cursor-pointer"
+                    >
+                      <ShoppingCart className="h-3 w-3 mr-1 inline" />
+                      <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

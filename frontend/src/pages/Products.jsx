@@ -11,6 +11,7 @@ const Products = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null); // For a simple "View AI Content" modal
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -149,7 +150,7 @@ const Products = () => {
                         </div>
                         <div className="flex flex-col">
                           <span 
-                            onClick={() => setSelectedProduct(product)}
+                            onClick={() => { setSelectedProduct(product); setActiveImageIndex(0); }}
                             className="cursor-pointer hover:underline text-primary hover:text-indigo-400 font-semibold"
                           >
                             {product.name}
@@ -186,7 +187,7 @@ const Products = () => {
                     </td>
                     <td className="px-4 py-3.5 text-center">
                       <button
-                        onClick={() => setSelectedProduct(product)}
+                        onClick={() => { setSelectedProduct(product); setActiveImageIndex(0); }}
                         className="inline-flex items-center gap-1 rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[10px] text-primary hover:bg-primary/10 transition-colors"
                       >
                         <Eye className="h-3 w-3" />
@@ -229,18 +230,35 @@ const Products = () => {
 
              <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
               <div className="grid gap-4 md:grid-cols-[180px_1fr]">
-                {/* Image Section */}
-                <div className="glass-panel-soft p-2 flex items-center justify-center bg-slate-950/45 rounded-lg border border-slate-800/60 min-h-[180px]">
-                  {selectedProduct.images && selectedProduct.images[0] ? (
-                    <img
-                      src={selectedProduct.images[0]}
-                      alt={selectedProduct.name}
-                      className="max-h-[160px] max-w-full rounded object-contain"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-slate-600 text-center p-4">
-                      <Package className="h-10 w-10 mb-2" />
-                      <span className="text-[10px] text-slate-500">No Image URL</span>
+                {/* Image Section with Gallery Selector */}
+                <div className="flex flex-col gap-2">
+                  <div className="glass-panel-soft p-2 flex items-center justify-center bg-slate-950/45 rounded-lg border border-slate-800/60 min-h-[180px] max-h-[220px]">
+                    {selectedProduct.images && selectedProduct.images[activeImageIndex] ? (
+                      <img
+                        src={selectedProduct.images[activeImageIndex]}
+                        alt={selectedProduct.name}
+                        className="max-h-[160px] max-w-full rounded object-contain animate-fadeIn"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-slate-600 text-center p-4">
+                        <Package className="h-10 w-10 mb-2" />
+                        <span className="text-[10px] text-slate-500">No Image</span>
+                      </div>
+                    )}
+                  </div>
+                  {selectedProduct.images && selectedProduct.images.length > 1 && (
+                    <div className="flex gap-1.5 overflow-x-auto py-1 max-w-[180px] scrollbar-none">
+                      {selectedProduct.images.map((img, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setActiveImageIndex(idx)}
+                          className={`h-11 w-11 rounded border overflow-hidden shrink-0 transition-all ${
+                            idx === activeImageIndex ? 'border-primary ring-1 ring-primary' : 'border-slate-850 hover:border-slate-600'
+                          }`}
+                        >
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
