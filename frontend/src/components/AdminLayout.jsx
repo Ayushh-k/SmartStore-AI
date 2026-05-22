@@ -4,6 +4,7 @@ import React from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
+  Package,
   PackagePlus,
   LogOut,
   ShoppingBag,
@@ -26,6 +27,11 @@ const AdminLayout = () => {
       label: "Dashboard",
       icon: LayoutDashboard,
       end: true,
+    },
+    {
+      to: "/products",
+      label: "Products",
+      icon: Package,
     },
     {
       to: "/products/new",

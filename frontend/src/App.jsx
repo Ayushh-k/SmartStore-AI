@@ -4,6 +4,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Products from "./pages/Products.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
 import Login from "./pages/Login.jsx";
 
@@ -32,6 +33,7 @@ const App = () => {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="products" element={<Products />} />
         <Route path="products/new" element={<AddProduct />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -40,3 +42,4 @@ const App = () => {
 };
 
 export default App;
+
