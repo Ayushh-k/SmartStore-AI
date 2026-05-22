@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, LogOut, LayoutDashboard, User, Heart } from "lucide-react";
+import { ShoppingCart, LogOut, LayoutDashboard, User, Heart, Menu, X } from "lucide-react";
 import api from "../utils/api.js";
 import ThemeToggle from "./ThemeToggle.jsx";
 
@@ -11,6 +11,7 @@ const UserNavbar = () => {
   const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Read user profile
   useEffect(() => {
@@ -123,29 +124,134 @@ const UserNavbar = () => {
 
   return (
     <nav className={navContainerClass}>
-      <div className="grid grid-cols-3 w-full items-center">
-        {/* Left Side: Navigation Links */}
-        <div className="flex items-center gap-8 justify-start">
-          <NavLink to="/" end className={({ isActive }) => getLinkClass(isActive && !isWishlistPage)}>
+      {/* Mobile Backdrop overlay */}
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden transition-opacity duration-300"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Drawer */}
+      <div
+        className={`fixed inset-y-0 left-0 w-72 bg-white dark:bg-[#0a0a0a] border-r border-black/10 dark:border-white/10 p-6 z-50 transform transition-transform duration-300 ease-out md:hidden ${
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex justify-between items-center pb-6 border-b border-black/5 dark:border-white/5">
+          <Link to="/" className="font-serif text-lg tracking-[0.25em] uppercase font-semibold" onClick={() => setIsMenuOpen(false)}>
+            SmartStore
+          </Link>
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="text-neutral-500 hover:text-black dark:hover:text-white p-1 focus:outline-none"
+          >
+            <X className="h-5 w-5 stroke-[1.5]" />
+          </button>
+        </div>
+
+        <div className="mt-8 flex flex-col gap-6 text-left">
+          <NavLink
+            to="/"
+            end
+            onClick={() => setIsMenuOpen(false)}
+            className={({ isActive }) => getLinkClass(isActive && !isWishlistPage)}
+          >
             Shop
           </NavLink>
 
           {user && (
-            <NavLink to="/profile?tab=wishlist" className={wishlinkClass}>
+            <NavLink
+              to="/profile?tab=wishlist"
+              onClick={() => setIsMenuOpen(false)}
+              className={wishlinkClass}
+            >
               <Heart className="h-3.5 w-3.5 stroke-[1.5]" />
-              <span className="hidden sm:inline">Wishlist</span>
+              <span>Wishlist</span>
             </NavLink>
           )}
 
           {user && user.role === "admin" && (
             <Link
               to="/dashboard"
-              className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-neutral-800 dark:hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
+              onClick={() => setIsMenuOpen(false)}
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-neutral-800 dark:hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-2 flex items-center gap-1.5 w-max"
             >
               <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
-              <span>Admin</span>
+              <span>Admin Dashboard</span>
             </Link>
           )}
+
+          <div className="border-t border-black/5 dark:border-white/5 pt-6 flex flex-col gap-6">
+            {user ? (
+              <>
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={actionClass}
+                >
+                  <User className="h-3.5 w-3.5 stroke-[1.5]" />
+                  <span>My Profile ({user.name.split(" ")[0]})</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className={logoutClass}
+                >
+                  <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className={signInClass}
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 w-full items-center">
+        {/* Left Side: Hamburger (Mobile) & Navigation Links (Desktop) */}
+        <div className="flex items-center justify-start">
+          {/* Hamburger button */}
+          <button
+            onClick={() => setIsMenuOpen(true)}
+            className="md:hidden text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white p-1 focus:outline-none"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-5 w-5 stroke-[1.5]" />
+          </button>
+
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-8">
+            <NavLink to="/" end className={({ isActive }) => getLinkClass(isActive && !isWishlistPage)}>
+              Shop
+            </NavLink>
+
+            {user && (
+              <NavLink to="/profile?tab=wishlist" className={wishlinkClass}>
+                <Heart className="h-3.5 w-3.5 stroke-[1.5]" />
+                <span>Wishlist</span>
+              </NavLink>
+            )}
+
+            {user && user.role === "admin" && (
+              <Link
+                to="/dashboard"
+                className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-neutral-800 dark:hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
+              >
+                <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
+                <span>Admin</span>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Center: Luxury Serif Brand Logo */}
@@ -156,7 +262,7 @@ const UserNavbar = () => {
         </div>
 
         {/* Right Side: Theme Toggle, Cart, Profile & Actions */}
-        <div className="flex items-center gap-6 sm:gap-8 justify-end">
+        <div className="flex items-center gap-4 sm:gap-8 justify-end">
           <ThemeToggle className={themeToggleClass} />
 
           <NavLink to="/cart" className={({ isActive }) => getLinkClass(isActive)}>
@@ -169,20 +275,30 @@ const UserNavbar = () => {
             )}
           </NavLink>
 
-          {user ? (
-            <div className="flex items-center gap-6">
-              <Link to="/profile" className={actionClass}>
-                <User className="h-3.5 w-3.5 stroke-[1.5]" />
-                <span className="hidden md:inline">{user.name.split(" ")[0]}</span>
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center gap-6">
+            {user ? (
+              <div className="flex items-center gap-6">
+                <Link to="/profile" className={actionClass}>
+                  <User className="h-3.5 w-3.5 stroke-[1.5]" />
+                  <span>{user.name.split(" ")[0]}</span>
+                </Link>
+                <button onClick={handleLogout} className={logoutClass}>
+                  <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className={signInClass}>
+                Sign In
               </Link>
-              <button onClick={handleLogout} className={logoutClass}>
-                <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
-                <span className="hidden lg:inline">Logout</span>
-              </button>
-            </div>
-          ) : (
-            <Link to="/login" className={signInClass}>
-              Sign In
+            )}
+          </div>
+
+          {/* Mobile Profile Icon */}
+          {user && (
+            <Link to="/profile" className="md:hidden text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white p-1">
+              <User className="h-4 w-4 stroke-[1.5]" />
             </Link>
           )}
         </div>

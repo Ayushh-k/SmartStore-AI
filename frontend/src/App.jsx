@@ -15,6 +15,9 @@ import Checkout from "./pages/Checkout.jsx";
 import UserProfile from "./pages/UserProfile.jsx";
 import ProductPage from "./pages/ProductPage.jsx";
 import AdminOrders from "./pages/AdminOrders.jsx";
+import Footer from "./components/Footer.jsx";
+import Terms from "./pages/Terms.jsx";
+import Privacy from "./pages/Privacy.jsx";
 
 /**
   Authentication Guard for storefront users (e.g. shopping cart)
@@ -63,6 +66,7 @@ const UserLayout = () => {
       <main className={`flex-1 ${isStorefront ? "" : "pt-28"}`}>
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 };
@@ -109,6 +113,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Route>
 
       {/* Admin Layout Routes protected by admin role */}

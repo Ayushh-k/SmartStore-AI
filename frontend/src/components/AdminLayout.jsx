@@ -11,7 +11,8 @@ import {
   Bell,
   Check,
   X,
-  ClipboardList
+  ClipboardList,
+  Menu
 } from "lucide-react";
 import api from "../utils/api.js";
 
@@ -24,6 +25,7 @@ const AdminLayout = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "" });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   const notificationRef = useRef(null);
   const latestNotificationIdRef = useRef(null);
@@ -139,6 +141,14 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] text-black dark:text-neutral-100 relative font-sans transition-colors duration-300">
+      {/* Sidebar Backdrop Overlay on Mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden transition-opacity duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Toast Alert Popup */}
       {toast.show && (
         <div className="fixed top-6 right-6 z-[9999] w-80 border border-black dark:border-white bg-white dark:bg-black p-4 shadow-2xl flex items-start gap-3 animate-slideIn rounded-none text-black dark:text-white">
@@ -160,21 +170,34 @@ const AdminLayout = () => {
         </div>
       )}
 
-      <div className="mx-auto flex h-screen max-w-7xl gap-6 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-screen max-w-7xl gap-6 px-4 py-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black flex flex-col p-6 rounded-none transition-colors duration-300">
-          <div className="mb-8 flex items-center gap-3 border-b border-gray-200 dark:border-neutral-900 pb-5">
-            <div className="text-black dark:text-white shrink-0">
-              <ShoppingBag className="h-5 w-5" />
-            </div>
-            <div className="text-left">
-              <div className="font-serif text-sm font-semibold tracking-widest uppercase text-black dark:text-white">
-                SmartStore
+        <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-gray-200 dark:border-neutral-900 bg-white dark:bg-black flex flex-col p-6 rounded-none transition-transform duration-300 md:static md:translate-x-0 md:flex md:w-64 md:border ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}>
+          <div className="mb-8 flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="text-black dark:text-white shrink-0">
+                <ShoppingBag className="h-5 w-5" />
               </div>
-              <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
-                Admin Console
+              <div className="text-left">
+                <div className="font-serif text-sm font-semibold tracking-widest uppercase text-black dark:text-white">
+                  SmartStore
+                </div>
+                <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  Admin Console
+                </div>
               </div>
             </div>
+            
+            {/* Close button on mobile */}
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden p-1 text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none"
+              aria-label="Close sidebar"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
 
           {/* Navigation */}
@@ -222,13 +245,24 @@ const AdminLayout = () => {
         {/* Main content */}
         <main className="flex-1 border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black flex flex-col overflow-hidden rounded-none text-black dark:text-white transition-colors duration-300">
           <header className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 px-6 py-5 bg-white dark:bg-black">
-            <div className="text-left">
-              <h1 className="font-serif text-lg tracking-widest uppercase text-black dark:text-white">
-                Admin Portal
-              </h1>
-              <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
-                SmartStore AI Engine
-              </p>
+            <div className="flex items-center gap-3">
+              {/* Sidebar Menu Trigger Button on Mobile */}
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black rounded-none focus:outline-none"
+                aria-label="Open sidebar"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+              
+              <div className="text-left">
+                <h1 className="font-serif text-lg tracking-widest uppercase text-black dark:text-white">
+                  Admin Portal
+                </h1>
+                <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  SmartStore AI Engine
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               {/* Notification Bell Dropdown */}

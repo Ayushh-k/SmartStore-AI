@@ -561,7 +561,7 @@ const Storefront = () => {
               <h3 className="font-serif text-2xl uppercase tracking-wider text-black dark:text-white">Deals of the Season</h3>
             </div>
 
-            <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
               {MOCK_DEALS.map((deal, idx) => (
                 <div 
                   key={idx}
@@ -746,7 +746,7 @@ const Storefront = () => {
             </p>
           </div>
         ) : (
-          <div className="grid gap-x-8 gap-y-16 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid gap-x-8 gap-y-16 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             {filteredProducts.map((p) => (
               <ProductCard
                 key={p._id}
