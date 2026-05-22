@@ -8,7 +8,8 @@ export default {
     extend: {
       fontFamily: {
         serif: ["'Playfair Display'", "serif"],
-        sans: ["'Montserrat'", "sans-serif"],
+        sans: ["'Inter'", "sans-serif"],
+        montserrat: ["'Montserrat'", "sans-serif"],
       },
       colors: {
         background: "#0a0a0a",
