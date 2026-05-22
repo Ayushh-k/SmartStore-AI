@@ -264,21 +264,21 @@ const UserProfile = () => {
   const getOrderStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+        return "border-emerald-500/30 text-emerald-450 bg-transparent";
       case "processing":
-        return "bg-amber-500/10 border-amber-500/30 text-amber-400";
+        return "border-amber-500/30 text-amber-400 bg-transparent";
       case "cancelled":
-        return "bg-rose-500/10 border-rose-500/30 text-rose-400";
+        return "border-rose-500/30 text-rose-450 bg-transparent";
       default:
-        return "bg-slate-500/10 border-slate-500/30 text-slate-400";
+        return "border-neutral-800 text-neutral-400 bg-transparent";
     }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 space-y-3 text-xs text-slate-400">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        <span>Loading your profile settings dashboard...</span>
+      <div className="flex flex-col items-center justify-center py-32 space-y-4 text-[10px] text-neutral-400 font-sans tracking-[0.25em] uppercase bg-background">
+        <Loader2 className="h-5 w-5 animate-spin text-white stroke-[1.5]" />
+        <span>Loading Profile</span>
       </div>
     );
   }
@@ -350,76 +350,76 @@ const UserProfile = () => {
 
         {/* 1. ORDER HISTORY */}
         {activeTab === "orders" && (
-          <div className="space-y-4 animate-fadeIn">
+          <div className="space-y-6 animate-fadeIn">
             {orders.length === 0 ? (
-              <div className="glass-panel py-20 text-center text-slate-500 space-y-3">
-                <ClipboardList className="h-10 w-10 text-slate-700 mx-auto" />
-                <h3 className="text-sm font-semibold text-slate-350">No orders placed yet</h3>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                  Looks like you haven't ordered anything. Browse our catalog and secure your first product!
+              <div className="border border-neutral-900 py-20 text-center text-neutral-500 space-y-4 bg-black">
+                <ClipboardList className="h-8 w-8 text-neutral-700 mx-auto stroke-[1]" />
+                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-350">No orders placed yet</h3>
+                <p className="text-[10px] tracking-wide text-neutral-500 max-w-xs mx-auto">
+                  Your order log is currently empty.
                 </p>
-                <Link to="/" className="btn-primary inline-flex items-center gap-1.5 text-xs px-5 py-2 mt-2">
-                  Browse Storefront
+                <Link to="/" className="bg-white text-black border border-white px-8 py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 inline-block">
+                  Explore Products
                 </Link>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {orders.map((order) => (
-                  <div key={order._id} className="glass-panel border-slate-850 overflow-hidden text-left bg-slate-900/10">
+                  <div key={order._id} className="border border-neutral-900 overflow-hidden text-left bg-black">
                     {/* Order summary header */}
-                    <div className="p-4 bg-slate-950/40 border-b border-slate-850/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="p-5 bg-neutral-950 border-b border-neutral-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
                         <div>
-                          <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tight block">Order ID</span>
-                          <span className="font-mono text-xs text-slate-300 font-semibold block truncate max-w-[150px]" title={order._id}>
+                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Order ID</span>
+                          <span className="font-mono text-xs text-neutral-300 font-semibold block truncate max-w-[150px]" title={order._id}>
                             {order._id}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tight block">Placed On</span>
-                          <span className="text-xs text-slate-300 block">{new Date(order.createdAt).toLocaleDateString()}</span>
+                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Placed On</span>
+                          <span className="text-xs text-neutral-300 block">{new Date(order.createdAt).toLocaleDateString()}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tight block">Total Paid</span>
-                          <span className="text-xs font-bold text-slate-200 block">${Number(order.totalAmount).toFixed(2)}</span>
+                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Total Paid</span>
+                          <span className="text-xs font-bold text-white block">${Number(order.totalAmount).toFixed(2)}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tight block">Payment Status</span>
-                          <span className="text-xs text-slate-300 block font-semibold text-emerald-400 capitalize">
+                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Status</span>
+                          <span className="text-xs text-neutral-300 block font-semibold capitalize">
                             {order.paymentDetails?.status || "Completed"} ({order.paymentDetails?.method || "Card"})
                           </span>
                         </div>
                       </div>
                       <div className="self-end md:self-auto">
-                        <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${getOrderStatusColor(order.status)}`}>
+                        <span className={`border px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${getOrderStatusColor(order.status)}`}>
                           {order.status}
                         </span>
                       </div>
                     </div>
 
                     {/* Order Items list */}
-                    <div className="p-4 divide-y divide-slate-850/60">
+                    <div className="p-5 divide-y divide-neutral-900">
                       {order.products?.map((item, idx) => (
-                        <div key={idx} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4 text-xs">
-                          <div className="space-y-0.5">
-                            <span className="font-semibold text-slate-200">{item.product?.name || "Deleted Product"}</span>
-                            <div className="flex gap-2 flex-wrap text-[9px] pt-0.5">
+                        <div key={idx} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4 text-xs">
+                          <div className="space-y-1">
+                            <span className="font-serif tracking-wide text-white uppercase text-xs block">{item.product?.name || "Deleted Product"}</span>
+                            <div className="flex gap-2 flex-wrap text-[9px] pt-1 uppercase tracking-widest">
                               {item.selectedSize && (
-                                <span className="bg-slate-900 border border-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-bold">
+                                <span className="border border-neutral-900 text-neutral-400 px-2 py-0.5 font-bold">
                                   Size: {item.selectedSize}
                                 </span>
                               )}
                               {item.selectedColor && (
-                                <span className="bg-slate-900 border border-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-bold">
+                                <span className="border border-neutral-900 text-neutral-400 px-2 py-0.5 font-bold">
                                   Color: {item.selectedColor}
                                 </span>
                               )}
-                              <span className="text-slate-500 font-medium self-center">Quantity: {item.quantity}</span>
+                              <span className="text-neutral-500 font-medium self-center">Qty: {item.quantity}</span>
                             </div>
                           </div>
                           <div className="text-right shrink-0 min-w-[70px]">
-                            <p className="font-bold text-slate-250">${(item.priceAtPurchase * item.quantity).toFixed(2)}</p>
-                            <p className="text-[10px] text-slate-500">{item.quantity} × ${Number(item.priceAtPurchase).toFixed(2)}</p>
+                            <p className="font-bold text-white">${(item.priceAtPurchase * item.quantity).toFixed(2)}</p>
+                            <p className="text-[10px] text-neutral-500">{item.quantity} × ${Number(item.priceAtPurchase).toFixed(2)}</p>
                           </div>
                         </div>
                       ))}
@@ -427,10 +427,10 @@ const UserProfile = () => {
 
                     {/* Shipping Address Footer */}
                     {order.shippingAddress && (
-                      <div className="bg-slate-950/20 border-t border-slate-850/60 px-4 py-2.5 text-[10px] text-slate-400 flex flex-wrap gap-2 items-center">
-                        <MapPin className="h-3 w-3 text-indigo-400" />
-                        <span className="font-semibold text-slate-350">Shipped To:</span>
-                        <span>{order.shippingAddress.street}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.zipCode}, {order.shippingAddress.country}</span>
+                      <div className="bg-neutral-950 border-t border-neutral-900 px-5 py-3 text-[10px] text-neutral-500 flex flex-wrap gap-2 items-center uppercase tracking-widest">
+                        <MapPin className="h-3.5 w-3.5 text-neutral-600" />
+                        <span className="font-semibold text-neutral-400">Shipped To:</span>
+                        <span className="font-sans normal-case tracking-normal text-neutral-400">{order.shippingAddress.street}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.zipCode}, {order.shippingAddress.country}</span>
                       </div>
                     )}
                   </div>
@@ -442,81 +442,86 @@ const UserProfile = () => {
 
         {/* 2. MY WISHLIST */}
         {activeTab === "wishlist" && (
-          <div className="space-y-4 animate-fadeIn">
+          <div className="space-y-6 animate-fadeIn">
             {!user?.wishlist || user.wishlist.length === 0 ? (
-              <div className="glass-panel py-20 text-center text-slate-500 space-y-3">
-                <Heart className="h-10 w-10 text-slate-700 mx-auto" />
-                <h3 className="text-sm font-semibold text-slate-350">Your wishlist is empty</h3>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                  Add items to your wishlist while browsing to save them for later!
+              <div className="border border-neutral-900 py-20 text-center text-neutral-500 space-y-4 bg-black">
+                <Heart className="h-8 w-8 text-neutral-700 mx-auto stroke-[1]" />
+                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-350">Your wishlist is empty</h3>
+                <p className="text-[10px] tracking-wide text-neutral-500 max-w-xs mx-auto">
+                  Save items to your wishlist to view them later.
                 </p>
-                <Link to="/" className="btn-primary inline-flex items-center gap-1.5 text-xs px-5 py-2 mt-2">
+                <Link to="/" className="bg-white text-black border border-white px-8 py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 inline-block">
                   Explore Products
                 </Link>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
                 {user.wishlist.map((product) => {
-                  const isOutOfStock = Number(product.stock) <= 0;
                   const isActionLoading = wishlistActionId === product._id;
                   return (
-                    <div key={product._id} className="glass-panel p-4 flex flex-col justify-between hover:border-primary/40 transition-all text-left bg-slate-900/10 border-slate-850 relative group">
+                    <div key={product._id} className="group relative flex flex-col justify-between text-left bg-black border border-neutral-900 transition-all duration-300">
                       <div>
                         {/* Remove from wishlist top corner */}
                         <button
                           onClick={() => handleRemoveWishlist(product._id)}
                           disabled={isActionLoading}
-                          className="absolute top-3 right-3 rounded-full bg-slate-950/70 border border-slate-800 p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 cursor-pointer transition-colors z-10"
+                          className="absolute top-3 right-3 bg-black/80 p-2 text-white hover:text-rose-450 cursor-pointer transition-colors z-10 border border-neutral-800"
                           title="Remove from Wishlist"
                         >
-                          <X className="h-3.5 w-3.5" />
+                          <X className="h-4 w-4 stroke-[1.5]" />
                         </button>
 
-                        <div className="flex gap-4">
-                          {/* Image frame */}
-                          <div className="h-16 w-16 bg-slate-950 rounded-lg border border-slate-850 overflow-hidden flex items-center justify-center shrink-0">
-                            {product.images && product.images[0] ? (
-                              <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            ) : (
-                              <Heart className="h-6 w-6 text-slate-800" />
-                            )}
-                          </div>
-
-                          {/* Info metadata */}
-                          <div className="space-y-0.5 min-w-0">
-                            <span className="rounded bg-slate-900 border border-slate-800 px-1.5 py-0.5 text-[8px] font-bold text-slate-400 uppercase tracking-wide">
-                              {product.category || "General"}
-                            </span>
-                            <h4 className="text-xs font-bold text-slate-200 line-clamp-1 mt-1">{product.name}</h4>
-                            <p className="text-xs text-slate-100 font-bold mt-0.5">${Number(product.price).toFixed(2)}</p>
-                          </div>
+                        {/* Image frame (3:4 aspect ratio) */}
+                        <div className="w-full aspect-[3/4] bg-neutral-950 overflow-hidden relative border-b border-neutral-900">
+                          {product.images && product.images[0] ? (
+                            <img 
+                              src={product.images[0]} 
+                              alt={product.name} 
+                              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-neutral-800 bg-neutral-950">
+                              <Heart className="h-8 w-8 stroke-[1]" />
+                            </div>
+                          )}
                         </div>
 
-                        <p className="text-[10px] text-slate-500 mt-2 line-clamp-2">{product.description}</p>
+                        {/* Info details (left-aligned title/price) */}
+                        <div className="p-4 space-y-1">
+                          <span className="text-[9px] tracking-[0.2em] uppercase text-neutral-500 font-medium">
+                            {product.category || "General"}
+                          </span>
+                          <h4 className="text-xs font-serif tracking-wide text-white line-clamp-1 uppercase mt-1">
+                            {product.name}
+                          </h4>
+                          <p className="text-xs font-montserrat text-neutral-300 font-semibold pt-0.5">
+                            ${Number(product.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Action buttons */}
-                      <div className="flex gap-2 mt-4 pt-3 border-t border-slate-850/60">
+                      {/* Action buttons (Solid white rectangles, high-contrast) */}
+                      <div className="p-4 pt-0 flex flex-col gap-2">
+                        <Link
+                          to={`/product/${product._id}`}
+                          className="w-full bg-white text-black py-2.5 text-[10px] font-bold tracking-[0.2em] uppercase text-center hover:bg-neutral-200 transition-colors duration-300 border border-white"
+                        >
+                          View Details
+                        </Link>
                         <button
                           onClick={() => handleRemoveWishlist(product._id)}
                           disabled={isActionLoading}
-                          className="btn-outline flex-1 py-1.5 text-[10px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer hover:bg-rose-950/20 hover:border-rose-900/50 hover:text-rose-250 text-rose-400"
+                          className="w-full bg-black text-rose-500 py-2.5 text-[10px] font-bold tracking-[0.2em] uppercase border border-neutral-900 hover:border-rose-900/55 hover:bg-rose-950/15 transition-all duration-300 inline-flex items-center justify-center gap-1.5"
                         >
                           {isActionLoading ? (
                             <Loader2 className="h-3 w-3 animate-spin" />
                           ) : (
                             <>
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
                               <span>Remove</span>
                             </>
                           )}
                         </button>
-                        <Link
-                          to={`/product/${product._id}`}
-                          className="btn-primary flex-1 py-1.5 text-[10px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer text-center decoration-transparent"
-                        >
-                          <span>View Details</span>
-                        </Link>
                       </div>
                     </div>
                   );
@@ -528,9 +533,9 @@ const UserProfile = () => {
 
         {/* 3. ADDRESS BOOK */}
         {activeTab === "addresses" && (
-          <div className="space-y-4 animate-fadeIn text-left">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-semibold text-slate-200">Manage Saved Addresses</h3>
+          <div className="space-y-6 animate-fadeIn text-left">
+            <div className="flex justify-between items-center border-b border-neutral-900 pb-4">
+              <h3 className="text-sm font-serif tracking-wide uppercase text-white">Saved Addresses</h3>
               {!showAddressForm && (
                 <button
                   onClick={() => {
@@ -545,19 +550,19 @@ const UserProfile = () => {
                     });
                     setShowAddressForm(true);
                   }}
-                  className="btn-primary inline-flex items-center gap-1.5 py-1.5 px-3 text-xs cursor-pointer"
+                  className="bg-white text-black px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 flex items-center gap-1.5"
                 >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add New Address</span>
+                  <Plus className="h-3 w-3" />
+                  <span>Add Address</span>
                 </button>
               )}
             </div>
 
             {showAddressForm && (
-              <form onSubmit={handleSaveAddress} className="glass-panel p-5 space-y-4 max-w-xl border-slate-850 animate-fadeIn bg-slate-900/10">
-                <div className="flex justify-between items-center pb-2 border-b border-slate-850">
-                  <h4 className="text-xs font-bold text-slate-350 uppercase tracking-wider">
-                    {editingAddressId ? "Modify Existing Address" : "Save New Delivery Address"}
+              <form onSubmit={handleSaveAddress} className="border border-neutral-900 p-6 space-y-6 max-w-xl animate-fadeIn bg-black">
+                <div className="flex justify-between items-center pb-3 border-b border-neutral-900">
+                  <h4 className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                    {editingAddressId ? "Modify Address" : "New Address"}
                   </h4>
                   <button
                     type="button"
@@ -565,71 +570,73 @@ const UserProfile = () => {
                       setShowAddressForm(false);
                       setEditingAddressId(null);
                     }}
-                    className="text-[10px] text-slate-500 hover:text-slate-350 font-semibold cursor-pointer"
+                    className="text-[10px] text-neutral-500 hover:text-white font-semibold cursor-pointer uppercase tracking-wider"
                   >
                     Cancel
                   </button>
                 </div>
 
-                <div>
-                  <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold">Street Address *</label>
-                  <input
-                    type="text"
-                    placeholder="123 Luxury Ave, Apt 4B"
-                    className="input text-xs"
-                    value={addressForm.street}
-                    onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
-                    required
-                  />
-                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">Street Address *</label>
+                    <input
+                      type="text"
+                      placeholder="Street address, P.O. box, suite"
+                      className="input text-xs"
+                      value={addressForm.street}
+                      onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                      required
+                    />
+                  </div>
 
-                <div className="grid gap-3 grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold">City *</label>
-                    <input
-                      type="text"
-                      placeholder="Beverly Hills"
-                      className="input text-xs"
-                      value={addressForm.city}
-                      onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
-                      required
-                    />
+                  <div className="grid gap-6 grid-cols-2">
+                    <div>
+                      <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">City *</label>
+                      <input
+                        type="text"
+                        placeholder="City"
+                        className="input text-xs"
+                        value={addressForm.city}
+                        onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">State / Province *</label>
+                      <input
+                        type="text"
+                        placeholder="State"
+                        className="input text-xs"
+                        value={addressForm.state}
+                        onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold">State / Province *</label>
-                    <input
-                      type="text"
-                      placeholder="California"
-                      className="input text-xs"
-                      value={addressForm.state}
-                      onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
 
-                <div className="grid gap-3 grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold">Zip / Postal Code *</label>
-                    <input
-                      type="text"
-                      placeholder="90210"
-                      className="input text-xs"
-                      value={addressForm.zipCode}
-                      onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold">Country *</label>
-                    <input
-                      type="text"
-                      placeholder="United States"
-                      className="input text-xs"
-                      value={addressForm.country}
-                      onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
-                      required
-                    />
+                  <div className="grid gap-6 grid-cols-2">
+                    <div>
+                      <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">Zip / Postal Code *</label>
+                      <input
+                        type="text"
+                        placeholder="Zip code"
+                        className="input text-xs"
+                        value={addressForm.zipCode}
+                        onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">Country *</label>
+                      <input
+                        type="text"
+                        placeholder="Country"
+                        className="input text-xs"
+                        value={addressForm.country}
+                        onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -637,75 +644,73 @@ const UserProfile = () => {
                   <input
                     type="checkbox"
                     id="address-default-chk"
-                    className="cursor-pointer rounded bg-slate-900 border-slate-800 text-primary focus:ring-primary"
+                    className="cursor-pointer h-4 w-4 bg-transparent border-neutral-850 text-white focus:ring-0 focus:ring-offset-0 rounded-none"
                     checked={addressForm.isDefault}
                     onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
                   />
-                  <label htmlFor="address-default-chk" className="text-xs text-slate-400 cursor-pointer">
-                    Make this my default shipping address
+                  <label htmlFor="address-default-chk" className="text-[10px] tracking-wider text-neutral-500 uppercase cursor-pointer select-none">
+                    Set as default shipping address
                   </label>
                 </div>
 
                 <button
                   type="submit"
                   disabled={addressLoading}
-                  className="btn-primary w-full py-2 text-xs font-semibold cursor-pointer inline-flex items-center justify-center gap-1.5"
+                  className="w-full bg-white text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 inline-flex items-center justify-center gap-1.5"
                 >
-                  {addressLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  <span>{editingAddressId ? "Update Address Details" : "Save and Register Address"}</span>
+                  {addressLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+                  <span>{editingAddressId ? "Save Changes" : "Save Address"}</span>
                 </button>
               </form>
             )}
 
             {!user?.addresses || user.addresses.length === 0 ? (
-              <div className="glass-panel py-16 text-center text-slate-500 space-y-2">
-                <MapPin className="h-10 w-10 text-slate-700 mx-auto" />
-                <h4 className="text-sm font-semibold text-slate-350">No saved addresses</h4>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                  You haven't saved any shipping address. Add one to accelerate your checkout process.
+              <div className="border border-neutral-900 py-16 text-center text-neutral-500 space-y-2 bg-black">
+                <MapPin className="h-8 w-8 text-neutral-700 mx-auto stroke-[1]" />
+                <h4 className="text-xs font-serif uppercase tracking-wider text-neutral-350">No saved addresses</h4>
+                <p className="text-[10px] text-neutral-500 tracking-wide max-w-xs mx-auto">
+                  Add shipping addresses for faster checkout experiences.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2">
                 {user.addresses.map((addr) => (
                   <div
                     key={addr._id}
-                    className={`glass-panel p-4 border text-xs flex flex-col justify-between transition-all bg-slate-900/10 ${
+                    className={`border p-6 text-xs flex flex-col justify-between transition-all bg-black ${
                       addr.isDefault 
-                        ? "border-primary bg-indigo-950/5 shadow-md shadow-primary/5" 
-                        : "border-slate-850 hover:border-slate-800"
+                        ? "border-white" 
+                        : "border-neutral-900 hover:border-neutral-800"
                     }`}
                   >
                     <div>
-                      <div className="flex justify-between items-start pb-2 border-b border-slate-900">
-                        <span className="font-bold text-slate-200">
-                          {addr.isDefault ? "Primary Address" : "Alternate Address"}
+                      <div className="flex justify-between items-start pb-2 border-b border-neutral-900">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-neutral-250">
+                          {addr.isDefault ? "Primary Address" : "Address"}
                         </span>
                         {addr.isDefault && (
-                          <span className="h-2 w-2 rounded-full bg-primary" />
+                          <span className="h-1.5 w-1.5 bg-white" />
                         )}
                       </div>
-                      <div className="mt-3 text-slate-400 space-y-1.5 leading-relaxed">
-                        <p className="font-medium text-slate-350">{addr.street}</p>
+                      <div className="mt-4 text-neutral-455 space-y-1 font-sans text-xs tracking-wide leading-relaxed">
+                        <p className="text-white font-medium">{addr.street}</p>
                         <p>{addr.city}, {addr.state} - {addr.zipCode}</p>
-                        <p className="font-medium text-slate-300">{addr.country}</p>
+                        <p className="text-neutral-500 uppercase tracking-widest text-[9px] pt-1">{addr.country}</p>
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-slate-900/80">
+                    <div className="flex justify-end gap-4 mt-6 pt-3 border-t border-neutral-900">
                       <button
                         onClick={() => handleEditAddressClick(addr)}
-                        className="rounded p-1.5 text-slate-500 hover:text-primary hover:bg-primary/10 transition-all cursor-pointer"
-                        title="Edit Address"
+                        className="text-neutral-500 hover:text-white transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
                       >
-                        <Edit2 className="h-4 w-4" />
+                        Edit
                       </button>
                       <button
                         onClick={() => handleDeleteAddress(addr._id)}
-                        className="rounded p-1.5 text-slate-500 hover:text-rose-450 hover:bg-rose-950/15 transition-all cursor-pointer"
-                        title="Delete Address"
+                        className="text-neutral-500 hover:text-rose-455 transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -718,21 +723,19 @@ const UserProfile = () => {
         {/* 4. PROFILE SETTINGS */}
         {activeTab === "settings" && (
           <div className="max-w-xl animate-fadeIn text-left">
-            <form onSubmit={handleUpdateSettings} className="glass-panel p-5 space-y-5 border-slate-850 bg-slate-900/10">
-              <h3 className="text-sm font-semibold text-slate-200 border-b border-slate-850 pb-2 flex items-center gap-1.5">
-                <Settings className="h-4.5 w-4.5 text-primary" />
-                <span>Account Profile Details</span>
+            <form onSubmit={handleUpdateSettings} className="border border-neutral-900 p-6 space-y-6 bg-black">
+              <h3 className="text-xs font-serif tracking-widest uppercase text-white border-b border-neutral-900 pb-3">
+                Account Details
               </h3>
 
               <div className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold flex items-center gap-1">
-                    <User className="h-3 w-3 text-slate-500" />
-                    <span>Display Name *</span>
+                  <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                    Display Name *
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter your name"
+                    placeholder="Full Name"
                     className="input text-xs"
                     value={settingsForm.name}
                     onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
@@ -741,13 +744,12 @@ const UserProfile = () => {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold flex items-center gap-1">
-                    <Mail className="h-3 w-3 text-slate-500" />
-                    <span>Email Address *</span>
+                  <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                    Email Address *
                   </label>
                   <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Email Address"
                     className="input text-xs"
                     value={settingsForm.email}
                     onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
@@ -755,14 +757,13 @@ const UserProfile = () => {
                   />
                 </div>
 
-                <div className="grid gap-4 grid-cols-2">
+                <div className="grid gap-6 grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-[10px] uppercase text-slate-400 font-semibold flex items-center gap-1">
-                      <Globe className="h-3 w-3 text-slate-500" />
-                      <span>Preferred Language</span>
+                    <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                      Language
                     </label>
                     <select
-                      className="input text-xs cursor-pointer"
+                      className="w-full bg-black border-b border-neutral-800 text-xs py-2.5 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                       value={settingsForm.language}
                       onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
                     >
@@ -778,13 +779,12 @@ const UserProfile = () => {
                       <input
                         type="checkbox"
                         id="notifications-chk"
-                        className="cursor-pointer rounded bg-slate-900 border-slate-850 text-primary focus:ring-primary"
+                        className="cursor-pointer h-4 w-4 bg-transparent border-neutral-850 text-white focus:ring-0 focus:ring-offset-0 rounded-none"
                         checked={settingsForm.notifications}
                         onChange={(e) => setSettingsForm({ ...settingsForm, notifications: e.target.checked })}
                       />
-                      <label htmlFor="notifications-chk" className="text-xs text-slate-400 font-semibold flex items-center gap-1 cursor-pointer">
-                        <Bell className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-                        <span>Email Notifications</span>
+                      <label htmlFor="notifications-chk" className="text-[10px] tracking-wider text-neutral-500 uppercase cursor-pointer select-none">
+                        Email Updates
                       </label>
                     </div>
                   </div>
@@ -794,10 +794,10 @@ const UserProfile = () => {
               <button
                 type="submit"
                 disabled={settingsLoading}
-                className="btn-primary w-full py-2 text-xs font-semibold cursor-pointer inline-flex items-center justify-center gap-1.5 mt-2"
+                className="w-full bg-white text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 inline-flex items-center justify-center gap-1.5 mt-2"
               >
                 {settingsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                <span>Save Profile Changes</span>
+                <span>Save Changes</span>
               </button>
             </form>
           </div>
