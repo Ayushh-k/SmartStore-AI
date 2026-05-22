@@ -1,17 +1,19 @@
-// frontend/src/pages/Login.jsx
+// frontend/src/pages/Signup.jsx
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api from "../utils/api.js";
 
-const Login = () => {
+const Signup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
+    role: "user",
   });
 
   const handleChange = (e) => {
@@ -25,9 +27,11 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await api.post("/api/auth/login", {
+      const res = await api.post("/api/auth/register", {
+        name: form.name,
         email: form.email,
         password: form.password,
+        role: form.role,
       });
       
       // Store token and user info
@@ -38,18 +42,12 @@ const Login = () => {
       if (res.data.user.role === "admin") {
         navigate("/dashboard");
       } else {
-        const urlParams = new URLSearchParams(window.location.search);
-        const importCart = urlParams.get("importCart");
-        if (importCart) {
-          navigate(`/?importCart=${importCart}`);
-        } else {
-          navigate("/");
-        }
+        navigate("/");
       }
     } catch (err) {
-      console.error("Auth error:", err);
+      console.error("Auth registration error:", err);
       setError(
-        err?.response?.data?.message || "Authentication failed. Please check your credentials."
+        err?.response?.data?.message || "Registration failed. Please check your inputs."
       );
     } finally {
       setLoading(false);
@@ -64,7 +62,7 @@ const Login = () => {
         {/* Left Side: Striking Fashion Editorial Image */}
         <div className="relative hidden md:block h-full w-full overflow-hidden bg-neutral-900">
           <img 
-            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80" 
+            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1000&q=80" 
             alt="Editorial Fashion" 
             className="absolute inset-0 w-full h-full object-cover opacity-70"
           />
@@ -74,20 +72,20 @@ const Login = () => {
               SmartStore Atelier
             </span>
             <h2 className="text-3xl font-serif font-light text-white tracking-widest leading-tight uppercase mt-2">
-              EXQUISITE FORMS / MINIMAL DESIGN
+              CREATING NEW DIMENSIONS / DESIGN
             </h2>
           </div>
         </div>
 
         {/* Right Side: Form Area */}
         <div className="flex flex-col justify-center items-center px-8 sm:px-16 md:px-24 py-12 bg-black">
-          <div className="w-full max-w-md space-y-10 text-left">
+          <div className="w-full max-w-md space-y-8 text-left">
             <div className="space-y-3">
               <h2 className="text-3xl sm:text-4xl font-serif font-light tracking-wide uppercase">
-                Sign In
+                Create Account
               </h2>
               <p className="text-xs text-neutral-400 font-sans tracking-widest uppercase">
-                Welcome back to your luxury experience.
+                Register to explore the editorial collection.
               </p>
             </div>
 
@@ -97,7 +95,37 @@ const Login = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-sans font-medium">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={form.name}
+                  onChange={handleChange}
+                  className="input"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-sans font-medium">
+                  Register As
+                </label>
+                <select
+                  name="role"
+                  value={form.role}
+                  onChange={handleChange}
+                  className="input cursor-pointer border-b border-white/20 bg-transparent text-white focus:outline-none focus:border-white select-luxury text-sm py-2.5 w-full rounded-none"
+                >
+                  <option value="user" className="bg-black text-white">Customer (Storefront)</option>
+                  <option value="admin" className="bg-black text-white">Administrator (Dashboard)</option>
+                </select>
+              </div>
+
               <div className="space-y-1">
                 <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-sans font-medium">
                   Email Address
@@ -129,7 +157,7 @@ const Login = () => {
                 />
               </div>
 
-              <div className="pt-4">
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={loading}
@@ -138,7 +166,7 @@ const Login = () => {
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    "Sign In"
+                    "Register"
                   )}
                 </button>
               </div>
@@ -146,9 +174,9 @@ const Login = () => {
 
             <div className="border-t border-white/5 pt-6 space-y-4">
               <p className="text-xs text-neutral-500 font-sans tracking-wider">
-                Don't have an account?{" "}
-                <Link to="/signup" className="text-white hover:text-gold transition-colors font-medium">
-                  Create Account
+                Already have an account?{" "}
+                <Link to="/login" className="text-white hover:text-gold transition-colors font-medium">
+                  Sign In
                 </Link>
               </p>
               <p className="text-[10px] text-neutral-600 font-sans tracking-widest uppercase">
@@ -165,4 +193,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Products from "./pages/Products.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
 import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
 import Storefront from "./pages/Storefront.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
@@ -71,6 +72,7 @@ const App = () => {
     <Routes>
       {/* Login / Auth */}
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
       {/* User / Storefront Layout Routes */}
       <Route element={<UserLayout />}>
