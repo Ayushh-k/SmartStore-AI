@@ -234,6 +234,24 @@ const Products = () => {
                 </div>
               </div>
 
+              {/* Audience & Keywords */}
+              {(selectedProduct.audience || selectedProduct.keywords) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {selectedProduct.audience && (
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase font-semibold">Target Audience</span>
+                      <p className="text-slate-300 mt-0.5">{selectedProduct.audience}</p>
+                    </div>
+                  )}
+                  {selectedProduct.keywords && (
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase font-semibold">Key Features / Keywords</span>
+                      <p className="text-slate-300 mt-0.5">{selectedProduct.keywords}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Description */}
               <div className="space-y-1">
                 <h4 className="font-semibold text-primary uppercase tracking-wide text-[10px]">Description</h4>

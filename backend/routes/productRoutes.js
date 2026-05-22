@@ -2,16 +2,16 @@
 
 import express from "express";
 import Product from "../models/Product.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, admin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 /**
-  Basic CRUD for Products.
+  Admin CRUD for Products.
  */
 
 // Create product
-router.post("/", protect, async (req, res) => {
+router.post("/", protect, admin, async (req, res) => {
   try {
     const product = await Product.create(req.body);
     res.status(201).json(product);
@@ -22,7 +22,7 @@ router.post("/", protect, async (req, res) => {
 });
 
 // Get all products
-router.get("/", protect, async (req, res) => {
+router.get("/", protect, admin, async (req, res) => {
   try {
     const products = await Product.find({}).sort({ createdAt: -1 });
     res.json(products);
@@ -32,8 +32,23 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
+// Get unique audiences and keywords from existing products (must reside before GET /:id)
+router.get("/meta/values", protect, admin, async (req, res) => {
+  try {
+    const audiences = await Product.distinct("audience");
+    const keywords = await Product.distinct("keywords");
+    res.json({
+      audiences: audiences.filter(Boolean),
+      keywords: keywords.filter(Boolean)
+    });
+  } catch (error) {
+    console.error("Get product meta values error:", error);
+    res.status(500).json({ message: "Failed to fetch distinct meta values." });
+  }
+});
+
 // Get single product
-router.get("/:id", protect, async (req, res) => {
+router.get("/:id", protect, admin, async (req, res) => {
   try {
     const prod = await Product.findById(req.params.id);
     if (!prod) {
@@ -47,7 +62,7 @@ router.get("/:id", protect, async (req, res) => {
 });
 
 // Update product
-router.put("/:id", protect, async (req, res) => {
+router.put("/:id", protect, admin, async (req, res) => {
   try {
     const prod = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -63,7 +78,7 @@ router.put("/:id", protect, async (req, res) => {
 });
 
 // Delete product
-router.delete("/:id", protect, async (req, res) => {
+router.delete("/:id", protect, admin, async (req, res) => {
   try {
     const prod = await Product.findByIdAndDelete(req.params.id);
     if (!prod) {

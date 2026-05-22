@@ -1,6 +1,6 @@
 // frontend/src/pages/AddProduct.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, Loader2, Save } from "lucide-react";
 import api from "../utils/api.js";
 
@@ -51,10 +51,32 @@ const AddProduct = () => {
   const [keywordSelection, setKeywordSelection] = useState("");
   const [customKeywords, setCustomKeywords] = useState("");
 
+  const [dbAudiences, setDbAudiences] = useState(AUDIENCES);
+  const [dbKeywords, setDbKeywords] = useState(KEYWORDS_PRESETS);
+
   const [submitting, setSubmitting] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info"); // info, success, error
+
+  // Fetch unique target audience and keywords from existing products on mount
+  const fetchMetaValues = async () => {
+    try {
+      const res = await api.get("/api/products/meta/values");
+      if (res.data) {
+        const uniqueAud = Array.from(new Set([...AUDIENCES, ...(res.data.audiences || [])]));
+        const uniqueKw = Array.from(new Set([...KEYWORDS_PRESETS, ...(res.data.keywords || [])]));
+        setDbAudiences(uniqueAud);
+        setDbKeywords(uniqueKw);
+      }
+    } catch (err) {
+      console.error("Failed to load metadata dropdown options:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMetaValues();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -140,12 +162,17 @@ const AddProduct = () => {
     setMessageType("info");
 
     try {
+      const audienceVal = audienceSelection === "other" ? customAudience : audienceSelection;
+      const keywordsVal = keywordSelection === "other" ? customKeywords : keywordSelection;
+
       const payload = {
         name: form.name,
         sku: form.sku || undefined,
         price: Number(form.price) || 0,
         stock: Number(form.stock) || 0,
         category: form.category || undefined,
+        audience: audienceVal,
+        keywords: keywordsVal,
         description: form.description,
         tags: form.tags
           .split(",")
@@ -171,7 +198,7 @@ const AddProduct = () => {
       setMessage("Product created successfully with AI-enhanced content!");
       setMessageType("success");
 
-      // Reset form
+      // Reset form fields
       setForm({
         name: "",
         sku: "",
@@ -194,6 +221,9 @@ const AddProduct = () => {
       setCustomAudience("");
       setKeywordSelection("");
       setCustomKeywords("");
+
+      // Refresh dynamic options lists so the dropdown captures the new values instantly
+      await fetchMetaValues();
     } catch (err) {
       console.error("Create product error:", err);
       setMessage(
@@ -402,7 +432,7 @@ const AddProduct = () => {
                   onChange={(e) => setAudienceSelection(e.target.value)}
                 >
                   <option value="">Select target audience...</option>
-                  {AUDIENCES.map((aud) => (
+                  {dbAudiences.map((aud) => (
                     <option key={aud} value={aud}>{aud}</option>
                   ))}
                   <option value="other">Other (Custom)...</option>
@@ -445,7 +475,7 @@ const AddProduct = () => {
                   onChange={(e) => setKeywordSelection(e.target.value)}
                 >
                   <option value="">Select preset key features...</option>
-                  {KEYWORDS_PRESETS.map((kw) => (
+                  {dbKeywords.map((kw) => (
                     <option key={kw} value={kw}>{kw}</option>
                   ))}
                   <option value="other">Other (Custom)...</option>

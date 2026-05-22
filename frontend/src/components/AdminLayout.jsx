@@ -18,12 +18,13 @@ const AdminLayout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("smartstoretoken");
+    localStorage.removeItem("smartstoreuser");
     navigate("/login");
   };
 
   const navItems = [
     {
-      to: "/",
+      to: "/dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
       end: true,

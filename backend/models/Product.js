@@ -34,6 +34,16 @@ const productSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    audience: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    keywords: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     tags: [
       {
         type: String,

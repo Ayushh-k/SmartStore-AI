@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingBag, Lock, Mail, User, Loader2 } from "lucide-react";
+import { ShoppingBag, Lock, Mail, User, Loader2, UserCheck } from "lucide-react";
 import api from "../utils/api.js";
 
 const Login = () => {
@@ -14,6 +14,7 @@ const Login = () => {
     name: "",
     email: "",
     password: "",
+    role: "user",
   });
 
   const handleChange = (e) => {
@@ -29,12 +30,21 @@ const Login = () => {
     try {
       const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
       const payload = isRegister 
-        ? { name: form.name, email: form.email, password: form.password }
+        ? { name: form.name, email: form.email, password: form.password, role: form.role }
         : { email: form.email, password: form.password };
 
       const res = await api.post(endpoint, payload);
+      
+      // Store token and user info
       localStorage.setItem("smartstoretoken", res.data.token);
-      navigate("/");
+      localStorage.setItem("smartstoreuser", JSON.stringify(res.data.user));
+      
+      // Redirect based on role
+      if (res.data.user.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error("Auth error:", err);
       setError(
@@ -53,12 +63,12 @@ const Login = () => {
             <ShoppingBag className="h-7 w-7" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight">
-            {isRegister ? "Create Admin Account" : "Welcome Back"}
+            {isRegister ? "Create Account" : "Welcome Back"}
           </h2>
           <p className="mt-1.5 text-xs text-slate-400">
             {isRegister
-              ? "Register to access the AI console"
-              : "Sign in to manage your smart store"}
+              ? "Register to shop or manage store"
+              : "Sign in to access your smart store"}
           </p>
         </div>
 
@@ -70,25 +80,47 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isRegister && (
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-300">
-                Full Name
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-                  <User className="h-4 w-4" />
-                </span>
-                <input
-                  type="text"
-                  name="name"
-                  required={isRegister}
-                  value={form.name}
-                  onChange={handleChange}
-                  className="input !pl-10"
-                  placeholder="John Doe"
-                />
+            <>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-300">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                    <User className="h-4 w-4" />
+                  </span>
+                  <input
+                    type="text"
+                    name="name"
+                    required={isRegister}
+                    value={form.name}
+                    onChange={handleChange}
+                    className="input !pl-10"
+                    placeholder="John Doe"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-300">
+                  Register As
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                    <UserCheck className="h-4 w-4" />
+                  </span>
+                  <select
+                    name="role"
+                    value={form.role}
+                    onChange={handleChange}
+                    className="input select !pl-10"
+                  >
+                    <option value="user">Customer (Storefront)</option>
+                    <option value="admin">Administrator (Dashboard)</option>
+                  </select>
+                </div>
+              </div>
+            </>
           )}
 
           <div>
@@ -106,7 +138,7 @@ const Login = () => {
                 value={form.email}
                 onChange={handleChange}
                 className="input !pl-10"
-                placeholder="admin@smartstore.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -157,7 +189,7 @@ const Login = () => {
           >
             {isRegister
               ? "Already have an account? Sign In"
-              : "Don't have an admin account? Sign Up"}
+              : "Don't have an account? Sign Up"}
           </button>
         </div>
       </div>
