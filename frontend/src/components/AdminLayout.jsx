@@ -138,22 +138,22 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 relative">
+    <div className="min-h-screen bg-[#0a0a0a] text-neutral-100 relative font-sans">
       {/* Toast Alert Popup */}
       {toast.show && (
-        <div className="fixed top-4 right-4 z-[9999] w-80 rounded-2xl border border-emerald-500/30 bg-slate-950/95 backdrop-blur-md p-4 shadow-2xl flex items-start gap-3 border-l-4 border-l-emerald-500 animate-slideIn">
-          <div className="rounded-lg bg-emerald-950/60 p-1.5 text-emerald-400 border border-emerald-500/20 shrink-0">
+        <div className="fixed top-6 right-6 z-[9999] w-80 border border-white bg-black p-4 shadow-2xl flex items-start gap-3 animate-slideIn rounded-none">
+          <div className="text-white shrink-0 mt-0.5">
             <ShoppingBag className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <h4 className="text-xs font-bold text-slate-200">New Sale Recorded!</h4>
-            <p className="text-[11px] text-slate-400 mt-0.5 leading-normal">
+            <h4 className="text-[10px] font-bold tracking-widest uppercase text-white">New Sale Recorded</h4>
+            <p className="text-[11px] text-neutral-400 mt-1 leading-normal">
               {toast.message}
             </p>
           </div>
           <button
             onClick={() => setToast({ show: false, message: "" })}
-            className="text-slate-505 hover:text-slate-300 cursor-pointer"
+            className="text-neutral-500 hover:text-white cursor-pointer transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -162,23 +162,23 @@ const AdminLayout = () => {
 
       <div className="mx-auto flex h-screen max-w-7xl gap-6 px-4 py-4 sm:px-6 lg:px-8">
         {/* Sidebar */}
-        <aside className="glass-panel flex w-64 flex-col p-4">
-          <div className="mb-6 flex items-center gap-3 border-b border-slate-700/60 pb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
-              <ShoppingBag className="h-6 w-6" />
+        <aside className="w-64 border border-neutral-900 bg-black flex flex-col p-6 rounded-none">
+          <div className="mb-8 flex items-center gap-3 border-b border-neutral-900 pb-5">
+            <div className="text-white shrink-0">
+              <ShoppingBag className="h-5 w-5" />
             </div>
             <div className="text-left">
-              <div className="text-sm font-semibold tracking-tight">
-                SmartStore AI
+              <div className="font-serif text-sm font-semibold tracking-widest uppercase text-white">
+                SmartStore
               </div>
-              <div className="text-xs text-slate-400">
-                AI-Powered Admin Console
+              <div className="text-[8px] uppercase tracking-widest text-neutral-500 mt-0.5">
+                Admin Console
               </div>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 text-sm">
+          <nav className="flex-1 space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -188,14 +188,14 @@ const AdminLayout = () => {
                   end={item.end}
                   className={({ isActive }) =>
                     [
-                      "flex items-center gap-2 rounded-lg px-3 py-2 transition-colors",
+                      "flex items-center gap-3 px-3 py-2.5 transition-all text-[10px] uppercase tracking-widest rounded-none",
                       isActive
-                        ? "bg-primary/20 text-primary"
-                        : "text-slate-300 hover:bg-slate-800/70 hover:text-slate-100",
+                        ? "bg-white text-black font-semibold"
+                        : "text-neutral-400 hover:bg-neutral-900 hover:text-white",
                     ].join(" ")
                   }
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4 shrink-0" />
                   <span>{item.label}</span>
                 </NavLink>
               );
@@ -203,16 +203,16 @@ const AdminLayout = () => {
           </nav>
 
           {/* Footer */}
-          <div className="mt-4 border-t border-slate-700/60 pt-4 text-xs text-slate-400">
+          <div className="mt-4 border-t border-neutral-900 pt-4">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-slate-300 hover:bg-slate-800/70 hover:text-slate-100 cursor-pointer"
+              className="flex w-full items-center justify-between px-2 py-2 text-neutral-400 hover:text-white transition-colors cursor-pointer rounded-none animate-none"
             >
-              <span className="flex items-center gap-2 text-sm">
+              <span className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-semibold">
                 <LogOut className="h-4 w-4" />
                 Logout
               </span>
-              <span className="text-[10px] uppercase tracking-wide">
+              <span className="text-[8px] uppercase tracking-widest text-neutral-600">
                 Admin
               </span>
             </button>
@@ -220,27 +220,27 @@ const AdminLayout = () => {
         </aside>
 
         {/* Main content */}
-        <main className="glass-panel flex-1 overflow-hidden">
-          <header className="flex items-center justify-between border-b border-slate-700/60 px-6 py-4">
+        <main className="flex-1 border border-neutral-900 bg-black flex flex-col overflow-hidden rounded-none">
+          <header className="flex items-center justify-between border-b border-neutral-900 px-6 py-5">
             <div className="text-left">
-              <h1 className="text-lg font-semibold tracking-tight">
-                SmartStore Overview
+              <h1 className="font-serif text-lg tracking-widest uppercase text-white">
+                Admin Portal
               </h1>
-              <p className="text-xs text-slate-400">
-                Monitor performance and generate AI-powered product content.
+              <p className="text-[9px] uppercase tracking-widest text-neutral-500 mt-0.5">
+                SmartStore AI Engine
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* Notification Bell Dropdown */}
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="relative rounded-xl border border-slate-800 bg-slate-950/70 p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-all cursor-pointer"
+                  className="relative border border-neutral-900 bg-black p-2.5 text-neutral-400 hover:text-white hover:border-neutral-700 transition-all cursor-pointer rounded-none"
                   title="Notifications"
                 >
                   <Bell className="h-4.5 w-4.5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[8px] font-bold text-white ring-1 ring-slate-950 animate-pulse">
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center bg-white text-[8px] font-bold text-black ring-1 ring-black">
                       {unreadCount}
                     </span>
                   )}
@@ -248,49 +248,45 @@ const AdminLayout = () => {
 
                 {/* Dropdown Popover */}
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-slate-800 bg-slate-950/95 backdrop-blur-md shadow-2xl z-50 overflow-hidden animate-fadeIn">
-                    <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-                      <span className="text-xs font-bold text-slate-350 uppercase tracking-wide">Notifications</span>
+                  <div className="absolute right-0 mt-2 w-80 border border-neutral-900 bg-black shadow-2xl z-50 overflow-hidden rounded-none animate-fadeIn">
+                    <div className="flex items-center justify-between border-b border-neutral-900 px-4 py-3 bg-[#0a0a0a]">
+                      <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest">Notifications</span>
                       {unreadCount > 0 && (
                         <button
                           onClick={handleMarkAllRead}
-                          className="text-[10px] text-primary hover:text-indigo-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                          className="text-[9px] text-white hover:underline uppercase tracking-widest font-semibold flex items-center gap-1 cursor-pointer"
                         >
                           <Check className="h-3 w-3" />
                           Mark all read
                         </button>
                       )}
                     </div>
-                    <div className="max-h-72 overflow-y-auto divide-y divide-slate-900">
+                    <div className="max-h-72 overflow-y-auto divide-y divide-neutral-900">
                       {notifications.length === 0 ? (
-                        <div className="px-4 py-8 text-center text-[11px] text-slate-500">
-                          No notifications yet
+                        <div className="px-4 py-8 text-center text-[10px] text-neutral-500 uppercase tracking-widest">
+                          No notifications
                         </div>
                       ) : (
                         notifications.map((n) => (
                           <div
                             key={n._id}
-                            className={`px-4 py-3 hover:bg-slate-900/40 transition-colors flex gap-2.5 items-start ${
-                              !n.read ? "bg-primary/5" : ""
+                            className={`px-4 py-3.5 hover:bg-neutral-900 transition-colors flex gap-3 items-start ${
+                              !n.read ? "bg-neutral-900/40" : ""
                             }`}
                           >
-                            <div className={`mt-0.5 rounded-lg p-1.5 shrink-0 ${
-                              n.type === "purchase" 
-                                ? "bg-emerald-950/40 border border-emerald-500/20 text-emerald-400" 
-                                : "bg-slate-900 border border-slate-800 text-slate-400"
-                            }`}>
+                            <div className="mt-0.5 text-neutral-400 shrink-0">
                               <ShoppingBag className="h-3.5 w-3.5" />
                             </div>
                             <div className="flex-1 min-w-0 text-left">
-                              <p className="text-[11px] text-slate-300 leading-normal break-words">
+                              <p className="text-[11px] text-neutral-300 leading-normal break-words">
                                 {n.message}
                               </p>
-                              <span className="text-[9px] text-slate-505 mt-1 block">
+                              <span className="text-[9px] text-neutral-500 uppercase tracking-wider mt-1.5 block">
                                 {formatTime(n.createdAt)}
                               </span>
                             </div>
                             {!n.read && (
-                              <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                              <span className="h-1.5 w-1.5 bg-white shrink-0 mt-1.5" />
                             )}
                           </div>
                         ))
@@ -302,15 +298,15 @@ const AdminLayout = () => {
 
               <Link
                 to="/products/new"
-                className="btn-primary inline-flex items-center gap-2 text-xs"
+                className="bg-white text-black hover:bg-neutral-200 tracking-widest uppercase font-bold py-2.5 px-4 text-[10px] rounded-none transition-colors inline-flex items-center gap-2"
               >
-                <PackagePlus className="h-4 w-4" />
-                New Product
+                <PackagePlus className="h-3.5 w-3.5" />
+                Add Product
               </Link>
             </div>
           </header>
 
-          <section className="h-[calc(100%-4rem)] overflow-y-auto px-6 py-5">
+          <section className="h-[calc(100%-4rem)] overflow-y-auto px-6 py-6 bg-black">
             <Outlet />
           </section>
         </main>
