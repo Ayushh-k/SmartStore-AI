@@ -18,3 +18,52 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch product details." });
   }
 };
+
+/**
+  Create a new product review.
+  Route: POST /api/products/:id/reviews
+  Access: Protected (logged-in users only)
+ */
+export const createProductReview = async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    
+    if (rating === undefined || !comment) {
+      return res.status(400).json({ message: "Please provide a rating and a comment." });
+    }
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Check if user already reviewed this product
+    const alreadyReviewed = product.reviews.some(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: "Product already reviewed by this user." });
+    }
+
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    };
+
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+    res.status(201).json({ message: "Review added successfully." });
+  } catch (error) {
+    console.error("Create product review error:", error);
+    res.status(500).json({ message: "Failed to submit review." });
+  }
+};

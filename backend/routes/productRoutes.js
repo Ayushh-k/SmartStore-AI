@@ -3,7 +3,7 @@
 import express from "express";
 import Product from "../models/Product.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
-import { getProductById } from "../controllers/productController.js";
+import { getProductById, createProductReview } from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -51,6 +51,9 @@ router.get("/meta/values", protect, admin, async (req, res) => {
 
 // Get single product (Accessible by logged-in users for PDP)
 router.get("/:id", protect, getProductById);
+
+// Submit product review (Accessible by logged-in users)
+router.post("/:id/reviews", protect, createProductReview);
 
 // Update product
 router.put("/:id", protect, admin, async (req, res) => {

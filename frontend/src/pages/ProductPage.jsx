@@ -42,6 +42,13 @@ const ProductPage = () => {
   const [shakeSize, setShakeSize] = useState(false);
   const [shakeColor, setShakeColor] = useState(false);
 
+  // Ratings & Reviews States
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+
   // AI & Utility Feature States
   const [pincode, setPincode] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState("");
@@ -289,6 +296,32 @@ const ProductPage = () => {
     }, 850);
   };
 
+  // Submit product review handler
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!reviewComment.trim()) return;
+
+    setSubmittingReview(true);
+    setReviewError("");
+    try {
+      await api.post(`/api/products/${id}/reviews`, {
+        rating: reviewRating,
+        comment: reviewComment
+      });
+      showToast("Review submitted successfully!");
+      setReviewComment("");
+      setReviewRating(5);
+      setShowReviewForm(false);
+      // Refresh details
+      await fetchProductDetails();
+    } catch (err) {
+      console.error("Submit review error:", err);
+      setReviewError(err?.response?.data?.message || "Failed to submit review.");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   // Loader screen
   if (loading) {
     return (
@@ -318,11 +351,25 @@ const ProductPage = () => {
     );
   }
 
-  // Average Rating Calculator
-  const averageRating = product.reviews?.length > 0
+  // Average Rating & Distribution Calculator
+  const averageRating = product.reviews && product.reviews.length > 0
     ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length).toFixed(1)
-    : "4.4";
-  const totalReviews = product.reviews?.length || 18;
+    : "0.0";
+  const totalReviews = product.reviews?.length || 0;
+
+  // Rating counts from 1 to 5 stars
+  const ratingsCount = [0, 0, 0, 0, 0];
+  if (product.reviews && product.reviews.length > 0) {
+    product.reviews.forEach((r) => {
+      const ratingVal = Math.round(r.rating);
+      if (ratingVal >= 1 && ratingVal <= 5) {
+        ratingsCount[ratingVal - 1]++;
+      }
+    });
+  }
+  const ratingsPercentages = ratingsCount.map((count) =>
+    totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0
+  );
 
   // Strikethrough pricing logic
   const originalPrice = product.price * 1.45;
@@ -510,7 +557,13 @@ const ProductPage = () => {
           <div className="grid gap-6 sm:grid-cols-2">
             {/* 1. Size Selection Picker */}
             {product.sizes && product.sizes.length > 0 && (
-              <div className={`space-y-3 ${shakeSize ? "animate-shake" : ""}`}>
+              <div className={`space-y-3 p-3 rounded-xl border transition-all duration-300 ${
+                shakeSize 
+                  ? "animate-shake border-red-500 bg-red-950/10" 
+                  : (validationError && !selectedSize) 
+                    ? "border-red-500 bg-red-950/5" 
+                    : "border-slate-850 bg-slate-900/10"
+              }`}>
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Select Size
@@ -527,20 +580,26 @@ const ProductPage = () => {
                   {product.sizes.map((size) => (
                     <button
                       key={size}
+                      type="button"
                       onClick={() => {
                         setSelectedSize(size);
                         setValidationError("");
                       }}
-                      className={`h-9 w-9 text-xs font-bold border rounded-lg flex items-center justify-center cursor-pointer transition-all ${
+                      className={`h-11 w-11 text-xs font-bold border rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
                         selectedSize === size
-                          ? "border-primary bg-primary/10 text-primary shadow-[0_0_10px_rgba(99,102,241,0.2)]"
-                          : "border-slate-850 bg-slate-950 text-slate-400 hover:border-slate-700"
+                          ? "border-indigo-500 ring-2 ring-indigo-500 bg-indigo-950/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                          : "border-slate-850 bg-slate-950 text-slate-350 hover:border-slate-700 hover:bg-slate-900/50"
                       }`}
                     >
                       {size}
                     </button>
                   ))}
                 </div>
+                {validationError && !selectedSize && (
+                  <p className="text-[10px] text-red-400 font-bold animate-fadeIn">
+                    * Please select a size
+                  </p>
+                )}
               </div>
             )}
 
@@ -763,6 +822,190 @@ const ProductPage = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* ================= RATINGS & REVIEWS SECTION ================= */}
+        <div className="mt-12 pt-8 border-t border-slate-900 text-left space-y-8">
+          <h2 className="text-lg font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
+            <span>Ratings & Reviews</span>
+            <span className="text-xs bg-slate-900 border border-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-semibold">
+              {totalReviews} Reviews
+            </span>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-slate-900/5 glass-panel p-6 rounded-2xl border border-slate-900">
+            {/* Average rating box */}
+            <div className="md:col-span-4 text-center space-y-2 border-b md:border-b-0 md:border-r border-slate-900 pb-6 md:pb-0 md:pr-6">
+              <h3 className="text-4xl font-extrabold text-slate-100 flex items-center justify-center gap-1">
+                <span>{averageRating}</span>
+                <Star className="h-7 w-7 text-amber-400 fill-current" />
+              </h3>
+              <p className="text-xs text-slate-400 font-semibold">{totalReviews} Verified Ratings</p>
+              <button
+                onClick={() => {
+                  setReviewError("");
+                  setShowReviewForm(true);
+                }}
+                className="btn-primary mt-2 py-2 px-4 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Award className="h-3.5 w-3.5" />
+                <span>Write a Review</span>
+              </button>
+            </div>
+
+            {/* Rating distribution chart */}
+            <div className="md:col-span-8 space-y-2.5">
+              {[5, 4, 3, 2, 1].map((stars) => {
+                const percentage = ratingsPercentages[stars - 1];
+                const count = ratingsCount[stars - 1];
+                return (
+                  <div key={stars} className="flex items-center gap-3 text-xs">
+                    <span className="w-8 font-semibold text-slate-400 text-right">{stars} ★</span>
+                    <div className="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-900">
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="w-10 text-slate-400 font-semibold">{percentage}%</span>
+                    <span className="w-8 text-[10px] text-slate-500 text-right">({count})</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Glassmorphic Write Review Form Modal */}
+          {showReviewForm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
+              <div className="glass-panel w-full max-w-lg p-6 space-y-5 border-slate-800 bg-slate-950 text-left">
+                <div className="flex justify-between items-center border-b border-slate-900 pb-3">
+                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Star className="h-4.5 w-4.5 text-primary" />
+                    <span>Write a Product Review</span>
+                  </h3>
+                  <button
+                    onClick={() => setShowReviewForm(false)}
+                    className="rounded bg-slate-900 hover:bg-slate-800 p-1 text-slate-450 hover:text-slate-200 cursor-pointer"
+                  >
+                    <ChevronLeft className="h-4 w-4 rotate-180" />
+                  </button>
+                </div>
+
+                {reviewError && (
+                  <div className="p-3 bg-rose-950/20 border border-rose-500/40 text-rose-350 text-xs rounded-lg font-semibold">
+                    {reviewError}
+                  </div>
+                )}
+
+                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                  {/* Star rating selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Rating</label>
+                    <div className="flex gap-1.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewRating(star)}
+                          className="text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
+                        >
+                          <Star
+                            className={`h-6 w-6 ${
+                              star <= reviewRating ? "text-amber-400 fill-current" : ""
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Comment textarea */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Your Comment</label>
+                    <textarea
+                      placeholder="Share your experience with this product... (materials, fit, durability)"
+                      rows={4}
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      className="input text-xs w-full py-2 px-3 focus:border-primary/60"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="submit"
+                      disabled={submittingReview}
+                      className="btn-primary flex-1 py-2 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      {submittingReview ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <span>Submit Review</span>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowReviewForm(false)}
+                      className="btn-outline px-4 py-2 text-xs font-bold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Review list */}
+          <div className="space-y-4">
+            {!product.reviews || product.reviews.length === 0 ? (
+              <div className="glass-panel py-12 text-center text-slate-500 border-slate-900 bg-slate-900/5 rounded-2xl">
+                <HelpCircle className="h-8 w-8 text-slate-700 mx-auto mb-2" />
+                <h4 className="text-xs font-semibold text-slate-350">No customer reviews yet</h4>
+                <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
+                  Be the first to review this product and share your thoughts with other shoppers!
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {product.reviews.map((r, idx) => {
+                  const isHighRating = r.rating >= 4;
+                  const isMidRating = r.rating === 3;
+                  const badgeColor = isHighRating
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    : isMidRating
+                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    : "bg-rose-500/10 text-rose-400 border-rose-500/20";
+                  return (
+                    <div
+                      key={r._id || idx}
+                      className="glass-panel p-5 border border-slate-900/60 bg-slate-900/5 hover:border-slate-800 transition-all rounded-2xl flex flex-col md:flex-row md:items-start justify-between gap-4"
+                    >
+                      <div className="space-y-2 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center gap-0.5 border rounded-md px-1.5 py-0.5 text-[10px] font-bold ${badgeColor}`}>
+                            <span>{r.rating}</span>
+                            <Star className="h-3 w-3 fill-current" />
+                          </span>
+                          <span className="font-semibold text-slate-200 text-xs">
+                            {r.name || "Verified Buyer"}
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-semibold font-mono">
+                            {new Date(r.createdAt || r.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                          {r.comment}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
