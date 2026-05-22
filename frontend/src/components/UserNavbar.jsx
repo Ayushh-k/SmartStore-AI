@@ -71,7 +71,7 @@ const UserNavbar = () => {
             to="/"
             end
             className={({ isActive }) =>
-              `font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 ${
+              `font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 ${
                 isActive && !isWishlistPage
                   ? "text-white border-b border-white"
                   : "text-neutral-400 hover:text-white"
@@ -85,7 +85,7 @@ const UserNavbar = () => {
             <NavLink
               to="/profile?tab=wishlist"
               className={() =>
-                `font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
+                `font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
                   isWishlistPage
                     ? "text-white border-b border-white"
                     : "text-neutral-400 hover:text-white"
@@ -100,7 +100,7 @@ const UserNavbar = () => {
           {user && user.role === "admin" && (
             <Link
               to="/dashboard"
-              className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
             >
               <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
               <span>Admin</span>
@@ -123,7 +123,7 @@ const UserNavbar = () => {
           <NavLink
             to="/cart"
             className={({ isActive }) =>
-              `font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
+              `font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
                 isActive ? "text-white border-b border-white" : "text-neutral-400 hover:text-white"
               }`
             }
@@ -131,7 +131,7 @@ const UserNavbar = () => {
             <ShoppingCart className="h-3.5 w-3.5 stroke-[1.5]" />
             <span className="hidden sm:inline">Cart</span>
             {cartCount > 0 && (
-              <span className="text-[10px] font-sans font-medium text-gold ml-0.5">
+              <span className="text-[10px] font-montserrat font-medium text-gold ml-0.5">
                 ({cartCount})
               </span>
             )}
@@ -141,14 +141,14 @@ const UserNavbar = () => {
             <div className="flex items-center gap-6">
               <Link
                 to="/profile"
-                className="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-white transition-colors duration-300 flex items-center gap-1.5"
+                className="font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-white transition-colors duration-300 flex items-center gap-1.5"
               >
                 <User className="h-3.5 w-3.5 stroke-[1.5]" />
                 <span className="hidden md:inline">{user.name.split(" ")[0]}</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-rose-400 transition-colors duration-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0"
+                className="font-montserrat text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-rose-400 transition-colors duration-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0"
               >
                 <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
                 <span className="hidden lg:inline">Logout</span>
@@ -157,7 +157,7 @@ const UserNavbar = () => {
           ) : (
             <Link
               to="/login"
-              className="font-sans text-[11px] tracking-[0.2em] uppercase bg-white text-black px-5 py-2 font-semibold hover:bg-neutral-200 transition-colors duration-300"
+              className="font-montserrat text-[11px] tracking-[0.2em] uppercase bg-white text-black px-5 py-2 font-semibold hover:bg-neutral-200 transition-colors duration-300"
             >
               Sign In
             </Link>
