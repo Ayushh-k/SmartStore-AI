@@ -1,7 +1,7 @@
 // frontend/src/App.jsx
 
 import React from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import AdminLayout from "./components/AdminLayout.jsx";
 import UserNavbar from "./components/UserNavbar.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -54,10 +54,12 @@ const AdminRoute = ({ children }) => {
   Layout container for user storefront shopping
  */
 const UserLayout = () => {
+  const location = useLocation();
+  const isStorefront = location.pathname === "/";
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-100 flex flex-col">
       <UserNavbar />
-      <main className="flex-1">
+      <main className={`flex-1 ${isStorefront ? "" : "pt-28"}`}>
         <Outlet />
       </main>
     </div>

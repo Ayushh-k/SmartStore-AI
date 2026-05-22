@@ -6,15 +6,21 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ["'Playfair Display'", "serif"],
+        sans: ["'Montserrat'", "sans-serif"],
+      },
       colors: {
         background: "#0a0a0a",
-        primary: "#6366f1",
-        primaryDark: "#4f46e5",
-        card: "rgba(15, 23, 42, 0.85)", // slate-900 with glass
-        borderGlass: "rgba(148, 163, 184, 0.35)", // slate-400
+        primary: "#ffffff", // Pure white for primary accent
+        primaryDark: "#e5e5e5",
+        gold: "#D4AF37",    // Champagne gold for special accents
+        card: "#121212",
+        borderGlass: "rgba(255, 255, 255, 0.1)",
       },
       boxShadow: {
-        glass: "0 10px 60px rgba(15, 23, 42, 0.85)",
+        glass: "none",
+        luxury: "0 10px 40px rgba(0, 0, 0, 0.5)",
       },
       backdropBlur: {
         xs: "2px",

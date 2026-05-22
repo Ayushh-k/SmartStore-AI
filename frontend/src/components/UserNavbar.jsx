@@ -1,12 +1,13 @@
 // frontend/src/components/UserNavbar.jsx
 
 import React, { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingBag, ShoppingCart, LogOut, LayoutDashboard, User, Heart } from "lucide-react";
 import api from "../utils/api.js";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(null);
 
@@ -59,98 +60,109 @@ const UserNavbar = () => {
     navigate("/login");
   };
 
+  const isWishlistPage = location.pathname === "/profile" && location.search.includes("tab=wishlist");
+
   return (
-    <nav className="glass-panel border-x-0 border-t-0 rounded-none sticky top-0 z-50 px-6 py-4 flex items-center justify-between backdrop-blur-md bg-slate-950/85">
-      <div className="flex items-center gap-3">
-        <Link to="/" className="flex items-center gap-2 text-primary hover:text-indigo-400 transition-colors">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
-            <ShoppingBag className="h-5 w-5" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight text-slate-100">
-            SmartStore Shop
-          </span>
-        </Link>
-      </div>
-
-      <div className="flex items-center gap-6 text-xs font-medium">
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) =>
-            isActive
-              ? "text-primary border-b border-primary pb-1"
-              : "text-slate-300 hover:text-slate-150 transition-colors"
-          }
-        >
-          Shop
-        </NavLink>
-
-        <NavLink
-          to="/cart"
-          className={({ isActive }) =>
-            `relative flex items-center gap-1.5 transition-colors ${
-              isActive ? "text-primary border-b border-primary pb-1" : "text-slate-300 hover:text-slate-150"
-            }`
-          }
-        >
-          <ShoppingCart className="h-4 w-4" />
-          <span>Cart</span>
-          {cartCount > 0 && (
-            <span className="absolute -top-2.5 -right-3 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white shadow-lg animate-pulse">
-              {cartCount}
-            </span>
-          )}
-        </NavLink>
-
-        {user && (
+    <nav className="absolute top-0 left-0 w-full z-50 bg-transparent py-8 px-6 sm:px-12 flex items-center justify-between text-white border-b border-white/5">
+      <div className="grid grid-cols-3 w-full items-center">
+        {/* Left Side: Navigation Links */}
+        <div className="flex items-center gap-8 justify-start">
           <NavLink
-            to="/profile?tab=wishlist"
+            to="/"
+            end
             className={({ isActive }) =>
-              `relative flex items-center gap-1.5 transition-colors ${
-                window.location.search.includes("tab=wishlist") ? "text-primary border-b border-primary pb-1" : "text-slate-300 hover:text-slate-150"
+              `font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 ${
+                isActive && !isWishlistPage
+                  ? "text-white border-b border-white"
+                  : "text-neutral-400 hover:text-white"
               }`
             }
           >
-            <Heart className="h-4 w-4 text-rose-500" />
-            <span>Wishlist</span>
+            Shop
           </NavLink>
-        )}
 
-        {user && user.role === "admin" && (
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors border border-emerald-500/30 bg-emerald-950/20 rounded px-2.5 py-1 text-[11px]"
-          >
-            <LayoutDashboard className="h-3 w-3" />
-            <span>Admin Dashboard</span>
-          </Link>
-        )}
+          {user && (
+            <NavLink
+              to="/profile?tab=wishlist"
+              className={() =>
+                `font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
+                  isWishlistPage
+                    ? "text-white border-b border-white"
+                    : "text-neutral-400 hover:text-white"
+                }`
+              }
+            >
+              <Heart className="h-3.5 w-3.5 stroke-[1.5]" />
+              <span className="hidden sm:inline">Wishlist</span>
+            </NavLink>
+          )}
 
-        {user ? (
-          <div className="flex items-center gap-4 pl-4 border-l border-slate-800">
+          {user && user.role === "admin" && (
             <Link
-              to="/profile"
-              className="flex items-center gap-1.5 text-slate-350 hover:text-primary transition-colors cursor-pointer"
+              to="/dashboard"
+              className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
             >
-              <User className="h-3.5 w-3.5 text-slate-400" />
-              <span>{user.name}</span>
+              <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
+              <span>Admin</span>
             </Link>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 rounded bg-slate-900 border border-slate-800 px-2 py-1 text-slate-400 hover:text-rose-450 hover:bg-rose-950/25 transition-all cursor-pointer"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span>Logout</span>
-            </button>
-          </div>
-        ) : (
+          )}
+        </div>
+
+        {/* Center: Luxury Serif Brand Logo */}
+        <div className="flex justify-center">
           <Link
-            to="/login"
-            className="btn-primary text-[11px] px-3.5 py-1.5"
+            to="/"
+            className="font-serif text-lg sm:text-2xl tracking-[0.35em] uppercase text-white hover:text-white/80 transition-colors duration-300 font-medium whitespace-nowrap"
           >
-            Login / Signup
+            SmartStore
           </Link>
-        )}
+        </div>
+
+        {/* Right Side: Cart, Profile & Actions */}
+        <div className="flex items-center gap-8 justify-end">
+          <NavLink
+            to="/cart"
+            className={({ isActive }) =>
+              `font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 flex items-center gap-1.5 ${
+                isActive ? "text-white border-b border-white" : "text-neutral-400 hover:text-white"
+              }`
+            }
+          >
+            <ShoppingCart className="h-3.5 w-3.5 stroke-[1.5]" />
+            <span className="hidden sm:inline">Cart</span>
+            {cartCount > 0 && (
+              <span className="text-[10px] font-sans font-medium text-gold ml-0.5">
+                ({cartCount})
+              </span>
+            )}
+          </NavLink>
+
+          {user ? (
+            <div className="flex items-center gap-6">
+              <Link
+                to="/profile"
+                className="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-white transition-colors duration-300 flex items-center gap-1.5"
+              >
+                <User className="h-3.5 w-3.5 stroke-[1.5]" />
+                <span className="hidden md:inline">{user.name.split(" ")[0]}</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="font-sans text-[11px] tracking-[0.2em] uppercase text-neutral-400 hover:text-rose-400 transition-colors duration-300 flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0"
+              >
+                <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
+                <span className="hidden lg:inline">Logout</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="font-sans text-[11px] tracking-[0.2em] uppercase bg-white text-black px-5 py-2 font-semibold hover:bg-neutral-200 transition-colors duration-300"
+            >
+              Sign In
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   );

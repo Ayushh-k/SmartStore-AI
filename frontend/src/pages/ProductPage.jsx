@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Sliders,
   Package,
-  Award
+  Award,
+  X
 } from "lucide-react";
 import api, { toggleWishlistAPI } from "../utils/api.js";
 
@@ -325,9 +326,9 @@ const ProductPage = () => {
   // Loader screen
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-40 space-y-3 text-slate-400">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="text-xs">Fetching premium product showcase details...</span>
+      <div className="flex flex-col items-center justify-center py-48 space-y-4 text-neutral-400 bg-black min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
+        <span className="text-[10px] uppercase tracking-widest">Fetching Atelier Catalog...</span>
       </div>
     );
   }
@@ -335,14 +336,14 @@ const ProductPage = () => {
   // Error screen
   if (error || !product) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-6">
-        <div className="glass-panel border-rose-500/30 p-8 space-y-4">
-          <h2 className="text-lg font-bold text-rose-400">Failed to load product page</h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
+      <div className="bg-black min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md w-full border border-white/10 p-8 space-y-6 text-center">
+          <h2 className="font-serif text-xl uppercase tracking-wider text-red-500">Failed to load product</h2>
+          <p className="text-xs text-neutral-400 leading-relaxed uppercase tracking-wider">
             {error || "Product details could not be found. Return to catalog storefront."}
           </p>
           <div className="pt-2">
-            <Link to="/" className="btn-primary py-2 px-5 text-xs font-semibold">
+            <Link to="/" className="bg-white text-black px-8 py-3 text-xs font-semibold uppercase tracking-widest inline-block hover:bg-neutral-250 transition-colors">
               Return Storefront
             </Link>
           </div>
@@ -378,543 +379,553 @@ const ProductPage = () => {
   const isOutOfStock = Number(product.stock) <= 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
-      {/* Toast Notification */}
-      {toast.show && (
-        <div className="fixed bottom-5 right-5 z-[200] glass-panel border-primary/45 bg-slate-950/90 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn border-l-4 border-l-primary backdrop-blur-md">
-          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-          <span className="text-xs font-semibold">{toast.message}</span>
-        </div>
-      )}
-
-      {/* Shake CSS Keyframes style definition */}
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-          20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
-
-      {/* Breadcrumb & Navigation */}
-      <div className="mb-6 flex justify-between items-center">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          <span>Back to Storefront</span>
-        </Link>
-        <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
-          SKU: {product.sku || "N/A"}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* ================= LEFT COLUMN: IMAGES ================= */}
-        <div className="lg:col-span-5 space-y-4">
-          {/* Main Showcase Image Frame */}
-          <div className="glass-panel border-slate-900 bg-slate-950 h-[380px] rounded-2xl overflow-hidden relative flex items-center justify-center border">
-            {product.images && product.images[activeImageIndex] ? (
-              <img
-                src={product.images[activeImageIndex]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  e.target.parentNode.querySelector(".fallback-icon").classList.remove("hidden");
-                }}
-              />
-            ) : null}
-
-            <div className={`fallback-icon flex flex-col items-center justify-center text-slate-700 ${product.images && product.images[activeImageIndex] ? "hidden" : ""}`}>
-              <Package className="h-16 w-16 mb-2" />
-              <span className="text-xs text-slate-500 font-semibold">No Image Available</span>
-            </div>
-
-            {/* Out of Stock Label overlay */}
-            {isOutOfStock && (
-              <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center">
-                <span className="rounded bg-rose-950 border border-rose-800 text-rose-200 px-4 py-1.5 text-xs uppercase tracking-widest font-extrabold shadow-lg">
-                  Out of Stock
-                </span>
-              </div>
-            )}
+    <div className="bg-black text-white min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12 pt-8 pb-16 relative">
+        {/* Toast Notification */}
+        {toast.show && (
+          <div className="fixed bottom-6 right-6 z-[200] bg-neutral-900 border border-white/10 text-white px-6 py-4 rounded-none shadow-2xl flex items-center gap-3 animate-fadeIn">
+            <Sparkles className="h-4 w-4 text-gold animate-pulse" />
+            <span className="text-[11px] uppercase tracking-widest font-sans font-semibold">{toast.message}</span>
           </div>
+        )}
 
-          {/* Interactive Thumbnails Gallery */}
-          {product.images && product.images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`h-16 w-16 bg-slate-950 rounded-lg border overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
-                    idx === activeImageIndex
-                      ? "border-primary shadow-[0_0_10px_rgba(99,102,241,0.3)] scale-105"
-                      : "border-slate-850 hover:border-slate-750"
-                  }`}
-                >
-                  <img src={img} alt={`${product.name} thumb ${idx}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+        {/* Shake CSS Keyframes */}
+        <style>{`
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+          }
+          .animate-shake {
+            animation: shake 0.5s ease-in-out;
+          }
+        `}</style>
+
+        {/* Breadcrumb & Navigation */}
+        <div className="mb-10 flex justify-between items-center text-xs tracking-wider uppercase font-sans text-neutral-500">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 hover:text-white transition-colors duration-300"
+          >
+            <ChevronLeft className="h-4 w-4 stroke-[1.5]" />
+            <span>Atelier Shop</span>
+          </Link>
+          <span className="font-mono text-[10px]">
+            SKU: {product.sku || "N/A"}
+          </span>
         </div>
 
-        {/* ================= RIGHT COLUMN: PRODUCT SPECIFICATIONS & CHECKOUT ================= */}
-        <div className="lg:col-span-7 space-y-6 text-left">
-          {/* Header Metadata block */}
-          <div className="space-y-3">
-            <span className="text-xs text-indigo-400 font-extrabold uppercase tracking-widest block">
-              {product.brand || "SmartStore AI Exclusive"}
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight">
-              {product.name}
-            </h1>
-            
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-primary/20 border border-primary/30 rounded px-2 py-0.5 text-xs text-primary font-bold">
-                <Star className="h-3.5 w-3.5 fill-current" />
-                <span>{averageRating}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* ================= LEFT COLUMN: IMAGES ================= */}
+          <div className="lg:col-span-6 space-y-6">
+            {/* Massive Main Showcase Image (aspect-[3/4] layout) */}
+            <div className="relative bg-neutral-950 aspect-[3/4] w-full overflow-hidden flex items-center justify-center border border-white/5">
+              {product.images && product.images[activeImageIndex] ? (
+                <img
+                  src={product.images[activeImageIndex]}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-all duration-500"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.parentNode.querySelector(".fallback-icon").classList.remove("hidden");
+                  }}
+                />
+              ) : null}
+
+              <div className={`fallback-icon flex flex-col items-center justify-center text-neutral-700 absolute inset-0 ${product.images && product.images[activeImageIndex] ? "hidden" : ""}`}>
+                <Package className="h-16 w-16 mb-2 stroke-[1.2]" />
+                <span className="text-[10px] tracking-widest uppercase font-medium">No Image Available</span>
               </div>
-              <span className="text-xs text-slate-400 font-semibold">
-                {totalReviews} Ratings & Reviews
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-800" />
-              <span className={`text-xs font-bold ${isOutOfStock ? "text-rose-450" : Number(product.stock) <= 5 ? "text-amber-450" : "text-emerald-450"}`}>
-                {isOutOfStock ? "Unavailable" : `${product.stock} units left in stock`}
-              </span>
-            </div>
-          </div>
 
-          {/* Action Bar (Wishlist & Share) */}
-          <div className="flex items-center gap-3 pb-2 border-b border-slate-900">
-            <button
-              onClick={handleWishlistToggle}
-              className={`rounded-xl border px-4 py-2.5 text-xs font-bold inline-flex items-center gap-2 cursor-pointer transition-all ${
-                isWishlisted
-                  ? "bg-rose-950/20 border-rose-900/60 text-rose-400"
-                  : "bg-slate-950 border-slate-850 text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <Heart className={`h-4.5 w-4.5 ${isWishlisted ? "fill-current text-rose-500" : ""}`} />
-              <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
-            </button>
-
-            <button
-              onClick={handleShareProduct}
-              className="rounded-xl border border-slate-850 bg-slate-950 p-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition-colors cursor-pointer"
-              title="Copy link to clipboard"
-            >
-              <Share2 className="h-4.5 w-4.5" />
-            </button>
-          </div>
-
-          {/* Pricing Block */}
-          <div className="glass-panel p-4 flex items-center justify-between gap-4">
-            <div className="space-y-1">
-              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wide block">Pricing Value</span>
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-3xl font-extrabold text-slate-100">
-                  ${product.price.toFixed(2)}
-                </span>
-                <span className="text-sm text-slate-500 line-through">
-                  ${originalPrice.toFixed(2)}
-                </span>
-                <span className="text-xs text-emerald-400 font-extrabold tracking-tight">
-                  ({discountPercent}% OFF)
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[9px] text-emerald-450 uppercase font-bold">
-                <Award className="h-3 w-3" />
-                Guaranteed Lowest Price
-              </span>
-            </div>
-          </div>
-
-          {/* Product Description */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Description</h3>
-            <p className="text-xs text-slate-350 leading-relaxed font-medium">
-              {product.description || "No description provided for this product in catalog listing."}
-            </p>
-          </div>
-
-          {/* Validation Error Banner */}
-          {validationError && (
-            <div className="rounded-lg border border-rose-500/40 bg-rose-950/20 p-3.5 text-xs text-rose-350 text-left font-bold animate-fadeIn">
-              {validationError}
-            </div>
-          )}
-
-          {/* Options: Sizes and Colors Pickers */}
-          <div className="grid gap-6 sm:grid-cols-2">
-            {/* 1. Size Selection Picker */}
-            {product.sizes && product.sizes.length > 0 && (
-              <div className={`space-y-3 p-3 rounded-xl border transition-all duration-300 ${
-                shakeSize 
-                  ? "animate-shake border-red-500 bg-red-950/10" 
-                  : (validationError && !selectedSize) 
-                    ? "border-red-500 bg-red-950/5" 
-                    : "border-slate-850 bg-slate-900/10"
-              }`}>
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Select Size
-                  </label>
-                  <button
-                    onClick={() => setShowPredictor(true)}
-                    className="text-[10px] text-primary hover:underline font-extrabold flex items-center gap-1"
-                  >
-                    <Sparkles className="h-3 w-3 animate-pulse" />
-                    <span>AI Size Advisor</span>
-                  </button>
+              {/* Out of Stock Label overlay */}
+              {isOutOfStock && (
+                <div className="absolute inset-0 bg-black/75 flex items-center justify-center z-10">
+                  <span className="bg-black border border-white/20 text-white px-8 py-3 text-xs uppercase tracking-widest font-semibold">
+                    Sold Out
+                  </span>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => {
-                        setSelectedSize(size);
-                        setValidationError("");
-                      }}
-                      className={`h-11 w-11 text-xs font-bold border rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                        selectedSize === size
-                          ? "border-indigo-500 ring-2 ring-indigo-500 bg-indigo-950/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-                          : "border-slate-850 bg-slate-950 text-slate-350 hover:border-slate-700 hover:bg-slate-900/50"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-                {validationError && !selectedSize && (
-                  <p className="text-[10px] text-red-400 font-bold animate-fadeIn">
-                    * Please select a size
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* 2. Color Selection Swatches */}
-            {product.colors && product.colors.length > 0 && (
-              <div className={`space-y-3 ${shakeColor ? "animate-shake" : ""}`}>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                  Select Color
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => {
-                        setSelectedColor(color);
-                        setValidationError("");
-                      }}
-                      className={`px-3 py-1.5 text-xs font-bold border rounded-lg cursor-pointer transition-all ${
-                        selectedColor === color
-                          ? "border-primary bg-primary/10 text-primary shadow-[0_0_10px_rgba(99,102,241,0.2)]"
-                          : "border-slate-850 bg-slate-950 text-slate-400 hover:border-slate-700"
-                      }`}
-                    >
-                      {color}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Add to Cart checkout primary button */}
-          <div className="pt-2">
-            <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || addingToCart}
-              className="btn-primary w-full py-3.5 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/10 hover:shadow-primary/25 disabled:opacity-40"
-            >
-              {addingToCart ? (
-                <>
-                  <Loader2 className="h-4.5 w-4.5 animate-spin" />
-                  <span>Adding to Shopping Cart...</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="h-4.5 w-4.5" />
-                  <span>{isOutOfStock ? "Out of Stock" : "Add to Cart & Checkout"}</span>
-                </>
               )}
-            </button>
-          </div>
-
-          {/* Delivery Pincode Checker */}
-          <div className="glass-panel p-4 space-y-3.5 text-xs border-slate-900 bg-slate-900/10">
-            <h3 className="font-bold uppercase text-[10px] tracking-wider text-slate-450 flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-indigo-400" />
-              <span>Check Delivery Pincode</span>
-            </h3>
-            <form onSubmit={handleCheckDelivery} className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Enter 6-digit pin code"
-                value={pincode}
-                onChange={(e) => setPincode(e.target.value)}
-                className="input py-2 px-3 text-xs flex-1 max-w-[200px]"
-                maxLength={6}
-                required
-              />
-              <button
-                type="submit"
-                disabled={pincodeLoading}
-                className="btn-outline text-xs px-4 py-2 cursor-pointer font-semibold"
-              >
-                {pincodeLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Check"}
-              </button>
-            </form>
-            {pincodeStatus && (
-              <p className="text-[11px] text-indigo-300 font-semibold tracking-wide flex items-center gap-1">
-                <Sparkles className="h-3 w-3 animate-pulse" />
-                {pincodeStatus}
-              </p>
-            )}
-          </div>
-
-          {/* ================= AI SHOPPING CORE ASSISTANT SECTION ================= */}
-          <div className="space-y-4 pt-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-900">
-              <Sparkles className="h-4.5 w-4.5 text-primary animate-pulse" />
-              <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-200">
-                AI Smart Assistant Features
-              </h2>
             </div>
 
-            {/* A. AI Size Predictor Modal-style section */}
-            {showPredictor && (
-              <div className="glass-panel p-5 border-primary/30 space-y-4 bg-slate-950/70 animate-fadeIn">
-                <div className="flex justify-between items-center border-b border-slate-900 pb-2">
-                  <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1">
-                    <Sliders className="h-4 w-4 text-indigo-400" />
-                    <span>AI Sizing Advisory Predictor</span>
-                  </h3>
+            {/* Interactive Thumbnails Gallery */}
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
+                {product.images.map((img, idx) => (
                   <button
-                    onClick={() => setShowPredictor(false)}
-                    className="text-[10px] text-slate-500 hover:text-slate-350 cursor-pointer font-bold"
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`h-20 w-20 bg-neutral-950 border overflow-hidden flex items-center justify-center transition-all cursor-pointer rounded-none ${
+                      idx === activeImageIndex
+                        ? "border-white"
+                        : "border-white/10 hover:border-white/40"
+                    }`}
                   >
-                    Close
+                    <img src={img} alt={`${product.name} thumb ${idx}`} className="w-full h-full object-cover" />
                   </button>
-                </div>
-                
-                <form onSubmit={handlePredictSize} className="grid gap-3 sm:grid-cols-3 items-end">
-                  <div>
-                    <label className="mb-1 block text-[9px] uppercase text-slate-400 font-bold">Height</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 178 cm or 5ft 10in"
-                      className="input py-1.5 text-xs"
-                      value={height}
-                      onChange={(e) => setHeight(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-[9px] uppercase text-slate-400 font-bold">Weight</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 72 kg or 158 lbs"
-                      className="input py-1.5 text-xs"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-[9px] uppercase text-slate-400 font-bold">Fit preference</label>
-                    <select
-                      className="input py-1.5 text-xs cursor-pointer"
-                      value={fitPreference}
-                      onChange={(e) => setFitPreference(e.target.value)}
-                    >
-                      <option value="Slim">Slim / Tight Fit</option>
-                      <option value="Regular">Regular Fit</option>
-                      <option value="Loose">Loose / Baggy Fit</option>
-                    </select>
-                  </div>
-                  <div className="sm:col-span-3 pt-2">
-                    <button
-                      type="submit"
-                      disabled={sizePredictLoading}
-                      className="btn-primary w-full py-2 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      {sizePredictLoading ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <span>Generate AI Size Estimation</span>
-                      )}
-                    </button>
-                  </div>
-                </form>
-
-                {sizeRec && (
-                  <div className="p-4 rounded-xl border border-indigo-950 bg-indigo-950/20 text-xs text-slate-200 text-left space-y-3 animate-fadeIn">
-                    <p className="leading-relaxed font-semibold">{sizeRec}</p>
-                    <button
-                      onClick={handleApplyPredictedSize}
-                      className="btn-outline py-1 px-3 text-[10px] font-bold cursor-pointer"
-                    >
-                      Apply Recommended Size
-                    </button>
-                  </div>
-                )}
+                ))}
               </div>
             )}
+          </div>
 
-            {/* B. AI Price Insights */}
-            <div className="glass-panel p-4 flex gap-4 text-xs border-slate-900 bg-slate-900/10 items-start">
-              <div className="h-8 w-8 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-primary shrink-0 mt-0.5">
-                <TrendingUp className="h-4 w-4" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-slate-350 uppercase text-[10px] tracking-wider">AI Price History Insights</h4>
-                {priceInsightsLoading ? (
-                  <p className="text-slate-500 italic">Analyzing price history database...</p>
-                ) : (
-                  <p className="text-slate-300 font-medium leading-relaxed">
-                    {priceInsights}
-                  </p>
-                )}
+          {/* ================= RIGHT COLUMN: PRODUCT SPECIFICATIONS & CHECKOUT ================= */}
+          <div className="lg:col-span-6 space-y-8 text-left">
+            {/* Header Metadata */}
+            <div className="space-y-4">
+              <span className="text-[10px] text-gold font-bold uppercase tracking-[0.3em] block">
+                {product.brand || "SmartStore Atelier"}
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-serif text-white tracking-wider leading-tight uppercase">
+                {product.name}
+              </h1>
+              
+              <div className="flex items-center gap-4 text-xs tracking-wider uppercase font-sans text-neutral-400">
+                <div className="flex items-center gap-1.5 text-gold font-semibold">
+                  <Star className="h-4 w-4 fill-current stroke-[1.2]" />
+                  <span>{averageRating}</span>
+                </div>
+                <span>{totalReviews} Reviews</span>
+                <span className="w-[1px] h-3 bg-neutral-800" />
+                <span className={`font-semibold ${isOutOfStock ? "text-red-500" : Number(product.stock) <= 5 ? "text-amber-500" : "text-neutral-300"}`}>
+                  {isOutOfStock ? "Sold Out" : `${product.stock} pieces left`}
+                </span>
               </div>
             </div>
 
-            {/* C. AI Product Q&A Ask Box */}
-            <div className="glass-panel p-5 space-y-4 border-slate-900 bg-slate-900/10">
-              <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-350 flex items-center gap-1.5">
-                <HelpCircle className="h-4 w-4 text-indigo-400" />
-                <span>Ask shopping AI assistant</span>
+            {/* Action Bar (Wishlist & Share) */}
+            <div className="flex items-center gap-4 pb-4 border-b border-white/5">
+              <button
+                onClick={handleWishlistToggle}
+                className={`border px-6 py-3 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 cursor-pointer transition-all rounded-none ${
+                  isWishlisted
+                    ? "bg-white text-black border-white"
+                    : "bg-transparent border-white/20 text-white hover:border-white"
+                }`}
+              >
+                <Heart className={`h-4 w-4 stroke-[1.5] ${isWishlisted ? "fill-current" : ""}`} />
+                <span>{isWishlisted ? "In Wishlist" : "Wishlist"}</span>
+              </button>
+
+              <button
+                onClick={handleShareProduct}
+                className="border border-white/20 p-3 text-neutral-400 hover:text-white hover:border-white transition-colors cursor-pointer rounded-none bg-transparent"
+                title="Share link"
+              >
+                <Share2 className="h-4 w-4 stroke-[1.5]" />
+              </button>
+            </div>
+
+            {/* Pricing Block */}
+            <div className="border-t border-b border-white/10 py-6 flex items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="text-[9px] text-neutral-500 uppercase tracking-widest font-bold block">Price Value</span>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-serif text-white">
+                    ${product.price.toFixed(2)}
+                  </span>
+                  <span className="text-sm text-neutral-500 line-through font-sans">
+                    ${originalPrice.toFixed(2)}
+                  </span>
+                  <span className="text-xs text-gold font-semibold tracking-wider font-sans uppercase">
+                    ({discountPercent}% OFF)
+                  </span>
+                </div>
+              </div>
+              <div>
+                <span className="inline-flex items-center gap-1 border border-gold/20 bg-gold/5 px-2.5 py-1 text-[9px] text-gold uppercase tracking-widest font-bold">
+                  <Award className="h-3.5 w-3.5 stroke-[1.2]" />
+                  ATELIER PROMISE
+                </span>
+              </div>
+            </div>
+
+            {/* Product Description */}
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">Description</h3>
+              <p className="text-xs text-neutral-350 leading-relaxed font-sans font-light uppercase tracking-wide">
+                {product.description || "No description provided for this product in catalog listing."}
+              </p>
+            </div>
+
+            {/* Validation Error Banner */}
+            {validationError && (
+              <div className="border border-red-500/20 bg-red-950/15 p-4 text-xs font-mono uppercase tracking-widest text-red-400 text-left font-bold animate-fadeIn">
+                {validationError}
+              </div>
+            )}
+
+            {/* Variation Selection Options */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              {/* 1. Size Selection Picker */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className={`space-y-4 p-4 border transition-all duration-350 rounded-none ${
+                  shakeSize 
+                    ? "animate-shake border-red-500/50 bg-red-950/10" 
+                    : (validationError && !selectedSize) 
+                      ? "border-red-500/35 bg-red-950/5" 
+                      : "border-white/10 bg-transparent"
+                }`}>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                      Size
+                    </label>
+                    <button
+                      onClick={() => setShowPredictor(true)}
+                      className="text-[9px] text-gold hover:underline font-bold uppercase tracking-wider flex items-center gap-1"
+                    >
+                      <Sparkles className="h-3 w-3 animate-pulse" />
+                      <span>Size Advisor</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => {
+                          setSelectedSize(size);
+                          setValidationError("");
+                        }}
+                        className={`h-11 w-11 text-xs font-sans tracking-wide border flex items-center justify-center cursor-pointer transition-all duration-200 uppercase rounded-none ${
+                          selectedSize === size
+                            ? "border-white bg-white text-black font-semibold"
+                            : "border-white/20 bg-transparent text-white hover:border-white"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  {validationError && !selectedSize && (
+                    <p className="text-[9px] text-red-400 font-bold uppercase tracking-wider animate-fadeIn">
+                      * Required variation
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* 2. Color Selection Swatches */}
+              {product.colors && product.colors.length > 0 && (
+                <div className={`space-y-4 p-4 border transition-all duration-350 rounded-none ${
+                  shakeColor 
+                    ? "animate-shake border-red-500/50 bg-red-950/10" 
+                    : (validationError && !selectedColor) 
+                      ? "border-red-500/35 bg-red-950/5" 
+                      : "border-white/10 bg-transparent"
+                }`}>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block">
+                    Color
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {product.colors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => {
+                          setSelectedColor(color);
+                          setValidationError("");
+                        }}
+                        className={`px-4 py-2 text-xs font-sans tracking-wide border cursor-pointer transition-all uppercase rounded-none ${
+                          selectedColor === color
+                            ? "border-white bg-white text-black font-semibold"
+                            : "border-white/20 bg-transparent text-white hover:border-white"
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                  {validationError && !selectedColor && (
+                    <p className="text-[9px] text-red-400 font-bold uppercase tracking-wider animate-fadeIn">
+                      * Required variation
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Add to Cart Primary Button */}
+            <div className="pt-2">
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock || addingToCart}
+                className="w-full py-4 bg-white text-black hover:bg-neutral-200 text-xs font-bold uppercase tracking-[0.25em] flex items-center justify-center gap-2 cursor-pointer transition-colors duration-300 rounded-none disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {addingToCart ? (
+                  <>
+                    <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                    <span>Adding to Bag...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4.5 w-4.5 stroke-[1.5]" />
+                    <span>{isOutOfStock ? "Sold Out" : "Add to Bag"}</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Delivery Pincode Checker */}
+            <div className="border border-white/10 p-5 space-y-4 text-xs rounded-none bg-neutral-950/20">
+              <h3 className="font-bold uppercase text-[9px] tracking-[0.2em] text-neutral-400 flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gold stroke-[1.5]" />
+                <span>Estimate Shipping</span>
               </h3>
-              
-              <form onSubmit={handleAskQuestion} className="flex gap-2">
+              <form onSubmit={handleCheckDelivery} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Ask a question (e.g. Is this material machine washable?)"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  className="input py-2 px-3 text-xs flex-1"
+                  placeholder="6-digit pincode"
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
+                  className="bg-transparent border border-white/20 focus:border-white px-4 py-2 text-xs text-white placeholder-neutral-600 rounded-none max-w-[200px] focus:outline-none"
+                  maxLength={6}
                   required
                 />
                 <button
                   type="submit"
-                  disabled={qaLoading}
-                  className="btn-primary text-xs px-4 py-2 cursor-pointer font-bold shrink-0"
+                  disabled={pincodeLoading}
+                  className="border border-white text-white px-6 py-2 hover:bg-white hover:text-black uppercase tracking-widest text-[10px] font-semibold transition-all duration-300 cursor-pointer rounded-none bg-transparent"
                 >
-                  {qaLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Ask"}
+                  {pincodeLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Check"}
                 </button>
               </form>
+              {pincodeStatus && (
+                <p className="text-[11px] text-gold uppercase tracking-widest font-semibold flex items-center gap-2 animate-fadeIn">
+                  <Sparkles className="h-3 w-3 animate-pulse" />
+                  {pincodeStatus}
+                </p>
+              )}
+            </div>
 
-              {aiAnswer && (
-                <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 text-xs text-indigo-300 text-left leading-relaxed font-semibold animate-fadeIn">
-                  <span className="font-extrabold uppercase text-[9px] text-slate-500 block mb-1">AI Shopping response</span>
-                  {aiAnswer}
+            {/* ================= AI SHOPPING CORE ASSISTANT SECTION ================= */}
+            <div className="space-y-6 pt-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-white/10">
+                <Sparkles className="h-4.5 w-4.5 text-gold animate-pulse" />
+                <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-white">
+                  Atelier AI Assistant
+                </h2>
+              </div>
+
+              {/* A. AI Size Predictor Section */}
+              {showPredictor && (
+                <div className="border border-white/10 p-6 space-y-4 bg-neutral-900/50 rounded-none animate-fadeIn">
+                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                    <h3 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                      <Sliders className="h-4 w-4 text-gold stroke-[1.5]" />
+                      <span>Size Advisor Predictor</span>
+                    </h3>
+                    <button
+                      onClick={() => setShowPredictor(false)}
+                      className="text-[9px] text-neutral-500 hover:text-white uppercase tracking-wider cursor-pointer font-bold"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  
+                  <form onSubmit={handlePredictSize} className="grid gap-4 sm:grid-cols-3 items-end">
+                    <div>
+                      <label className="mb-1 block text-[9px] uppercase tracking-widest text-neutral-400 font-bold">Height</label>
+                      <input
+                        type="text"
+                        placeholder="5ft 10in / 178 cm"
+                        className="w-full bg-black border border-white/20 focus:border-white px-3 py-2 text-xs text-white placeholder-neutral-700 rounded-none focus:outline-none"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[9px] uppercase tracking-widest text-neutral-400 font-bold">Weight</label>
+                      <input
+                        type="text"
+                        placeholder="158 lbs / 72 kg"
+                        className="w-full bg-black border border-white/20 focus:border-white px-3 py-2 text-xs text-white placeholder-neutral-700 rounded-none focus:outline-none"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[9px] uppercase tracking-widest text-neutral-400 font-bold">Fit Preference</label>
+                      <select
+                        className="w-full bg-black border border-white/20 focus:border-white px-3 py-2 text-xs text-white rounded-none cursor-pointer focus:outline-none"
+                        value={fitPreference}
+                        onChange={(e) => setFitPreference(e.target.value)}
+                      >
+                        <option value="Slim">Slim Fit</option>
+                        <option value="Regular">Regular Fit</option>
+                        <option value="Loose">Loose Fit</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-3 pt-2">
+                      <button
+                        type="submit"
+                        disabled={sizePredictLoading}
+                        className="w-full py-3 bg-white text-black hover:bg-neutral-200 text-xs font-bold uppercase tracking-widest transition-colors duration-300 rounded-none cursor-pointer"
+                      >
+                        {sizePredictLoading ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <span>Calculate AI Sizing</span>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+
+                  {sizeRec && (
+                    <div className="p-4 border border-gold/20 bg-gold/5 text-xs text-white text-left space-y-3 animate-fadeIn">
+                      <p className="leading-relaxed font-semibold">{sizeRec.replace(/\*\*/g, "")}</p>
+                      <button
+                        onClick={handleApplyPredictedSize}
+                        className="border border-white bg-white text-black px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest cursor-pointer hover:bg-neutral-200"
+                      >
+                        Apply Recommended Size
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
+
+              {/* B. AI Price Insights */}
+              <div className="border border-white/10 p-5 flex gap-4 text-xs bg-neutral-900/10 items-start rounded-none">
+                <div className="h-8 w-8 rounded-none border border-gold/20 bg-gold/5 flex items-center justify-center text-gold shrink-0 mt-0.5">
+                  <TrendingUp className="h-4 w-4 stroke-[1.5]" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-bold text-neutral-400 uppercase text-[9px] tracking-widest">Atelier AI Price Analyzer</h4>
+                  {priceInsightsLoading ? (
+                    <p className="text-neutral-500 italic">Analyzing price history database...</p>
+                  ) : (
+                    <p className="text-neutral-350 leading-relaxed font-light">
+                      {priceInsights}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* C. AI Product Q&A Ask Box */}
+              <div className="border border-white/10 p-6 space-y-4 bg-neutral-900/10 rounded-none">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-gold stroke-[1.5]" />
+                  <span>Ask Atelier Shopping AI</span>
+                </h3>
+                
+                <form onSubmit={handleAskQuestion} className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. Is this machine washable?"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    className="w-full bg-transparent border-b border-white/20 focus:border-white px-0 py-2.5 text-xs text-white placeholder-neutral-700 focus:outline-none"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={qaLoading}
+                    className="bg-white text-black px-6 py-2.5 hover:bg-neutral-200 text-xs font-bold uppercase tracking-widest transition-colors duration-300 rounded-none shrink-0"
+                  >
+                    {qaLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Ask"}
+                  </button>
+                </form>
+
+                {aiAnswer && (
+                  <div className="p-4 border border-white/10 bg-black/40 text-xs text-neutral-300 text-left leading-relaxed animate-fadeIn">
+                    <span className="font-bold uppercase text-[9px] text-neutral-500 block mb-1">Atelier AI Response</span>
+                    {aiAnswer}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ================= RATINGS & REVIEWS SECTION ================= */}
-        <div className="mt-12 pt-8 border-t border-slate-900 text-left space-y-8">
-          <h2 className="text-lg font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
+        {/* ================= RATINGS & REVIEWS SECTION ================= */}
+        <div className="mt-20 pt-10 border-t border-white/10 text-left space-y-8">
+          <h2 className="text-xl font-serif text-white uppercase tracking-wider flex items-center gap-3">
             <span>Ratings & Reviews</span>
-            <span className="text-xs bg-slate-900 border border-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-semibold">
+            <span className="text-[10px] border border-white/20 text-neutral-400 px-3 py-1 font-semibold uppercase font-sans">
               {totalReviews} Reviews
             </span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-slate-900/5 glass-panel p-6 rounded-2xl border border-slate-900">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-neutral-900/10 p-8 border border-white/5 rounded-none">
             {/* Average rating box */}
-            <div className="md:col-span-4 text-center space-y-2 border-b md:border-b-0 md:border-r border-slate-900 pb-6 md:pb-0 md:pr-6">
-              <h3 className="text-4xl font-extrabold text-slate-100 flex items-center justify-center gap-1">
+            <div className="md:col-span-4 text-center space-y-3 border-b md:border-b-0 md:border-r border-white/5 pb-6 md:pb-0 md:pr-8">
+              <h3 className="text-5xl font-serif text-white flex items-center justify-center gap-1.5">
                 <span>{averageRating}</span>
-                <Star className="h-7 w-7 text-amber-400 fill-current" />
+                <Star className="h-8 w-8 text-gold fill-current stroke-[1.2]" />
               </h3>
-              <p className="text-xs text-slate-400 font-semibold">{totalReviews} Verified Ratings</p>
+              <p className="text-[10px] text-neutral-450 uppercase tracking-widest font-semibold">{totalReviews} Verified Buyers</p>
               <button
                 onClick={() => {
                   setReviewError("");
                   setShowReviewForm(true);
                 }}
-                className="btn-primary mt-2 py-2 px-4 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                className="bg-white text-black px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors cursor-pointer mt-2"
               >
-                <Award className="h-3.5 w-3.5" />
-                <span>Write a Review</span>
+                Write A Review
               </button>
             </div>
 
             {/* Rating distribution chart */}
-            <div className="md:col-span-8 space-y-2.5">
+            <div className="md:col-span-8 space-y-3">
               {[5, 4, 3, 2, 1].map((stars) => {
                 const percentage = ratingsPercentages[stars - 1];
                 const count = ratingsCount[stars - 1];
                 return (
-                  <div key={stars} className="flex items-center gap-3 text-xs">
-                    <span className="w-8 font-semibold text-slate-400 text-right">{stars} ★</span>
-                    <div className="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-900">
+                  <div key={stars} className="flex items-center gap-4 text-xs font-sans">
+                    <span className="w-8 font-semibold text-neutral-400 text-right uppercase">{stars} ★</span>
+                    <div className="flex-1 h-[2px] bg-neutral-900 overflow-hidden">
                       <div
-                        className="h-full bg-primary rounded-full"
+                        className="h-full bg-gold"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="w-10 text-slate-400 font-semibold">{percentage}%</span>
-                    <span className="w-8 text-[10px] text-slate-500 text-right">({count})</span>
+                    <span className="w-10 text-neutral-450 font-semibold">{percentage}%</span>
+                    <span className="w-8 text-[10px] text-neutral-500 text-right">({count})</span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Glassmorphic Write Review Form Modal */}
+          {/* Minimalist Write Review Form Modal */}
           {showReviewForm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-              <div className="glass-panel w-full max-w-lg p-6 space-y-5 border-slate-800 bg-slate-950 text-left">
-                <div className="flex justify-between items-center border-b border-slate-900 pb-3">
-                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                    <Star className="h-4.5 w-4.5 text-primary" />
-                    <span>Write a Product Review</span>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
+              <div className="bg-neutral-900 w-full max-w-lg p-8 space-y-6 border border-white/5 text-left rounded-none">
+                <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                  <h3 className="font-serif text-lg text-white uppercase tracking-wider flex items-center gap-2">
+                    <Star className="h-5 w-5 text-gold" />
+                    <span>Write Product Review</span>
                   </h3>
                   <button
                     onClick={() => setShowReviewForm(false)}
-                    className="rounded bg-slate-900 hover:bg-slate-800 p-1 text-slate-450 hover:text-slate-200 cursor-pointer"
+                    className="text-neutral-500 hover:text-white"
                   >
-                    <ChevronLeft className="h-4 w-4 rotate-180" />
+                    <X className="h-5 w-5 stroke-[1.5]" />
                   </button>
                 </div>
 
                 {reviewError && (
-                  <div className="p-3 bg-rose-950/20 border border-rose-500/40 text-rose-350 text-xs rounded-lg font-semibold">
+                  <div className="p-4 border border-red-500/25 bg-red-950/15 text-red-400 text-xs font-mono uppercase tracking-widest">
                     {reviewError}
                   </div>
                 )}
 
-                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                <form onSubmit={handleReviewSubmit} className="space-y-6">
                   {/* Star rating selector */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Rating</label>
-                    <div className="flex gap-1.5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-neutral-400 block">Rating</label>
+                    <div className="flex gap-2">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
                           type="button"
                           onClick={() => setReviewRating(star)}
-                          className="text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
+                          className="text-neutral-600 hover:text-gold transition-colors cursor-pointer"
                         >
                           <Star
-                            className={`h-6 w-6 ${
-                              star <= reviewRating ? "text-amber-400 fill-current" : ""
+                            className={`h-7 w-7 ${
+                              star <= reviewRating ? "text-gold fill-current" : ""
                             }`}
                           />
                         </button>
@@ -923,23 +934,23 @@ const ProductPage = () => {
                   </div>
 
                   {/* Comment textarea */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 block">Your Comment</label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-neutral-400 block">Comment</label>
                     <textarea
-                      placeholder="Share your experience with this product... (materials, fit, durability)"
+                      placeholder="Detail materials, fit, comfort..."
                       rows={4}
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
-                      className="input text-xs w-full py-2 px-3 focus:border-primary/60"
+                      className="w-full bg-black border border-white/20 focus:border-white px-4 py-3 text-xs text-white placeholder-neutral-700 rounded-none focus:outline-none"
                       required
                     />
                   </div>
 
-                  <div className="flex gap-3 pt-2">
+                  <div className="flex gap-4 pt-2">
                     <button
                       type="submit"
                       disabled={submittingReview}
-                      className="btn-primary flex-1 py-2 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 py-3.5 bg-white text-black hover:bg-neutral-200 text-xs font-bold uppercase tracking-widest transition-all duration-300 rounded-none cursor-pointer flex items-center justify-center gap-2"
                     >
                       {submittingReview ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -950,7 +961,7 @@ const ProductPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowReviewForm(false)}
-                      className="btn-outline px-4 py-2 text-xs font-bold cursor-pointer"
+                      className="border border-white/20 text-white px-6 py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors cursor-pointer rounded-none bg-transparent"
                     >
                       Cancel
                     </button>
@@ -961,44 +972,44 @@ const ProductPage = () => {
           )}
 
           {/* Review list */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {!product.reviews || product.reviews.length === 0 ? (
-              <div className="glass-panel py-12 text-center text-slate-500 border-slate-900 bg-slate-900/5 rounded-2xl">
-                <HelpCircle className="h-8 w-8 text-slate-700 mx-auto mb-2" />
-                <h4 className="text-xs font-semibold text-slate-350">No customer reviews yet</h4>
-                <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
-                  Be the first to review this product and share your thoughts with other shoppers!
+              <div className="py-16 text-center text-neutral-500 border border-white/5 bg-neutral-900/5 rounded-none max-w-xl mx-auto space-y-3">
+                <HelpCircle className="h-8 w-8 text-neutral-700 mx-auto stroke-[1.2]" />
+                <h4 className="font-serif text-md text-white uppercase tracking-wider">No reviews yet</h4>
+                <p className="text-[11px] text-neutral-550 uppercase tracking-widest max-w-xs mx-auto">
+                  Be the first to review this product and share your feedback.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4">
+              <div className="grid gap-6">
                 {product.reviews.map((r, idx) => {
                   const isHighRating = r.rating >= 4;
                   const isMidRating = r.rating === 3;
                   const badgeColor = isHighRating
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400"
                     : isMidRating
-                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                    : "bg-rose-500/10 text-rose-400 border-rose-500/20";
+                    ? "border-amber-500/20 bg-amber-500/5 text-amber-400"
+                    : "border-red-500/20 bg-red-500/5 text-red-400";
                   return (
                     <div
                       key={r._id || idx}
-                      className="glass-panel p-5 border border-slate-900/60 bg-slate-900/5 hover:border-slate-800 transition-all rounded-2xl flex flex-col md:flex-row md:items-start justify-between gap-4"
+                      className="p-6 border border-white/5 bg-neutral-900/5 hover:border-white/10 transition-colors rounded-none flex flex-col md:flex-row md:items-start justify-between gap-4"
                     >
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-flex items-center gap-0.5 border rounded-md px-1.5 py-0.5 text-[10px] font-bold ${badgeColor}`}>
+                      <div className="space-y-3 flex-1 text-left">
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className={`inline-flex items-center gap-0.5 border px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${badgeColor}`}>
                             <span>{r.rating}</span>
-                            <Star className="h-3 w-3 fill-current" />
+                            <Star className="h-3 w-3 fill-current stroke-[1.2]" />
                           </span>
-                          <span className="font-semibold text-slate-200 text-xs">
+                          <span className="font-bold text-white uppercase tracking-wider text-xs">
                             {r.name || "Verified Buyer"}
                           </span>
-                          <span className="text-[10px] text-slate-500 font-semibold font-mono">
+                          <span className="text-[10px] text-neutral-500 font-mono">
                             {new Date(r.createdAt || r.date).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                        <p className="text-xs text-neutral-300 leading-relaxed font-light uppercase tracking-wide">
                           {r.comment}
                         </p>
                       </div>
@@ -1010,6 +1021,7 @@ const ProductPage = () => {
           </div>
         </div>
       </div>
+    </div>
   );
 };
 

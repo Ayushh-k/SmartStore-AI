@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import api, { toggleWishlistAPI } from "../utils/api.js";
 import ProductDetails from "../components/ProductDetails.jsx";
-import heroBanner from "../assets/flipkart_hero_banner.png";
 
 const CATEGORIES = [
   { name: "Mobiles", icon: Smartphone, color: "text-indigo-400" },
@@ -88,27 +87,27 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
   };
 
   return (
-    <div className="glass-panel flex flex-col justify-between hover:border-primary/45 hover:shadow-primary/5 transition-all group overflow-hidden">
-      {/* Product Image Frame */}
-      <div className="h-44 bg-slate-950 overflow-hidden relative border-b border-slate-900/60 flex items-center justify-center">
-        {/* Wishlist toggle Heart button overlay */}
+    <div className="group flex flex-col justify-between overflow-hidden text-left relative">
+      {/* 3:4 Portrait Image Frame */}
+      <div className="aspect-[3/4] bg-neutral-900 overflow-hidden relative flex items-center justify-center">
+        {/* Wishlist Heart Icon Overlay */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
             onWishlistToggle(product._id);
           }}
-          className="absolute top-2.5 right-2.5 rounded-full bg-slate-950/70 border border-slate-800 p-1.5 text-slate-400 hover:text-rose-505 hover:text-rose-500 transition-colors cursor-pointer z-10 animate-fadeIn"
+          className="absolute top-4 right-4 rounded-full bg-black/60 p-2 text-white/70 hover:text-white hover:scale-105 transition-all z-10"
           title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
         >
-          <Heart className={`h-4 w-4 transition-transform hover:scale-110 ${isWishlisted ? "fill-rose-550 text-rose-550 text-rose-500 fill-rose-500" : ""}`} />
+          <Heart className={`h-4 w-4 stroke-[1.5] ${isWishlisted ? "fill-white text-white" : ""}`} />
         </button>
 
         {product.images && product.images[currentImgIndex] ? (
           <img
             src={product.images[currentImgIndex]}
             alt={product.name}
-            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             onError={(e) => {
               e.target.style.display = 'none';
               e.target.parentNode.querySelector('.fallback-icon').classList.remove('hidden');
@@ -116,109 +115,75 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
           />
         ) : null}
         
-        <div className={`fallback-icon flex flex-col items-center justify-center text-slate-700 ${product.images && product.images[currentImgIndex] ? 'hidden' : ''}`}>
-          <Package className="h-10 w-10 mb-2" />
-          <span className="text-[9px] text-slate-500 font-medium">No Product Image</span>
+        <div className={`fallback-icon flex flex-col items-center justify-center text-neutral-700 absolute inset-0 ${product.images && product.images[currentImgIndex] ? 'hidden' : ''}`}>
+          <Package className="h-10 w-10 mb-2 stroke-[1.2]" />
+          <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-medium">No Image</span>
         </div>
 
         {/* Hover Slider Controls */}
         {hasMultipleImages && (
-          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
               onClick={prevImage}
-              className="rounded-full bg-slate-950/70 border border-slate-800 p-1 text-slate-350 hover:text-white transition-all cursor-pointer"
+              className="rounded-full bg-black/60 p-1.5 text-white/70 hover:text-white transition-all cursor-pointer"
             >
-              <ChevronLeft className="h-3 w-3" />
+              <ChevronLeft className="h-3 w-3 stroke-[1.5]" />
             </button>
             <button
               onClick={nextImage}
-              className="rounded-full bg-slate-950/70 border border-slate-800 p-1 text-slate-350 hover:text-white transition-all cursor-pointer"
+              className="rounded-full bg-black/60 p-1.5 text-white/70 hover:text-white transition-all cursor-pointer"
             >
-              <ChevronRight className="h-3 w-3" />
+              <ChevronRight className="h-3 w-3 stroke-[1.5]" />
             </button>
           </div>
         )}
 
-        {/* Bullet indicators if multiple images */}
-        {hasMultipleImages && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 bg-slate-950/60 px-2 py-0.5 rounded-full backdrop-blur-xs">
-            {product.images.map((_, idx) => (
-              <span
-                key={idx}
-                className={`h-1.5 w-1.5 rounded-full transition-all ${
-                  idx === currentImgIndex ? 'bg-primary scale-110' : 'bg-slate-650'
-                }`}
-              />
-            ))}
+        {/* Out of Stock banner overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+            <span className="bg-black border border-white/20 text-white px-4 py-1.5 text-[9px] uppercase tracking-widest font-semibold">
+              Sold Out
+            </span>
           </div>
         )}
-      </div>
 
-      {/* Product Meta */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-3.5 text-left">
-        <div className="space-y-3.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-[9px] font-medium text-slate-450 uppercase">
-              {product.category || "General"}
-            </span>
-            <span
-              className={`text-[9px] font-bold uppercase tracking-wider ${
-                isOutOfStock
-                  ? "text-rose-455 text-rose-450"
-                  : Number(product.stock) <= 5
-                  ? "text-amber-455 text-amber-450"
-                  : "text-emerald-455 text-emerald-450"
-              }`}
-            >
-              {isOutOfStock ? "Out of Stock" : `${product.stock} Left`}
-            </span>
-          </div>
-
-          <div className="space-y-1">
-            <h3 className="text-sm font-semibold tracking-tight text-slate-200 group-hover:text-primary transition-colors line-clamp-1">
-              {product.name}
-            </h3>
-            <p className="text-[11px] text-slate-455 line-clamp-3 leading-relaxed min-h-[48px]">
-              {product.description || "AI-generated description pending for this catalog item."}
-            </p>
-          </div>
-
-          {product.tags && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {product.tags.slice(0, 3).map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="flex items-center gap-0.5 rounded bg-primary/5 border border-primary/10 px-1.5 py-0.5 text-[9px] text-primary/80"
-                >
-                  <Tag className="h-2 w-2" />
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Pricing and Actions */}
-      <div className="px-5 pb-5 pt-3 border-t border-slate-800/40 bg-slate-900/15 flex items-center justify-between gap-3">
-        <div>
-          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Price</span>
-          <span className="text-sm font-bold text-slate-100">${Number(product.price).toFixed(2)}</span>
-        </div>
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={() => setSelectedProduct(product)}
-            className="rounded border border-slate-800 bg-slate-950/70 p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer"
-            title="View AI Copywriting"
-          >
-            <Eye className="h-3.5 w-3.5" />
-          </button>
+        {/* Slide-Up Hover CTA Action */}
+        <div className="absolute bottom-4 left-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-10">
           <Link
             to={`/product/${product._id}`}
-            className="btn-primary inline-flex items-center gap-1.5 text-xs py-1.5 px-3.5 cursor-pointer text-center justify-center decoration-transparent"
+            className="block w-full bg-white text-black py-3 text-center text-[10px] uppercase tracking-widest font-semibold hover:bg-neutral-200 transition-colors duration-300"
           >
-            <span>View Details</span>
+            View Details
           </Link>
+        </div>
+      </div>
+
+      {/* Product Details Area */}
+      <div className="pt-4 space-y-1.5">
+        <div className="flex items-center justify-between text-[9px] tracking-widest uppercase font-sans text-gold font-semibold">
+          <span>{product.category || "General"}</span>
+          {Number(product.stock) > 0 && Number(product.stock) <= 5 && (
+            <span className="text-amber-500">Only {product.stock} left</span>
+          )}
+        </div>
+
+        <Link to={`/product/${product._id}`} className="block">
+          <h3 className="text-sm font-serif tracking-wide text-white uppercase line-clamp-1 hover:text-neutral-400 transition-colors duration-300">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="flex justify-between items-baseline">
+          <span className="font-sans text-xs tracking-wider text-neutral-400">
+            ${Number(product.price).toFixed(2)}
+          </span>
+          <button 
+            onClick={() => setSelectedProduct(product)}
+            className="text-[9px] tracking-widest uppercase text-neutral-500 hover:text-white font-sans transition-colors duration-300 flex items-center gap-1"
+          >
+            <Eye className="h-3 w-3 stroke-[1.2]" />
+            <span>AI Copy</span>
+          </button>
         </div>
       </div>
     </div>
@@ -405,31 +370,6 @@ const Storefront = () => {
     handleQueryParams();
   }, [isLoggedIn]);
 
-  const slides = [
-    {
-      image: heroBanner,
-      title: "Big Billion AI Deals",
-      subtitle: "Upgrade your catalog with descriptions and marketing copies generated in seconds by AI.",
-      badge: "Limited Time Offer",
-      buttonText: "Browse AI Catalog",
-      gradient: "from-indigo-950/40 via-purple-950/20 to-slate-950"
-    },
-    {
-      title: "SmartStore AI Power",
-      subtitle: "Instantly draft Facebook, Instagram, and Twitter posts for any new inventory product.",
-      badge: "Social Marketing Core",
-      buttonText: "Get Started Now",
-      gradient: "from-emerald-950/40 via-cyan-950/20 to-slate-950"
-    },
-    {
-      title: "Instant E-Commerce Launch",
-      subtitle: "Check out shopping cart, user role-based controls, and fully integrated checkout systems.",
-      badge: "All-in-One Storefront",
-      buttonText: "Sign Up for Free",
-      gradient: "from-rose-950/40 via-amber-950/20 to-slate-950"
-    }
-  ];
-
   const fetchProducts = async () => {
     setLoading(true);
     setError("");
@@ -534,15 +474,6 @@ const Storefront = () => {
     }
   }, [isLoggedIn]);
 
-  // Carousel transition effect
-  useEffect(() => {
-    if (isLoggedIn) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5500);
-    return () => clearInterval(interval);
-  }, [isLoggedIn, slides.length]);
-
   const handleAddToCart = async (productId, size = "", color = "") => {
     if (!isLoggedIn) {
       alert("Please sign in or register to add items to your cart.");
@@ -576,311 +507,263 @@ const Storefront = () => {
         );
       });
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  // ==================== RENDERING LOGGED-OUT FLIPKART LANDING ====================
+  // ==================== RENDERING LOGGED-OUT LUXURY LANDING ====================
   if (!isLoggedIn) {
     return (
-      <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-black text-white min-h-screen">
         
-        {/* Category Circle Bar */}
-        <div className="glass-panel p-4 flex justify-around items-center overflow-x-auto whitespace-nowrap gap-4">
-          {CATEGORIES.map((cat, idx) => {
-            const Icon = cat.icon;
-            return (
-              <div 
-                key={idx}
-                className="flex flex-col items-center gap-2 cursor-pointer group shrink-0"
-                onClick={() => alert(`Please sign in to browse ${cat.name} products!`)}
-              >
-                <div className="h-14 w-14 rounded-full border border-slate-800 bg-slate-950 flex items-center justify-center group-hover:border-primary/50 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
-                  <Icon className={`h-6 w-6 ${cat.color} group-hover:scale-110 transition-transform`} />
-                </div>
-                <span className="text-xs font-semibold text-slate-400 group-hover:text-slate-200 transition-colors">
-                  {cat.name}
-                </span>
-              </div>
-            );
-          })}
+        {/* Edge-to-Edge Luxury Hero Section */}
+        <div className="relative h-[85vh] w-full overflow-hidden bg-neutral-950 flex items-center justify-center md:justify-start">
+          <img 
+            src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80" 
+            alt="Editorial Luxury Fashion Banner" 
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
+          
+          <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full z-10 text-center md:text-left flex flex-col items-center md:items-start space-y-6">
+            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-gold font-bold">
+              Luxury Atelier
+            </span>
+            <h2 className="text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white tracking-widest leading-tight uppercase max-w-3xl">
+              THE WINTER COLLECTION
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-400 font-sans tracking-[0.2em] max-w-lg leading-relaxed uppercase">
+              EXQUISITE MINIMALISM / ARCHITECTURAL FORMS
+            </p>
+            <div className="pt-4">
+              <Link to="/login" className="bg-white text-black px-12 py-4 text-xs font-semibold uppercase tracking-[0.2em] hover:bg-neutral-200 transition-colors duration-300">
+                Explore The Collection
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* Hero Carousel Banner */}
-        <div className="relative group rounded-2xl overflow-hidden border border-slate-800">
-          {slides.map((slide, idx) => {
-            if (idx !== currentSlide) return null;
-            return (
-              <div 
-                key={idx} 
-                className={`relative w-full h-[320px] sm:h-[380px] bg-gradient-to-r ${slide.gradient} flex flex-col md:flex-row justify-between items-center p-8 sm:p-12 transition-all duration-700 ease-in-out`}
-              >
-                {/* Banner Content */}
-                <div className="z-10 space-y-4 max-w-lg md:pr-6 text-left">
-                  <span className="inline-block rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] text-primary font-bold uppercase tracking-wider">
-                    {slide.badge}
-                  </span>
-                  <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
-                    {slide.title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                    {slide.subtitle}
-                  </p>
-                  <div className="pt-2">
-                    <Link to="/login" className="btn-primary py-2 px-5 font-semibold text-xs inline-flex items-center gap-1.5 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
-                      <span>{slide.buttonText}</span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Banner Graphic or AI Banner Asset */}
-                {slide.image ? (
-                  <div className="hidden md:block w-[40%] h-full relative shrink-0">
-                    <img 
-                      src={slide.image} 
-                      alt="Flipkart AI Promotion Banner" 
-                      className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_15px_30px_rgba(99,102,241,0.25)] rounded-lg"
-                    />
-                  </div>
-                ) : (
-                  <div className="hidden md:flex w-[40%] h-full items-center justify-center shrink-0">
-                    <div className="w-44 h-44 rounded-full bg-slate-900/60 border border-slate-800 flex items-center justify-center relative overflow-hidden animate-pulse">
-                      <Sparkles className="h-16 w-16 text-primary" />
-                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-transparent blur-md" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Navigation Arrows */}
-          <button 
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-2 bg-slate-950/70 border border-slate-800 text-slate-400 hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button 
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 bg-slate-950/70 border border-slate-800 text-slate-400 hover:text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-
-          {/* Dot Indicators */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {slides.map((_, idx) => (
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 py-16 space-y-16">
+          
+          {/* Borderless text category navigation links */}
+          <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-white/5">
+            {CATEGORIES.map((cat, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-5 bg-primary' : 'w-1.5 bg-slate-700'}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Deals of the Day Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary animate-pulse" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-200">Deals of the Day</h3>
-              <span className="text-[9px] bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded px-1.5 py-0.5 font-bold tracking-tight animate-pulse ml-2">
-                Ends in 12h 45m
-              </span>
-            </div>
-            <Link to="/login" className="text-xs text-primary hover:underline font-semibold">
-              View All Deals
-            </Link>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {MOCK_DEALS.map((deal, idx) => (
-              <div 
-                key={idx}
-                className="glass-panel p-4 flex flex-col justify-between hover:border-primary/45 hover:shadow-primary/5 transition-all group overflow-hidden cursor-pointer"
-                onClick={() => alert("Please sign in or register to browse the real-time AI product catalog.")}
+                className="font-sans text-[11px] uppercase tracking-[0.2em] text-neutral-500 hover:text-white pb-1.5 transition-colors duration-300"
+                onClick={() => alert("Please sign in or register to browse products.")}
               >
-                <div className="h-40 rounded-lg bg-slate-950 overflow-hidden relative border border-slate-900/60 mb-3 flex items-center justify-center">
-                  <img 
-                    src={deal.image} 
-                    alt={deal.name} 
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                  />
-                  <span className="absolute top-2 left-2 rounded bg-primary px-2 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
-                    {deal.discount}
-                  </span>
-                </div>
-                <div className="space-y-1 text-left">
-                  <h4 className="text-xs font-bold text-slate-200 group-hover:text-primary transition-colors line-clamp-1">
-                    {deal.name}
-                  </h4>
-                  <p className="text-[10px] text-slate-500 font-medium">{deal.category}</p>
-                  <p className="text-[10px] text-emerald-400 font-bold tracking-wide mt-1">{deal.tagline}</p>
-                </div>
-              </div>
+                {cat.name}
+              </button>
             ))}
           </div>
-        </div>
 
-        {/* Sign-in CTA Block */}
-        <div className="relative glass-panel p-8 sm:p-12 overflow-hidden rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center space-y-5 bg-gradient-to-b from-slate-900/10 to-primary/5">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="h-14 w-14 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center mb-1">
-            <ShoppingCart className="h-6 w-6 text-primary" />
-          </div>
-          <div className="space-y-2 max-w-xl z-10">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100">
-              Unlock the Real-Time Product Catalog
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Welcome to SmartStore AI! Sign in now to explore our real-time database catalog, test out our interactive AI-enhanced copy writing generator, use the shopping cart features, and experience role-based controls.
-            </p>
-          </div>
-          <div className="z-10 pt-2 flex flex-col sm:flex-row gap-3">
-            <Link to="/login" className="btn-primary py-2 px-6 font-semibold text-xs shadow-lg shadow-primary/20">
-              Sign In / Register
-            </Link>
-            <button 
-              onClick={() => alert("SmartStore AI generates high-converting marketing copywriting for e-commerce. Sign in to try it out!")} 
-              className="btn-outline py-2 px-6 text-xs font-semibold"
-            >
-              Learn More
-            </button>
-          </div>
-        </div>
+          {/* Deals of the Season (Minimalist grid of portrait cards) */}
+          <div className="space-y-12">
+            <div className="text-center space-y-2">
+              <span className="font-sans text-[9px] tracking-[0.25em] text-gold uppercase block">Featured Offers</span>
+              <h3 className="font-serif text-2xl uppercase tracking-wider text-white">Deals of the Season</h3>
+            </div>
 
+            <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
+              {MOCK_DEALS.map((deal, idx) => (
+                <div 
+                  key={idx}
+                  className="group flex flex-col justify-between overflow-hidden cursor-pointer text-left"
+                  onClick={() => alert("Please sign in or register to browse the real-time AI product catalog.")}
+                >
+                  <div className="aspect-[3/4] bg-neutral-900 overflow-hidden relative mb-4">
+                    <img 
+                      src={deal.image} 
+                      alt={deal.name} 
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                    />
+                    <span className="absolute top-3 left-3 bg-white text-black px-2.5 py-1 text-[9px] uppercase tracking-widest font-semibold">
+                      {deal.discount}
+                    </span>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                      <span className="bg-white text-black py-2.5 text-center text-[10px] uppercase tracking-widest font-semibold">
+                        Unlock Offer
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="font-sans text-[9px] tracking-[0.2em] text-gold uppercase">{deal.category}</span>
+                    <h4 className="font-serif text-sm tracking-wide text-white uppercase line-clamp-1 group-hover:text-neutral-400 transition-colors">
+                      {deal.name}
+                    </h4>
+                    <p className="font-sans text-xs text-neutral-500">{deal.tagline}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Luxury Sign-in CTA Block */}
+          <div className="py-24 border-t border-white/5 flex flex-col items-center justify-center text-center space-y-6">
+            <div className="h-10 w-10 border border-white/20 flex items-center justify-center text-white mb-2">
+              <ShoppingCart className="h-4 w-4 stroke-[1.2]" />
+            </div>
+            <div className="space-y-3 max-w-xl">
+              <h2 className="font-serif text-3xl text-white uppercase tracking-wider">
+                Unlock the AI Catalog
+              </h2>
+              <p className="text-xs text-neutral-400 tracking-wider uppercase leading-relaxed font-sans max-w-md mx-auto">
+                Welcome to SmartStore AI. Sign in to explore our real-time database catalog, generate AI marketing copy, manage your cart, and experience customized features.
+              </p>
+            </div>
+            <div className="pt-4">
+              <Link to="/login" className="bg-white text-black px-12 py-4 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+                Sign In / Register
+              </Link>
+            </div>
+          </div>
+
+        </div>
       </div>
     );
   }
 
-  // ==================== RENDERING LOGGED-IN STOREFRONT ====================
+  // ==================== RENDERING LOGGED-IN LUXURY STOREFRONT ====================
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="bg-black text-white min-h-screen">
       
-      {/* Category circle selection filter bar */}
-      <div className="glass-panel p-4 flex justify-around items-center overflow-x-auto whitespace-nowrap gap-4">
-        {CATEGORIES.map((cat, idx) => {
-          const Icon = cat.icon;
-          return (
-            <div 
+      {/* Edge-to-Edge Hero section */}
+      <div className="relative h-[85vh] w-full overflow-hidden bg-neutral-950 flex items-center justify-center md:justify-start">
+        <img 
+          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=80" 
+          alt="Editorial Luxury Fashion Banner" 
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
+        
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full z-10 text-center md:text-left flex flex-col items-center md:items-start space-y-6">
+          <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-gold font-bold">
+            Luxury Atelier
+          </span>
+          <h2 className="text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white tracking-widest leading-tight uppercase max-w-3xl">
+            THE WINTER COLLECTION
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-400 font-sans tracking-[0.2em] max-w-lg leading-relaxed uppercase">
+            EXQUISITE MINIMALISM / ARCHITECTURAL FORMS
+          </p>
+          <div className="pt-4">
+            <a href="#catalog" className="bg-white text-black px-12 py-4 text-xs font-semibold uppercase tracking-[0.2em] hover:bg-neutral-200 transition-colors duration-300">
+              Browse Catalog
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div id="catalog" className="max-w-7xl mx-auto px-6 sm:px-12 py-12 space-y-10 scroll-mt-24">
+        
+        {/* Sleek, borderless category navigation */}
+        <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-white/5">
+          <button
+            onClick={() => {
+              setSearch("");
+              setSearchMode("text");
+              setAiSearchResults([]);
+            }}
+            className={`font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
+              search === ""
+                ? "text-white border-b border-white"
+                : "text-neutral-500 hover:text-white"
+            }`}
+          >
+            All Collections
+          </button>
+          {CATEGORIES.map((cat, idx) => (
+            <button
               key={idx}
-              className={`flex flex-col items-center gap-2 cursor-pointer group shrink-0 ${search === cat.name ? 'scale-105' : ''}`}
               onClick={() => {
                 setSearch(search === cat.name ? "" : cat.name);
                 setSearchMode("text");
                 setAiSearchResults([]);
               }}
+              className={`font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
+                search === cat.name
+                  ? "text-white border-b border-white"
+                  : "text-neutral-500 hover:text-white"
+              }`}
             >
-              <div className={`h-14 w-14 rounded-full border bg-slate-950 flex items-center justify-center transition-all ${
-                search === cat.name 
-                  ? 'border-primary shadow-[0_0_15px_rgba(99,102,241,0.4)]' 
-                  : 'border-slate-800 group-hover:border-primary/50 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]'
-              }`}>
-                <Icon className={`h-6 w-6 ${cat.color} group-hover:scale-110 transition-transform`} />
-              </div>
-              <span className={`text-xs font-semibold transition-colors ${
-                search === cat.name ? 'text-primary' : 'text-slate-400 group-hover:text-slate-200'
-              }`}>
-                {cat.name}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Hero Banner with Search */}
-      <div className="glass-panel p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="space-y-2 z-10">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[10px] text-primary uppercase font-bold tracking-wide">
-            <Sparkles className="h-3 w-3 animate-pulse" />
-            AI-Enhanced Shopping
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">SmartStore Showcase</h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
-            Explore our curated catalog featuring high-converting product descriptions, tags, and titles generated automatically by our AI core.
-          </p>
+              {cat.name}
+            </button>
+          ))}
         </div>
-        <form onSubmit={handleVibeSearch} className="flex flex-col gap-2 min-w-[280px] z-10">
-          <div className="relative">
+
+        {/* Minimalist Bottom-Bordered AI Vibe Search */}
+        <div className="flex flex-col items-center py-6">
+          <form onSubmit={handleVibeSearch} className="w-full max-w-lg relative flex items-center">
             <input
               type="text"
               placeholder="Vibe Search (e.g. cold trekking gear) + Enter"
-              className="input !pl-10 !pr-16 text-xs py-2 w-full border-primary/20 focus:border-primary/50 shadow-inner"
+              className="w-full border-b border-white/10 bg-transparent focus:outline-none focus:border-white px-0 py-3.5 text-white placeholder-neutral-700 font-serif text-lg tracking-wide transition-colors duration-300"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Sparkles className="absolute left-3 top-2.5 h-4 w-4 text-primary animate-pulse" />
             <button
               type="submit"
-              className="absolute right-1 top-1 bg-primary/25 border border-primary/30 hover:bg-primary/45 text-[9px] font-bold text-primary px-2.5 py-1 rounded transition-all cursor-pointer"
+              className="absolute right-0 p-2 text-gold hover:text-white transition-colors cursor-pointer"
             >
-              Search
+              <Sparkles className="h-5 w-5 animate-pulse" />
             </button>
-          </div>
-          <div className="flex justify-between items-center text-[10px] text-slate-500">
+          </form>
+          <div className="w-full max-w-lg flex justify-between items-center text-[10px] text-neutral-500 uppercase tracking-widest mt-3">
             {searchMode === "ai" ? (
               <button 
                 type="button"
                 onClick={handleResetSearch}
-                className="text-primary hover:underline font-semibold"
+                className="text-gold hover:underline font-semibold"
               >
                 Clear AI Filter
               </button>
             ) : (
-              <span>Standard Filter active</span>
+              <span>Standard Filter Active</span>
             )}
             <span>
               Showing {filteredProducts.length} of {products.length} products
             </span>
           </div>
-        </form>
+        </div>
+
+        {error && (
+          <div className="border border-red-500/20 bg-red-950/15 p-4 text-xs text-red-400 uppercase tracking-widest font-mono text-center">
+            {error}
+          </div>
+        )}
+
+        {/* Product Grid */}
+        {(loading || aiSearchLoading) ? (
+          <div className="flex flex-col items-center justify-center py-32 space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            <span className="text-[10px] tracking-widest uppercase text-neutral-500">
+              {aiSearchLoading ? "AI matching products..." : "Loading products..."}
+            </span>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 text-center space-y-4">
+            <Package className="h-12 w-12 text-neutral-800 stroke-[1.2]" />
+            <h3 className="font-serif text-lg text-white uppercase tracking-wider">No products found</h3>
+            <p className="text-xs text-neutral-500 uppercase tracking-widest max-w-sm">
+              We couldn't find any products matching your selection.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-x-8 gap-y-16 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {filteredProducts.map((p) => (
+              <ProductCard
+                key={p._id}
+                product={p}
+                handleAddToCart={handleAddToCart}
+                setSelectedProduct={(prod) => {
+                  setSelectedProduct(prod);
+                  setActiveImageIndex(0);
+                }}
+                addingToCart={addingToCart}
+                isWishlisted={wishlistIds.includes(p._id)}
+                onWishlistToggle={handleWishlistToggle}
+              />
+            ))}
+          </div>
+        )}
       </div>
-
-      {error && (
-        <div className="glass-panel border-rose-500/40 bg-rose-950/40 p-4 text-xs text-rose-300">
-          {error}
-        </div>
-      )}
-
-      {/* Product Grid */}
-      {(loading || aiSearchLoading) ? (
-        <div className="flex flex-col items-center justify-center py-24 text-xs text-slate-400 space-y-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span>{aiSearchLoading ? "Smart AI matching products..." : "Loading storefront products..."}</span>
-        </div>
-      ) : filteredProducts.length === 0 ? (
-        <div className="glass-panel flex flex-col items-center justify-center py-20 text-center text-slate-500">
-          <Package className="h-12 w-12 text-slate-600 mb-3" />
-          <h3 className="text-sm font-semibold text-slate-350">No products available</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm">
-            We couldn't find any products matching your search, or the store catalog is currently empty.
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map((p) => (
-            <ProductCard
-              key={p._id}
-              product={p}
-              handleAddToCart={handleAddToCart}
-              setSelectedProduct={(prod) => {
-                setSelectedProduct(prod);
-                setActiveImageIndex(0);
-              }}
-              addingToCart={addingToCart}
-              isWishlisted={wishlistIds.includes(p._id)}
-              onWishlistToggle={handleWishlistToggle}
-            />
-          ))}
-        </div>
-      )}
 
       {/* Modal for Details */}
       {selectedProduct && (
@@ -898,49 +781,49 @@ const Storefront = () => {
 
       {/* Lightbox for Zoomable Image */}
       {lightboxImage && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95">
           {/* Top Header Panel */}
-          <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10 bg-slate-950/40 backdrop-blur-sm border-b border-slate-900/60">
-            <span className="text-xs text-slate-400 font-medium">
+          <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-10 bg-black/40">
+            <span className="text-xs text-neutral-400 font-sans tracking-widest uppercase">
               {selectedProduct?.name || "Product Image"}
             </span>
             <button
               onClick={() => setLightboxImage(null)}
-              className="rounded bg-slate-900 hover:bg-slate-800 p-2 text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
+              className="p-2 text-neutral-500 hover:text-white transition-colors"
               title="Close Zoom View"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5 stroke-[1.5]" />
             </button>
           </div>
 
           {/* Floating Control Toolbar */}
-          <div className="absolute bottom-6 flex items-center gap-4 px-4 py-2.5 rounded-full bg-slate-900/80 border border-slate-800/80 backdrop-blur-md z-10 shadow-2xl">
+          <div className="absolute bottom-8 flex items-center gap-4 px-5 py-3 rounded-full bg-neutral-900 border border-white/5 z-10 shadow-2xl">
             <button
               onClick={handleZoomOut}
               disabled={lightboxScale <= 1}
-              className="p-2 text-slate-400 hover:text-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              className="p-1 text-neutral-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               title="Zoom Out"
             >
-              <ZoomOut className="h-4 w-4" />
+              <ZoomOut className="h-4 w-4 stroke-[1.5]" />
             </button>
-            <span className="text-xs text-slate-300 font-semibold font-mono select-none px-1">
+            <span className="text-xs text-neutral-300 font-semibold font-mono select-none px-2">
               {Math.round(lightboxScale * 100)}%
             </span>
             <button
               onClick={handleZoomIn}
               disabled={lightboxScale >= 4}
-              className="p-2 text-slate-400 hover:text-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              className="p-1 text-neutral-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               title="Zoom In"
             >
-              <ZoomIn className="h-4 w-4" />
+              <ZoomIn className="h-4 w-4 stroke-[1.5]" />
             </button>
-            <div className="w-[1px] h-4 bg-slate-800"></div>
+            <div className="w-[1px] h-4 bg-white/10"></div>
             <button
               onClick={handleResetZoom}
-              className="p-2 text-slate-400 hover:text-slate-100 cursor-pointer transition-colors"
+              className="p-1 text-neutral-400 hover:text-white transition-colors"
               title="Reset Zoom"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4 stroke-[1.5]" />
             </button>
           </div>
 
@@ -970,53 +853,53 @@ const Storefront = () => {
 
       {/* Shared Cart Import Dialog */}
       {showImportDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-md p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-700/60 pb-3">
-              <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                <ShoppingCart className="h-4 w-4 text-primary" />
-                <span>Import Shared Cart</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+          <div className="bg-neutral-900 w-full max-w-md p-8 space-y-6 border border-white/5 text-left">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <h3 className="font-serif text-lg text-white uppercase tracking-wider flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 stroke-[1.2]" />
+                <span>Import Cart</span>
               </h3>
               <button
                 onClick={handleCancelImport}
-                className="rounded bg-slate-900 hover:bg-slate-800 p-1 text-slate-450 hover:text-slate-200 cursor-pointer"
+                className="text-neutral-500 hover:text-white"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5 stroke-[1.5]" />
               </button>
             </div>
 
-            <div className="text-xs text-slate-350 space-y-3 leading-relaxed">
+            <div className="text-xs text-neutral-400 space-y-3 leading-relaxed uppercase tracking-wider font-sans">
               <p>
-                Someone shared their shopping cart containing{" "}
-                <span className="font-bold text-slate-200">{sharedCartItems?.length || 0}</span> product line item(s) with you.
+                A shopping cart containing{" "}
+                <span className="font-bold text-white">{sharedCartItems?.length || 0}</span> product line item(s) has been shared.
               </p>
               {isLoggedIn ? (
-                <p className="text-[11px] text-slate-400">
-                  Choose how you want to import these items into your current shopping cart.
+                <p className="text-[11px] text-neutral-500">
+                  Select import method for your current shopping bag.
                 </p>
               ) : (
-                <p className="text-[11px] text-amber-400 font-medium">
-                  You need to sign in or sign up first to import these items into your cart.
+                <p className="text-[11px] text-gold font-semibold">
+                  Sign in or register to import these items.
                 </p>
               )}
             </div>
 
-            <div className="flex flex-col gap-2.5 pt-2">
+            <div className="flex flex-col gap-3 pt-4">
               {isLoggedIn ? (
                 <>
                   <button
                     onClick={() => handleImportCart(false)}
                     disabled={importingCart}
-                    className="btn-primary w-full py-2 text-xs font-semibold cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full bg-white text-black py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors"
                   >
-                    <span>Merge with my Cart</span>
+                    Merge Carts
                   </button>
                   <button
                     onClick={() => handleImportCart(true)}
                     disabled={importingCart}
-                    className="btn-outline w-full py-2 text-xs font-semibold cursor-pointer flex items-center justify-center gap-1.5 hover:bg-rose-950/20 hover:border-rose-900/50 hover:text-rose-200"
+                    className="w-full border border-white/20 text-white py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors"
                   >
-                    <span>Replace my Cart</span>
+                    Replace Cart
                   </button>
                 </>
               ) : (
@@ -1025,14 +908,14 @@ const Storefront = () => {
                     const sharedCartData = new URLSearchParams(window.location.search).get("importCart");
                     navigate(`/login?importCart=${sharedCartData}`);
                   }}
-                  className="btn-primary w-full py-2 text-xs font-semibold cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full bg-white text-black py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-200 transition-colors"
                 >
-                  <span>Sign In to Import Cart</span>
+                  Sign In to Import
                 </button>
               )}
               <button
                 onClick={handleCancelImport}
-                className="text-slate-500 hover:text-slate-350 text-[11px] py-1 cursor-pointer transition-colors"
+                className="text-neutral-500 hover:text-white text-[10px] uppercase tracking-widest py-2 text-center"
               >
                 Cancel
               </button>
@@ -1043,9 +926,9 @@ const Storefront = () => {
 
       {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed bottom-5 right-5 z-[200] glass-panel border-primary/45 bg-slate-950/90 text-slate-105 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn border-l-4 border-l-primary backdrop-blur-md">
-          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-          <span className="text-xs font-semibold">{toast.message}</span>
+        <div className="fixed bottom-6 right-6 z-[200] bg-neutral-900 border border-white/10 text-white px-6 py-4 rounded-none shadow-2xl flex items-center gap-3 animate-fadeIn">
+          <Sparkles className="h-4 w-4 text-gold animate-pulse" />
+          <span className="text-[11px] uppercase tracking-widest font-sans font-semibold">{toast.message}</span>
         </div>
       )}
     </div>
