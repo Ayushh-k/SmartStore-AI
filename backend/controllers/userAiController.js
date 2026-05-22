@@ -142,6 +142,29 @@ Do not return markdown code blocks, explanation, or notes.
 };
 
 /**
+ * Helper to simulate product QA when OpenAI is unavailable
+ */
+const simulateProductQA = (product, question) => {
+  const contextDesc = product.description || "";
+  const contextTags = (product.tags || []).join(", ");
+  const contextName = product.name;
+  const contextKeywords = product.keywords || "";
+  const q = question.toLowerCase();
+
+  if (q.includes("price") || q.includes("cost") || q.includes("how much") || q.includes("rate") || q.includes("cheap")) {
+    return `The current price of the ${contextName} is $${product.price.toFixed(2)}.`;
+  } else if (q.includes("stock") || q.includes("available") || q.includes("how many") || q.includes("left") || q.includes("buy")) {
+    return `We currently have ${product.stock} units of ${contextName} available in our inventory.`;
+  } else if (q.includes("tag") || q.includes("category") || q.includes("type") || q.includes("kind")) {
+    return `The ${contextName} is classified under the "${product.category || "General"}" category with tags like: ${contextTags || "none"}.`;
+  } else if (q.includes("feature") || q.includes("keyword") || q.includes("spec") || q.includes("description") || q.includes("detail") || q.includes("material") || q.includes("quality")) {
+    return `Key specs and features for the ${contextName} include: ${contextKeywords || "Premium design and materials"}. Description: ${contextDesc || "No description available"}.`;
+  } else {
+    return `Based on the product specs, the ${contextName} is a premium ${product.category || "product"} featuring "${contextKeywords || contextTags}". It offers great reliability and is currently priced at $${product.price.toFixed(2)}.`;
+  }
+};
+
+/**
  * 2. Product Q&A
  * POST /api/ai/user/qa
  * Body: { productId, question }
@@ -165,19 +188,7 @@ export const productQA = async (req, res) => {
 
     if (isApiKeyPlaceholder()) {
       console.log("Using local product QA simulation.");
-      const q = question.toLowerCase();
-      let answer = "";
-      if (q.includes("price") || q.includes("cost") || q.includes("how much")) {
-        answer = `The current price of the ${contextName} is $${product.price.toFixed(2)}.`;
-      } else if (q.includes("stock") || q.includes("available") || q.includes("how many")) {
-        answer = `We currently have ${product.stock} units of ${contextName} available in our inventory.`;
-      } else if (q.includes("tag") || q.includes("category")) {
-        answer = `The ${contextName} is classified under the "${product.category || "General"}" category with tags like: ${contextTags || "none"}.`;
-      } else if (q.includes("feature") || q.includes("keyword") || q.includes("spec")) {
-        answer = `Key specs and features for ${contextName} include: ${contextKeywords || "Premium design and materials"}.`;
-      } else {
-        answer = `Based on the product specs, the ${contextName} is a top-tier choice in ${product.category || "our collection"} that highlights "${contextKeywords || contextTags}". It's designed to deliver peak utility and aesthetics.`;
-      }
+      const answer = simulateProductQA(product, question);
       return res.json({ answer });
     }
 
@@ -214,9 +225,8 @@ Provide a concise, accurate, and direct response (maximum 3 sentences). If the i
       return res.json({ answer });
     } catch (openaiErr) {
       console.warn("OpenAI QA error, using local fallback:", openaiErr.message);
-      return res.json({
-        answer: `Based on the specs, the ${contextName} is a premium ${product.category || "product"} featuring "${contextKeywords || contextTags}". It offers great reliability and is currently priced at $${product.price.toFixed(2)}.`,
-      });
+      const answer = simulateProductQA(product, question);
+      return res.json({ answer });
     }
   } catch (error) {
     console.error("Product QA error:", error);
