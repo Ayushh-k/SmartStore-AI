@@ -20,10 +20,26 @@ const app = express();
 connectDB();
 
 // CORS configuration
-const allowedOrigin = process.env.CLIENTURL || "http://localhost:5173";
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5000"];
+if (process.env.CLIENTURL) {
+  allowedOrigins.push(process.env.CLIENTURL.replace(/\/$/, ""));
+}
+
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+      if (!origin) return callback(null, true);
+      
+      const isAllowed = allowedOrigins.includes(origin) || 
+                        origin.endsWith(".vercel.app");
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
