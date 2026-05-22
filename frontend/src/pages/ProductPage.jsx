@@ -824,8 +824,9 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ================= RATINGS & REVIEWS SECTION ================= */}
+      {/* ================= RATINGS & REVIEWS SECTION ================= */}
         <div className="mt-12 pt-8 border-t border-slate-900 text-left space-y-8">
           <h2 className="text-lg font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
             <span>Ratings & Reviews</span>
@@ -1009,7 +1010,6 @@ const ProductPage = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
