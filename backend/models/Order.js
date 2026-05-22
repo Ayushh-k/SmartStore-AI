@@ -26,8 +26,27 @@ const orderSchema = new mongoose.Schema(
           required: true,
           min: 0,
         },
+        selectedSize: {
+          type: String,
+          default: "",
+        },
+        selectedColor: {
+          type: String,
+          default: "",
+        },
       },
     ],
+    shippingAddress: {
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      zipCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
+    paymentDetails: {
+      method: { type: String, required: true },
+      status: { type: String, enum: ["Pending", "Completed"], default: "Pending" },
+    },
     totalAmount: {
       type: Number,
       required: true,
@@ -44,3 +63,4 @@ const orderSchema = new mongoose.Schema(
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;
+

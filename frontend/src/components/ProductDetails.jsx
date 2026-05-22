@@ -1,5 +1,3 @@
-// frontend/src/components/ProductDetails.jsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { 
   X, 
@@ -15,7 +13,8 @@ import {
   Shirt,
   ChevronLeft,
   ChevronRight,
-  Package
+  Package,
+  Heart
 } from "lucide-react";
 import api from "../utils/api.js";
 
@@ -32,6 +31,14 @@ const ProductDetails = ({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [priceInsights, setPriceInsights] = useState("");
   const [insightsLoading, setInsightsLoading] = useState(false);
+
+  // Variations Selection State
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+
+  // Wishlist State
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   // Review Summary State
   const [reviewSummary, setReviewSummary] = useState({ pros: [], cons: [] });
@@ -80,10 +87,24 @@ const ProductDetails = ({
       }
     };
 
+    const checkWishlist = async () => {
+      try {
+        const res = await api.get("/api/users/profile");
+        const wishlist = res.data?.user?.wishlist || [];
+        const found = wishlist.some(item => (item._id || item) === product._id);
+        setIsWishlisted(found);
+      } catch (err) {
+        console.error("Error checking wishlist status:", err);
+      }
+    };
+
     fetchAiInsights();
     fetchReviewSummary();
+    checkWishlist();
 
     // Reset local states
+    setSelectedSize("");
+    setSelectedColor("");
     setSizeRecommendation("");
     setHeight("");
     setWeight("");
@@ -92,6 +113,21 @@ const ProductDetails = ({
       { sender: "ai", text: `Hi! I'm your Smart Shopping Assistant. Ask me anything about the **${product.name}**!` }
     ]);
   }, [product]);
+
+  const handleToggleWishlist = async () => {
+    if (wishlistLoading) return;
+    setWishlistLoading(true);
+    try {
+      const res = await api.post("/api/users/wishlist/toggle", { productId: product._id });
+      const wishlist = res.data || [];
+      const found = wishlist.some(item => (item._id || item) === product._id);
+      setIsWishlisted(found);
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   // Scroll to bottom of chat when history changes
   useEffect(() => {
@@ -174,6 +210,19 @@ const ProductDetails = ({
             </div>
             <h2 className="text-base md:text-lg font-bold tracking-tight text-slate-100 flex items-center gap-2">
               {product.name}
+              <button
+                type="button"
+                onClick={handleToggleWishlist}
+                disabled={wishlistLoading}
+                className="focus:outline-none transition-transform hover:scale-110 p-1 ml-1 cursor-pointer"
+                title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+              >
+                <Heart
+                  className={`h-4.5 w-4.5 ${
+                    isWishlisted ? "fill-rose-500 text-rose-500" : "text-slate-400 hover:text-rose-455"
+                  }`}
+                />
+              </button>
             </h2>
           </div>
           <button
@@ -295,6 +344,59 @@ const ProductDetails = ({
 
           {/* Column 2: Description, Review Summarizer & Size Predictor */}
           <div className="flex flex-col space-y-4 overflow-y-auto pr-1">
+            {/* Product Variation Options */}
+            {((product.sizes && product.sizes.length > 0) || (product.colors && product.colors.length > 0)) && (
+              <div className="glass-panel-soft p-4 rounded-lg border border-slate-900/60 bg-slate-950/40 space-y-4 text-left">
+                {product.sizes && product.sizes.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
+                      Select Size *
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-3 py-1 rounded text-xs font-semibold border transition-all cursor-pointer ${
+                            selectedSize === size
+                              ? "bg-primary border-primary text-slate-100"
+                              : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {product.colors && product.colors.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
+                      Select Color *
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.colors.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setSelectedColor(color)}
+                          className={`px-3 py-1 rounded text-xs font-semibold border transition-all cursor-pointer ${
+                            selectedColor === color
+                              ? "bg-primary border-primary text-slate-100"
+                              : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700"
+                          }`}
+                        >
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* AI Product Copy */}
             <div className="space-y-1.5 text-[11px]">
               <h4 className="font-semibold text-primary uppercase text-[9px] tracking-wider">
@@ -500,15 +602,24 @@ const ProductDetails = ({
 
           <button
             onClick={() => {
-              onAddToCart(product._id);
+              onAddToCart(product._id, selectedSize, selectedColor);
               onClose();
             }}
-            disabled={Number(product.stock) <= 0}
+            disabled={
+              Number(product.stock) <= 0 ||
+              (product.sizes && product.sizes.length > 0 && !selectedSize) ||
+              (product.colors && product.colors.length > 0 && !selectedColor)
+            }
             className="btn-primary flex-1 inline-flex items-center justify-center gap-1.5 py-2 cursor-pointer text-xs font-bold"
           >
             <ShoppingCart className="h-4 w-4" />
             <span>
-              {Number(product.stock) <= 0 ? "Out of Stock" : "Add Product to Cart"}
+              {Number(product.stock) <= 0
+                ? "Out of Stock"
+                : (product.sizes && product.sizes.length > 0 && !selectedSize) ||
+                  (product.colors && product.colors.length > 0 && !selectedColor)
+                ? "Select Variations"
+                : "Add Product to Cart"}
             </span>
           </button>
         </div>

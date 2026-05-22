@@ -49,7 +49,9 @@ const Cart = () => {
         .filter(item => item.product)
         .map(item => ({
           id: item.product._id,
-          q: item.quantity
+          q: item.quantity,
+          selectedSize: item.selectedSize || "",
+          selectedColor: item.selectedColor || ""
         }));
       const jsonStr = JSON.stringify(items);
       const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
@@ -84,12 +86,16 @@ const Cart = () => {
     fetchCart();
   }, []);
 
-  const handleUpdateQuantity = async (productId, currentQty, amount) => {
+  const handleUpdateQuantity = async (productId, size = "", color = "", currentQty, amount) => {
     const newQty = currentQty + amount;
     if (newQty < 1) return;
 
     try {
-      const res = await api.put(`/api/store/cart/${productId}`, { quantity: newQty });
+      const res = await api.put(`/api/store/cart/${productId}`, {
+        quantity: newQty,
+        size,
+        color
+      });
       setCart(res.data || []);
       // Emit event so the Navbar updates the count instantly
       window.dispatchEvent(new Event("cartUpdated"));
@@ -100,10 +106,10 @@ const Cart = () => {
     }
   };
 
-  const handleRemoveItem = async (productId) => {
+  const handleRemoveItem = async (productId, size = "", color = "") => {
     if (!window.confirm("Remove this item from your cart?")) return;
     try {
-      const res = await api.delete(`/api/store/cart/${productId}`);
+      const res = await api.delete(`/api/store/cart/${productId}?size=${encodeURIComponent(size)}&color=${encodeURIComponent(color)}`);
       setCart(res.data || []);
       // Emit event so the Navbar updates the count instantly
       window.dispatchEvent(new Event("cartUpdated"));
@@ -242,17 +248,27 @@ const Cart = () => {
                 if (!product) return null;
                 const isInsufficientStock = Number(product.stock) < item.quantity;
                 return (
-                  <div key={product._id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div key={`${product._id}-${item.selectedSize}-${item.selectedColor}`} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-sm font-semibold text-slate-200 line-clamp-1">{product.name}</h4>
                         <span className="rounded bg-slate-900 border border-slate-800 px-1.5 py-0.5 text-[9px] text-slate-400">
                           {product.category || "General"}
                         </span>
+                        {item.selectedSize && (
+                          <span className="rounded bg-indigo-950/40 border border-indigo-500/20 px-1.5 py-0.5 text-[9px] font-bold text-indigo-400">
+                            Size: {item.selectedSize}
+                          </span>
+                        )}
+                        {item.selectedColor && (
+                          <span className="rounded bg-indigo-950/40 border border-indigo-500/20 px-1.5 py-0.5 text-[9px] font-bold text-indigo-400">
+                            Color: {item.selectedColor}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-[11px] text-slate-450 line-clamp-2">{product.description}</p>
+                      <p className="text-[11px] text-slate-455 line-clamp-2">{product.description}</p>
                       {isInsufficientStock && (
-                        <p className="text-[10px] text-rose-400 font-medium">
+                        <p className="text-[10px] text-rose-450 font-medium">
                           Insufficient stock. Only {product.stock} left in stock.
                         </p>
                       )}
@@ -261,7 +277,7 @@ const Cart = () => {
                     <div className="flex items-center justify-between sm:justify-end gap-6">
                       <div className="flex items-center gap-2.5">
                         <button
-                          onClick={() => handleUpdateQuantity(product._id, item.quantity, -1)}
+                          onClick={() => handleUpdateQuantity(product._id, item.selectedSize, item.selectedColor, item.quantity, -1)}
                           disabled={item.quantity <= 1}
                           className="rounded bg-slate-900 border border-slate-850 p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                         >
@@ -269,7 +285,7 @@ const Cart = () => {
                         </button>
                         <span className="text-xs font-semibold font-mono w-4 text-center">{item.quantity}</span>
                         <button
-                          onClick={() => handleUpdateQuantity(product._id, item.quantity, 1)}
+                          onClick={() => handleUpdateQuantity(product._id, item.selectedSize, item.selectedColor, item.quantity, 1)}
                           className="rounded bg-slate-900 border border-slate-850 p-1 text-slate-400 hover:text-slate-200 cursor-pointer"
                         >
                           <Plus className="h-3.5 w-3.5" />
@@ -282,7 +298,7 @@ const Cart = () => {
                       </div>
 
                       <button
-                        onClick={() => handleRemoveItem(product._id)}
+                        onClick={() => handleRemoveItem(product._id, item.selectedSize, item.selectedColor)}
                         className="rounded p-1.5 text-slate-550 hover:text-rose-400 hover:bg-rose-950/15 transition-all cursor-pointer"
                         title="Remove Item"
                       >
@@ -321,23 +337,17 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button
-                onClick={handleCheckout}
-                disabled={checkoutLoading || cart.some(item => Number(item.product?.stock) < item.quantity)}
-                className="btn-primary w-full py-2.5 text-xs font-semibold tracking-wide inline-flex items-center justify-center gap-1.5 cursor-pointer"
+              <Link
+                to="/checkout"
+                className={`btn-primary w-full py-2.5 text-xs font-semibold tracking-wide inline-flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                  cart.some(item => Number(item.product?.stock) < item.quantity)
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                }`}
               >
-                {checkoutLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Place Order</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </button>
+                <span>Proceed to Checkout</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
 
               <button
                 onClick={handleShareCart}

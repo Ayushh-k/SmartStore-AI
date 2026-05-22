@@ -40,8 +40,42 @@ const userSchema = new mongoose.Schema(
           min: 1,
           default: 1,
         },
+        selectedSize: {
+          type: String,
+          default: "",
+        },
+        selectedColor: {
+          type: String,
+          default: "",
+        },
       },
     ],
+    addresses: [
+      {
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        zipCode: { type: String, required: true },
+        country: { type: String, required: true },
+        isDefault: { type: Boolean, default: false },
+      },
+    ],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+    profileSettings: {
+      language: {
+        type: String,
+        default: "en",
+      },
+      notifications: {
+        type: Boolean,
+        default: true,
+      },
+    },
   },
   { timestamps: true }
 );

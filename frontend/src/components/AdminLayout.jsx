@@ -10,7 +10,8 @@ import {
   ShoppingBag,
   Bell,
   Check,
-  X
+  X,
+  ClipboardList
 } from "lucide-react";
 import api from "../utils/api.js";
 
@@ -128,6 +129,11 @@ const AdminLayout = () => {
       to: "/products/new",
       label: "Add Product",
       icon: PackagePlus,
+    },
+    {
+      to: "/admin/orders",
+      label: "Orders",
+      icon: ClipboardList,
     },
   ];
 

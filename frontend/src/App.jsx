@@ -10,6 +10,9 @@ import AddProduct from "./pages/AddProduct.jsx";
 import Login from "./pages/Login.jsx";
 import Storefront from "./pages/Storefront.jsx";
 import Cart from "./pages/Cart.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import UserProfile from "./pages/UserProfile.jsx";
+import AdminOrders from "./pages/AdminOrders.jsx";
 
 /**
   Authentication Guard for storefront users (e.g. shopping cart)
@@ -77,6 +80,22 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       {/* Admin Layout Routes protected by admin role */}
@@ -90,6 +109,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/new" element={<AddProduct />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
       </Route>
 
       {/* Fallback */}

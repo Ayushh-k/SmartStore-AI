@@ -38,11 +38,11 @@ export const getPublicProduct = async (req, res) => {
 
 /**
   Add a product ID and quantity to the logged-in user's cart.
-  Body: { productId, quantity }
+  Body: { productId, quantity, selectedSize, selectedColor }
  */
 export const addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, selectedSize = "", selectedColor = "" } = req.body;
     const qty = Number(quantity) || 1;
 
     if (!productId) {
@@ -60,17 +60,25 @@ export const addToCart = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Check if item already exists in cart
+    // Check if item already exists in cart with matching size and color
     const itemIndex = user.cart.findIndex(
-      (item) => item.product.toString() === productId
+      (item) =>
+        item.product.toString() === productId &&
+        (item.selectedSize || "") === selectedSize &&
+        (item.selectedColor || "") === selectedColor
     );
 
     if (itemIndex > -1) {
       // Update quantity
       user.cart[itemIndex].quantity += qty;
     } else {
-      // Add new item
-      user.cart.push({ product: productId, quantity: qty });
+      // Add new item with variations
+      user.cart.push({
+        product: productId,
+        quantity: qty,
+        selectedSize,
+        selectedColor,
+      });
     }
 
     await user.save();
@@ -106,9 +114,16 @@ export const getCart = async (req, res) => {
 
 /**
   Checkout cart: verifies stock, calculates total, creates Order, decrements stock, clears cart.
+  Body: { shippingAddress, paymentMethod }
  */
 export const checkout = async (req, res) => {
   try {
+    const { shippingAddress, paymentMethod = "Card" } = req.body;
+
+    if (!shippingAddress) {
+      return res.status(400).json({ message: "Shipping address is required." });
+    }
+
     const user = await User.findById(req.user._id).populate("cart.product");
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -139,6 +154,8 @@ export const checkout = async (req, res) => {
         product: product._id,
         quantity: item.quantity,
         priceAtPurchase: product.price,
+        selectedSize: item.selectedSize || "",
+        selectedColor: item.selectedColor || "",
       });
     }
 
@@ -146,6 +163,11 @@ export const checkout = async (req, res) => {
     const order = await Order.create({
       user: user._id,
       products: orderProducts,
+      shippingAddress,
+      paymentDetails: {
+        method: paymentMethod,
+        status: "Completed",
+      },
       totalAmount,
       status: "completed", // Completes instantly as a mock checkout flow
     });
@@ -191,12 +213,20 @@ export const checkout = async (req, res) => {
 export const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
+    const { size = "", color = "" } = req.query;
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    user.cart = user.cart.filter((item) => item.product.toString() !== productId);
+    user.cart = user.cart.filter(
+      (item) =>
+        !(
+          item.product.toString() === productId &&
+          (item.selectedSize || "") === size &&
+          (item.selectedColor || "") === color
+        )
+    );
     await user.save();
 
     const populatedUser = await User.findById(req.user._id).populate("cart.product");
@@ -209,12 +239,12 @@ export const removeFromCart = async (req, res) => {
 
 /**
   Update quantity for a product in the logged-in user's cart.
-  Body: { quantity }
+  Body: { quantity, size, color }
  */
 export const updateCartQuantity = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { quantity } = req.body;
+    const { quantity, size = "", color = "" } = req.body;
     const qty = Number(quantity);
 
     if (isNaN(qty) || qty < 1) {
@@ -227,7 +257,10 @@ export const updateCartQuantity = async (req, res) => {
     }
 
     const itemIndex = user.cart.findIndex(
-      (item) => item.product.toString() === productId
+      (item) =>
+        item.product.toString() === productId &&
+        (item.selectedSize || "") === size &&
+        (item.selectedColor || "") === color
     );
 
     if (itemIndex === -1) {
@@ -247,7 +280,7 @@ export const updateCartQuantity = async (req, res) => {
 
 /**
   Batch import/update cart.
-  Body: { items: [{ id, q }], replace: boolean }
+  Body: { items: [{ id, q, selectedSize, selectedColor }], replace: boolean }
  */
 export const batchUpdateCart = async (req, res) => {
   try {
@@ -266,7 +299,7 @@ export const batchUpdateCart = async (req, res) => {
     }
 
     for (const item of items) {
-      const { id, q } = item;
+      const { id, q, selectedSize = "", selectedColor = "" } = item;
       const qty = Number(q) || 1;
       
       // Verify product exists
@@ -274,13 +307,21 @@ export const batchUpdateCart = async (req, res) => {
       if (!product) continue; // skip non-existent products
 
       const itemIndex = user.cart.findIndex(
-        (cItem) => cItem.product.toString() === id
+        (cItem) =>
+          cItem.product.toString() === id &&
+          (cItem.selectedSize || "") === selectedSize &&
+          (cItem.selectedColor || "") === selectedColor
       );
 
       if (itemIndex > -1) {
         user.cart[itemIndex].quantity += qty;
       } else {
-        user.cart.push({ product: id, quantity: qty });
+        user.cart.push({
+          product: id,
+          quantity: qty,
+          selectedSize,
+          selectedColor,
+        });
       }
     }
 
@@ -296,4 +337,5 @@ export const batchUpdateCart = async (req, res) => {
     res.status(500).json({ message: "Failed to import shared cart." });
   }
 };
+
 

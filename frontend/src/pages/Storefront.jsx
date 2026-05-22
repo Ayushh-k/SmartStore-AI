@@ -479,7 +479,7 @@ const Storefront = () => {
     return () => clearInterval(interval);
   }, [isLoggedIn, slides.length]);
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = async (productId, size = "", color = "") => {
     if (!isLoggedIn) {
       alert("Please sign in or register to add items to your cart.");
       return;
@@ -487,7 +487,12 @@ const Storefront = () => {
 
     setAddingToCart((prev) => ({ ...prev, [productId]: true }));
     try {
-      await api.post("/api/store/cart", { productId, quantity: 1 });
+      await api.post("/api/store/cart", {
+        productId,
+        quantity: 1,
+        selectedSize: size,
+        selectedColor: color,
+      });
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
       console.error("Add to cart error:", err);

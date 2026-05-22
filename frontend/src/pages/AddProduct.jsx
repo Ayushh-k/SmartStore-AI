@@ -32,6 +32,7 @@ const AddProduct = () => {
     price: "",
     stock: "",
     category: "",
+    brand: "",
     description: "",
     tags: "",
     captionsInstagram: "",
@@ -39,6 +40,10 @@ const AddProduct = () => {
     captionsTwitter: "",
   });
 
+  const [sizes, setSizes] = useState([]);
+  const [sizeInput, setSizeInput] = useState("");
+  const [colors, setColors] = useState([]);
+  const [colorInput, setColorInput] = useState("");
   const [uploadedImages, setUploadedImages] = useState([]);
 
   const handleImageUpload = (e) => {
@@ -59,6 +64,36 @@ const AddProduct = () => {
 
   const removeUploadedImage = (index) => {
     setUploadedImages((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleSizeKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const val = sizeInput.trim();
+      if (val && !sizes.includes(val)) {
+        setSizes([...sizes, val]);
+      }
+      setSizeInput("");
+    }
+  };
+
+  const removeSize = (indexToRemove) => {
+    setSizes(sizes.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleColorKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const val = colorInput.trim();
+      if (val && !colors.includes(val)) {
+        setColors([...colors, val]);
+      }
+      setColorInput("");
+    }
+  };
+
+  const removeColor = (indexToRemove) => {
+    setColors(colors.filter((_, idx) => idx !== indexToRemove));
   };
 
   const [aiContext, setAiContext] = useState({
@@ -193,6 +228,9 @@ const AddProduct = () => {
         price: Number(form.price) || 0,
         stock: Number(form.stock) || 0,
         category: form.category || undefined,
+        brand: form.brand || undefined,
+        sizes,
+        colors,
         audience: audienceVal,
         keywords: keywordsVal,
         images: uploadedImages,
@@ -228,12 +266,15 @@ const AddProduct = () => {
         price: "",
         stock: "",
         category: "",
+        brand: "",
         description: "",
         tags: "",
         captionsInstagram: "",
         captionsFacebook: "",
         captionsTwitter: "",
       });
+      setSizes([]);
+      setColors([]);
       setUploadedImages([]);
       setAiContext({
         productType: "",
@@ -345,7 +386,7 @@ const AddProduct = () => {
 
               <div>
                 <label className="mb-1 block text-xs text-slate-300">
-                  Category
+                  Category *
                 </label>
                 <input
                   type="text"
@@ -353,6 +394,21 @@ const AddProduct = () => {
                   className="input"
                   placeholder="Apparel · Streetwear"
                   value={form.category}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs text-slate-300">
+                  Brand
+                </label>
+                <input
+                  type="text"
+                  name="brand"
+                  className="input"
+                  placeholder="E.g. Nike, Apple"
+                  value={form.brand}
                   onChange={handleChange}
                 />
               </div>
@@ -387,6 +443,68 @@ const AddProduct = () => {
                   value={form.stock}
                   onChange={handleChange}
                   required
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-xs text-slate-300">
+                  Sizes (type variation and press Enter)
+                </label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {sizes.map((size, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px]"
+                    >
+                      {size}
+                      <button
+                        type="button"
+                        onClick={() => removeSize(idx)}
+                        className="hover:text-rose-450 focus:outline-none font-bold"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={sizeInput}
+                  onChange={(e) => setSizeInput(e.target.value)}
+                  onKeyDown={handleSizeKeyDown}
+                  className="input text-xs"
+                  placeholder="E.g. S, M, L, XL"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-xs text-slate-300">
+                  Colors (type variation and press Enter)
+                </label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {colors.map((color, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px]"
+                    >
+                      {color}
+                      <button
+                        type="button"
+                        onClick={() => removeColor(idx)}
+                        className="hover:text-rose-450 focus:outline-none font-bold"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={colorInput}
+                  onChange={(e) => setColorInput(e.target.value)}
+                  onKeyDown={handleColorKeyDown}
+                  className="input text-xs"
+                  placeholder="E.g. Black, White, Navy"
                 />
               </div>
 

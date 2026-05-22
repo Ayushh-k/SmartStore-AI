@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { ShoppingBag, ShoppingCart, LogOut, LayoutDashboard, User } from "lucide-react";
+import { ShoppingBag, ShoppingCart, LogOut, LayoutDashboard, User, Heart } from "lucide-react";
 import api from "../utils/api.js";
 
 const UserNavbar = () => {
@@ -102,6 +102,20 @@ const UserNavbar = () => {
           )}
         </NavLink>
 
+        {user && (
+          <NavLink
+            to="/profile?tab=wishlist"
+            className={({ isActive }) =>
+              `relative flex items-center gap-1.5 transition-colors ${
+                window.location.search.includes("tab=wishlist") ? "text-primary border-b border-primary pb-1" : "text-slate-300 hover:text-slate-150"
+              }`
+            }
+          >
+            <Heart className="h-4 w-4 text-rose-500" />
+            <span>Wishlist</span>
+          </NavLink>
+        )}
+
         {user && user.role === "admin" && (
           <Link
             to="/dashboard"
@@ -114,10 +128,13 @@ const UserNavbar = () => {
 
         {user ? (
           <div className="flex items-center gap-4 pl-4 border-l border-slate-800">
-            <div className="flex items-center gap-1.5 text-slate-350">
+            <Link
+              to="/profile"
+              className="flex items-center gap-1.5 text-slate-350 hover:text-primary transition-colors cursor-pointer"
+            >
               <User className="h-3.5 w-3.5 text-slate-400" />
               <span>{user.name}</span>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 rounded bg-slate-900 border border-slate-800 px-2 py-1 text-slate-400 hover:text-rose-450 hover:bg-rose-950/25 transition-all cursor-pointer"

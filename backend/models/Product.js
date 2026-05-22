@@ -31,6 +31,12 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: String,
+      required: [true, "Category is required"],
+      trim: true,
+      default: "",
+    },
+    brand: {
+      type: String,
       trim: true,
       default: "",
     },
@@ -45,6 +51,18 @@ const productSchema = new mongoose.Schema(
       default: "",
     },
     tags: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    sizes: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    colors: [
       {
         type: String,
         trim: true,
