@@ -22,9 +22,10 @@ import {
   RotateCcw,
   Share2,
   Check,
-  X
+  X,
+  Heart
 } from "lucide-react";
-import api from "../utils/api.js";
+import api, { toggleWishlistAPI } from "../utils/api.js";
 import ProductDetails from "../components/ProductDetails.jsx";
 import heroBanner from "../assets/flipkart_hero_banner.png";
 
@@ -67,7 +68,7 @@ const MOCK_DEALS = [
   }
 ];
 
-const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCart }) => {
+const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCart, isWishlisted, onWishlistToggle }) => {
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const isOutOfStock = Number(product.stock) <= 0;
   const hasMultipleImages = product.images && product.images.length > 1;
@@ -90,6 +91,19 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
     <div className="glass-panel flex flex-col justify-between hover:border-primary/45 hover:shadow-primary/5 transition-all group overflow-hidden">
       {/* Product Image Frame */}
       <div className="h-44 bg-slate-950 overflow-hidden relative border-b border-slate-900/60 flex items-center justify-center">
+        {/* Wishlist toggle Heart button overlay */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onWishlistToggle(product._id);
+          }}
+          className="absolute top-2.5 right-2.5 rounded-full bg-slate-950/70 border border-slate-800 p-1.5 text-slate-400 hover:text-rose-505 hover:text-rose-500 transition-colors cursor-pointer z-10 animate-fadeIn"
+          title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+        >
+          <Heart className={`h-4 w-4 transition-transform hover:scale-110 ${isWishlisted ? "fill-rose-550 text-rose-550 text-rose-500 fill-rose-500" : ""}`} />
+        </button>
+
         {product.images && product.images[currentImgIndex] ? (
           <img
             src={product.images[currentImgIndex]}
@@ -150,10 +164,10 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
             <span
               className={`text-[9px] font-bold uppercase tracking-wider ${
                 isOutOfStock
-                  ? "text-rose-450"
+                  ? "text-rose-455 text-rose-450"
                   : Number(product.stock) <= 5
-                  ? "text-amber-450"
-                  : "text-emerald-450"
+                  ? "text-amber-455 text-amber-450"
+                  : "text-emerald-455 text-emerald-450"
               }`}
             >
               {isOutOfStock ? "Out of Stock" : `${product.stock} Left`}
@@ -191,7 +205,7 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
           <span className="text-[10px] text-slate-500 uppercase font-semibold block">Price</span>
           <span className="text-sm font-bold text-slate-100">${Number(product.price).toFixed(2)}</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <button
             onClick={() => setSelectedProduct(product)}
             className="rounded border border-slate-800 bg-slate-950/70 p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer"
@@ -199,14 +213,12 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
           >
             <Eye className="h-3.5 w-3.5" />
           </button>
-          <button
-            onClick={() => handleAddToCart(product._id)}
-            disabled={isOutOfStock || addingToCart[product._id]}
-            className="btn-primary inline-flex items-center gap-1.5 text-xs py-1.5 px-3.5 cursor-pointer"
+          <Link
+            to={`/product/${product._id}`}
+            className="btn-primary inline-flex items-center gap-1.5 text-xs py-1.5 px-3.5 cursor-pointer text-center justify-center decoration-transparent"
           >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            <span>{addingToCart[product._id] ? "Adding..." : "Add to Cart"}</span>
-          </button>
+            <span>View Details</span>
+          </Link>
         </div>
       </div>
     </div>
@@ -224,6 +236,15 @@ const Storefront = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Wishlist & Toast States
+  const [wishlistIds, setWishlistIds] = useState([]);
+  const [toast, setToast] = useState({ show: false, message: "" });
+
+  const showToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
 
   // AI search states
   const [searchMode, setSearchMode] = useState("text"); // text or ai
@@ -462,9 +483,52 @@ const Storefront = () => {
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
+  const fetchWishlist = async () => {
+    if (!isLoggedIn) return;
+    try {
+      const res = await api.get("/api/users/profile");
+      if (res.data && res.data.user) {
+        const ids = (res.data.user.wishlist || []).map(item => typeof item === 'object' ? item._id : item);
+        setWishlistIds(ids);
+      }
+    } catch (err) {
+      console.error("Fetch wishlist error:", err);
+    }
+  };
+
+  const handleWishlistToggle = async (productId) => {
+    if (!isLoggedIn) {
+      alert("Please sign in or register to add items to your wishlist.");
+      return;
+    }
+    const alreadyWishlisted = wishlistIds.includes(productId);
+    // Instantly toggle local state for immediate feedback
+    if (alreadyWishlisted) {
+      setWishlistIds(prev => prev.filter(id => id !== productId));
+      showToast("Removed from Wishlist");
+    } else {
+      setWishlistIds(prev => [...prev, productId]);
+      showToast("Added to Wishlist");
+    }
+
+    try {
+      await toggleWishlistAPI(productId);
+    } catch (err) {
+      console.error("Toggle wishlist error:", err);
+      // Revert on error
+      if (alreadyWishlisted) {
+        setWishlistIds(prev => [...prev, productId]);
+      } else {
+        setWishlistIds(prev => prev.filter(id => id !== productId));
+      }
+      showToast("Failed to sync wishlist changes.");
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn) {
       fetchProducts();
+      fetchWishlist();
     } else {
       setLoading(false);
     }
@@ -811,6 +875,8 @@ const Storefront = () => {
                 setActiveImageIndex(0);
               }}
               addingToCart={addingToCart}
+              isWishlisted={wishlistIds.includes(p._id)}
+              onWishlistToggle={handleWishlistToggle}
             />
           ))}
         </div>
@@ -972,6 +1038,14 @@ const Storefront = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className="fixed bottom-5 right-5 z-[200] glass-panel border-primary/45 bg-slate-950/90 text-slate-105 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-fadeIn border-l-4 border-l-primary backdrop-blur-md">
+          <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+          <span className="text-xs font-semibold">{toast.message}</span>
         </div>
       )}
     </div>

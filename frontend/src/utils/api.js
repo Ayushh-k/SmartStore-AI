@@ -35,4 +35,9 @@ api.interceptors.response.use(
   }
 );
 
+export const toggleWishlistAPI = async (productId) => {
+  const response = await api.post("/api/users/wishlist", { productId });
+  return response.data;
+};
+
 export default api;

@@ -86,16 +86,18 @@ export const toggleWishlist = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const index = user.wishlist.indexOf(productId);
-    if (index > -1) {
-      // Remove
-      user.wishlist.splice(index, 1);
+    const isWishlisted = req.user.wishlist && req.user.wishlist.some(id => id.toString() === productId.toString());
+
+    if (isWishlisted) {
+      await User.findByIdAndUpdate(req.user._id, {
+        $pull: { wishlist: productId }
+      });
     } else {
-      // Add
-      user.wishlist.push(productId);
+      await User.findByIdAndUpdate(req.user._id, {
+        $addToSet: { wishlist: productId }
+      });
     }
 
-    await user.save();
     const updatedUser = await User.findById(req.user._id).populate("wishlist");
     res.json(updatedUser.wishlist);
   } catch (error) {

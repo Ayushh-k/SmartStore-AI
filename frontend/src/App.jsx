@@ -12,6 +12,7 @@ import Storefront from "./pages/Storefront.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import UserProfile from "./pages/UserProfile.jsx";
+import ProductPage from "./pages/ProductPage.jsx";
 import AdminOrders from "./pages/AdminOrders.jsx";
 
 /**
@@ -93,6 +94,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <ProtectedRoute>
+              <ProductPage />
             </ProtectedRoute>
           }
         />

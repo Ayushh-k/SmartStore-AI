@@ -3,6 +3,7 @@
 import express from "express";
 import Product from "../models/Product.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
+import { getProductById } from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -48,19 +49,8 @@ router.get("/meta/values", protect, admin, async (req, res) => {
   }
 });
 
-// Get single product
-router.get("/:id", protect, admin, async (req, res) => {
-  try {
-    const prod = await Product.findById(req.params.id);
-    if (!prod) {
-      return res.status(404).json({ message: "Product not found." });
-    }
-    res.json(prod);
-  } catch (error) {
-    console.error("Get product error:", error);
-    res.status(500).json({ message: "Failed to fetch product." });
-  }
-});
+// Get single product (Accessible by logged-in users for PDP)
+router.get("/:id", protect, getProductById);
 
 // Update product
 router.put("/:id", protect, admin, async (req, res) => {

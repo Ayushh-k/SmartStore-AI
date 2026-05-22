@@ -498,19 +498,25 @@ const UserProfile = () => {
                       {/* Action buttons */}
                       <div className="flex gap-2 mt-4 pt-3 border-t border-slate-850/60">
                         <button
-                          onClick={() => handleMoveToCart(product)}
-                          disabled={isOutOfStock || isActionLoading}
-                          className="btn-primary flex-1 py-1.5 text-[10px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer"
+                          onClick={() => handleRemoveWishlist(product._id)}
+                          disabled={isActionLoading}
+                          className="btn-outline flex-1 py-1.5 text-[10px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer hover:bg-rose-950/20 hover:border-rose-900/50 hover:text-rose-250 text-rose-400"
                         >
                           {isActionLoading ? (
                             <Loader2 className="h-3 w-3 animate-spin" />
                           ) : (
                             <>
-                              <ShoppingCart className="h-3.5 w-3.5" />
-                              <span>{isOutOfStock ? "Out of Stock" : "Move to Cart"}</span>
+                              <Trash2 className="h-3.5 w-3.5" />
+                              <span>Remove</span>
                             </>
                           )}
                         </button>
+                        <Link
+                          to={`/product/${product._id}`}
+                          className="btn-primary flex-1 py-1.5 text-[10px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer text-center decoration-transparent"
+                        >
+                          <span>View Details</span>
+                        </Link>
                       </div>
                     </div>
                   );

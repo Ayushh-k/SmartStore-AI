@@ -21,6 +21,7 @@ router.route("/profile")
   .put(updateProfile);
 
 router.post("/wishlist/toggle", toggleWishlist);
+router.post("/wishlist", toggleWishlist);
 
 router.post("/address", addAddress);
 router.route("/address/:addressId")
