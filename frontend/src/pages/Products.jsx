@@ -129,31 +129,47 @@ const Products = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {filteredProducts.map((product) => (
+                 {filteredProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-slate-900/35 transition-colors">
                     <td className="px-4 py-3.5 font-medium">
-                      <div className="flex flex-col">
-                        <span 
-                          onClick={() => setSelectedProduct(product)}
-                          className="cursor-pointer hover:underline text-primary hover:text-indigo-400 font-semibold"
-                        >
-                          {product.name}
-                        </span>
-                        {product.tags && product.tags.length > 0 && (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {product.tags.slice(0, 3).map((tag, idx) => (
-                              <span key={idx} className="flex items-center gap-0.5 rounded bg-primary/10 px-1 py-0.5 text-[9px] text-primary">
-                                <Tag className="h-2 w-2" />
-                                {tag}
-                              </span>
-                            ))}
-                            {product.tags.length > 3 && (
-                              <span className="rounded bg-slate-800 px-1 py-0.5 text-[9px] text-slate-400">
-                                +{product.tags.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-md border border-slate-800 bg-slate-950/60 overflow-hidden flex items-center justify-center shrink-0">
+                          {product.images && product.images[0] ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.parentNode.querySelector('.fallback-pkg').classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <Package className={`fallback-pkg h-5 w-5 text-slate-500 ${product.images && product.images[0] ? 'hidden' : ''}`} />
+                        </div>
+                        <div className="flex flex-col">
+                          <span 
+                            onClick={() => setSelectedProduct(product)}
+                            className="cursor-pointer hover:underline text-primary hover:text-indigo-400 font-semibold"
+                          >
+                            {product.name}
+                          </span>
+                          {product.tags && product.tags.length > 0 && (
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {product.tags.slice(0, 3).map((tag, idx) => (
+                                <span key={idx} className="flex items-center gap-0.5 rounded bg-primary/10 px-1 py-0.5 text-[9px] text-primary">
+                                  <Tag className="h-2 w-2" />
+                                  {tag}
+                                </span>
+                              ))}
+                              {product.tags.length > 3 && (
+                                <span className="rounded bg-slate-800 px-1 py-0.5 text-[9px] text-slate-400">
+                                  +{product.tags.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-3.5 text-slate-400 font-mono">{product.sku || "—"}</td>
@@ -211,26 +227,44 @@ const Products = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
-              {/* Product Specifications Grid */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60">
-                <div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">SKU</span>
-                  <p className="text-slate-350 font-mono mt-0.5">{selectedProduct.sku || "—"}</p>
+             <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+              <div className="grid gap-4 md:grid-cols-[180px_1fr]">
+                {/* Image Section */}
+                <div className="glass-panel-soft p-2 flex items-center justify-center bg-slate-950/45 rounded-lg border border-slate-800/60 min-h-[180px]">
+                  {selectedProduct.images && selectedProduct.images[0] ? (
+                    <img
+                      src={selectedProduct.images[0]}
+                      alt={selectedProduct.name}
+                      className="max-h-[160px] max-w-full rounded object-contain"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-slate-600 text-center p-4">
+                      <Package className="h-10 w-10 mb-2" />
+                      <span className="text-[10px] text-slate-500">No Image URL</span>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Category</span>
-                  <p className="text-slate-350 mt-0.5">{selectedProduct.category || "General"}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Price</span>
-                  <p className="text-slate-350 mt-0.5 font-medium">${Number(selectedProduct.price).toFixed(2)}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Stock Level</span>
-                  <p className={`mt-0.5 font-semibold ${Number(selectedProduct.stock) <= 5 ? "text-rose-450" : "text-emerald-400"}`}>
-                    {selectedProduct.stock} units
-                  </p>
+
+                {/* Product Specifications Grid */}
+                <div className="grid grid-cols-2 gap-3 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 h-fit">
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold">SKU</span>
+                    <p className="text-slate-350 font-mono mt-0.5">{selectedProduct.sku || "—"}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Category</span>
+                    <p className="text-slate-350 mt-0.5">{selectedProduct.category || "General"}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Price</span>
+                    <p className="text-slate-350 mt-0.5 font-medium">${Number(selectedProduct.price).toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Stock Level</span>
+                    <p className={`mt-0.5 font-semibold ${Number(selectedProduct.stock) <= 5 ? "text-rose-450" : "text-emerald-450"}`}>
+                      {selectedProduct.stock} units
+                    </p>
+                  </div>
                 </div>
               </div>
 

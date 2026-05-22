@@ -37,6 +37,7 @@ const AddProduct = () => {
     captionsInstagram: "",
     captionsFacebook: "",
     captionsTwitter: "",
+    imageUrl: "",
   });
 
   const [aiContext, setAiContext] = useState({
@@ -173,6 +174,7 @@ const AddProduct = () => {
         category: form.category || undefined,
         audience: audienceVal,
         keywords: keywordsVal,
+        images: form.imageUrl ? [form.imageUrl] : [],
         description: form.description,
         tags: form.tags
           .split(",")
@@ -210,6 +212,7 @@ const AddProduct = () => {
         captionsInstagram: "",
         captionsFacebook: "",
         captionsTwitter: "",
+        imageUrl: "",
       });
       setAiContext({
         productType: "",
@@ -364,6 +367,23 @@ const AddProduct = () => {
                   onChange={handleChange}
                   required
                 />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-xs text-slate-300">
+                  Product Image URL
+                </label>
+                <input
+                  type="url"
+                  name="imageUrl"
+                  className="input"
+                  placeholder="E.g. https://images.unsplash.com/... or a local asset path"
+                  value={form.imageUrl}
+                  onChange={handleChange}
+                />
+                <p className="mt-1 text-[10px] text-slate-500">
+                  Provide an external photo URL (e.g. from Unsplash) to render the item on the storefront.
+                </p>
               </div>
             </div>
           </div>
