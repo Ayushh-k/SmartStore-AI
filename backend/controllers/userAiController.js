@@ -5,6 +5,7 @@ import Product from "../models/Product.js";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAIAPIKEY || "dummy-key",
+  timeout: 4000, // 4 seconds timeout
 });
 
 // Helper to check if OpenAI key is missing or is the default dummy/placeholder

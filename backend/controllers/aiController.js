@@ -7,6 +7,7 @@ import OpenAI from "openai";
  */
 const openai = new OpenAI({
   apiKey: process.env.OPENAIAPIKEY || "dummy-key",
+  timeout: 4000, // 4 seconds timeout
 });
 
 /**
