@@ -84,7 +84,7 @@ const Login = () => {
                   required={isRegister}
                   value={form.name}
                   onChange={handleChange}
-                  className="input pl-10"
+                  className="input !pl-10"
                   placeholder="John Doe"
                 />
               </div>
@@ -105,7 +105,7 @@ const Login = () => {
                 required
                 value={form.email}
                 onChange={handleChange}
-                className="input pl-10"
+                className="input !pl-10"
                 placeholder="admin@smartstore.com"
               />
             </div>
@@ -126,7 +126,7 @@ const Login = () => {
                 minLength={6}
                 value={form.password}
                 onChange={handleChange}
-                className="input pl-10"
+                className="input !pl-10"
                 placeholder="••••••••"
               />
             </div>

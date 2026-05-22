@@ -89,7 +89,7 @@ const Products = () => {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            className="input pl-9 text-xs"
+            className="input !pl-10 text-xs"
             placeholder="Search by name, SKU, or category..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -133,7 +133,12 @@ const Products = () => {
                   <tr key={product._id} className="hover:bg-slate-900/35 transition-colors">
                     <td className="px-4 py-3.5 font-medium">
                       <div className="flex flex-col">
-                        <span>{product.name}</span>
+                        <span 
+                          onClick={() => setSelectedProduct(product)}
+                          className="cursor-pointer hover:underline text-primary hover:text-indigo-400 font-semibold"
+                        >
+                          {product.name}
+                        </span>
                         {product.tags && product.tags.length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
                             {product.tags.slice(0, 3).map((tag, idx) => (
@@ -207,6 +212,28 @@ const Products = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+              {/* Product Specifications Grid */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60">
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold">SKU</span>
+                  <p className="text-slate-350 font-mono mt-0.5">{selectedProduct.sku || "—"}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Category</span>
+                  <p className="text-slate-350 mt-0.5">{selectedProduct.category || "General"}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Price</span>
+                  <p className="text-slate-350 mt-0.5 font-medium">${Number(selectedProduct.price).toFixed(2)}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold">Stock Level</span>
+                  <p className={`mt-0.5 font-semibold ${Number(selectedProduct.stock) <= 5 ? "text-rose-450" : "text-emerald-400"}`}>
+                    {selectedProduct.stock} units
+                  </p>
+                </div>
+              </div>
+
               {/* Description */}
               <div className="space-y-1">
                 <h4 className="font-semibold text-primary uppercase tracking-wide text-[10px]">Description</h4>
