@@ -59,82 +59,82 @@ const Products = () => {
   });
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-8 animate-fadeIn text-left">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-neutral-900 pb-5">
         <div>
-          <h2 className="text-base font-semibold tracking-tight">
-            Inventory & AI Asset Library
+          <h2 className="font-serif text-xl tracking-widest uppercase text-white">
+            Inventory & AI Assets
           </h2>
-          <p className="text-xs text-slate-400">
-            View all products and their generated AI copywriting, SEO tags, and social media captions.
+          <p className="text-[9px] uppercase tracking-widest text-neutral-500 mt-0.5">
+            Manage your catalog and access generated copy, SEO tags, and social media captions.
           </p>
         </div>
         <Link
           to="/products/new"
-          className="btn-primary inline-flex items-center gap-2 text-xs self-start sm:self-auto"
+          className="bg-white text-black hover:bg-neutral-200 tracking-widest uppercase font-bold py-2.5 px-4 text-[10px] rounded-none transition-colors inline-flex items-center gap-2 self-start sm:self-auto"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3.5 w-3.5" />
           Add Product
         </Link>
       </div>
 
       {error && (
-        <div className="glass-panel-soft border-rose-500/40 bg-rose-950/40 p-3 text-xs text-rose-300">
+        <div className="border border-neutral-900 bg-black p-4 text-[10px] uppercase tracking-widest text-rose-500">
           {error}
         </div>
       )}
 
       {/* Search & Statistics Bar */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-0 top-3 h-3.5 w-3.5 text-neutral-500" />
           <input
             type="text"
-            className="input !pl-10 text-xs"
+            className="w-full bg-black border-b border-neutral-800 text-xs py-3 pl-7 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
             placeholder="Search by name, SKU, or category..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="text-xs text-slate-400 font-medium">
+        <div className="text-[9px] uppercase tracking-widest text-neutral-500 font-semibold">
           Showing {filteredProducts.length} of {products.length} products
         </div>
       </div>
 
-      {/* Products Table / Grid */}
-      <div className="glass-panel-soft overflow-hidden">
+      {/* Products Table */}
+      <div className="border border-neutral-900 bg-black rounded-none overflow-hidden">
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-xs text-slate-400">
+          <div className="flex items-center justify-center py-20 text-[10px] uppercase tracking-widest text-neutral-500">
             Loading products...
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center text-slate-500">
-            <Package className="h-10 w-10 text-slate-600 mb-3" />
-            <p className="text-sm">No products found.</p>
-            <p className="text-xs text-slate-600 mt-1">
-              {search ? "Try adjusting your search query." : "Click 'Add Product' to create your first entry."}
+          <div className="flex flex-col items-center justify-center py-20 text-center text-neutral-500">
+            <Package className="h-8 w-8 text-neutral-600 mb-3" />
+            <p className="text-xs uppercase tracking-widest text-white">No products found</p>
+            <p className="text-[9px] uppercase tracking-widest text-neutral-500 mt-1">
+              {search ? "Adjust your filter" : "Add your first catalog entry"}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-800/80 bg-slate-900/40 text-[10px] uppercase tracking-wider text-slate-400">
-                  <th className="px-4 py-3 font-semibold">Product Name</th>
-                  <th className="px-4 py-3 font-semibold">SKU</th>
-                  <th className="px-4 py-3 font-semibold">Category</th>
-                  <th className="px-4 py-3 font-semibold text-right">Price</th>
-                  <th className="px-4 py-3 font-semibold text-right">Stock</th>
-                  <th className="px-4 py-3 font-semibold text-center">AI Assets</th>
-                  <th className="px-4 py-3 font-semibold text-right">Actions</th>
+                <tr className="border-b border-neutral-900 bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-400">
+                  <th className="px-5 py-4 font-bold">Product Name</th>
+                  <th className="px-5 py-4 font-bold">SKU</th>
+                  <th className="px-5 py-4 font-bold">Category</th>
+                  <th className="px-5 py-4 font-bold text-right">Price</th>
+                  <th className="px-5 py-4 font-bold text-right">Stock</th>
+                  <th className="px-5 py-4 font-bold text-center">AI Copywriting</th>
+                  <th className="px-5 py-4 font-bold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-neutral-900">
                  {filteredProducts.map((product) => (
-                  <tr key={product._id} className="hover:bg-slate-900/35 transition-colors">
-                    <td className="px-4 py-3.5 font-medium">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-md border border-slate-800 bg-slate-950/60 overflow-hidden flex items-center justify-center shrink-0">
+                  <tr key={product._id} className="hover:bg-neutral-900/30 transition-colors">
+                    <td className="px-5 py-4 font-medium">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 border border-neutral-900 bg-black overflow-hidden flex items-center justify-center shrink-0 rounded-none">
                           {product.images && product.images[0] ? (
                             <img
                               src={product.images[0]}
@@ -146,25 +146,24 @@ const Products = () => {
                               }}
                             />
                           ) : null}
-                          <Package className={`fallback-pkg h-5 w-5 text-slate-500 ${product.images && product.images[0] ? 'hidden' : ''}`} />
+                          <Package className={`fallback-pkg h-4 w-4 text-neutral-500 ${product.images && product.images[0] ? 'hidden' : ''}`} />
                         </div>
                         <div className="flex flex-col">
                           <span 
                             onClick={() => { setSelectedProduct(product); setActiveImageIndex(0); }}
-                            className="cursor-pointer hover:underline text-primary hover:text-indigo-400 font-semibold"
+                            className="cursor-pointer hover:underline text-white font-semibold text-xs tracking-wide"
                           >
                             {product.name}
                           </span>
                           {product.tags && product.tags.length > 0 && (
-                            <div className="mt-1 flex flex-wrap gap-1">
+                            <div className="mt-1.5 flex flex-wrap gap-1">
                               {product.tags.slice(0, 3).map((tag, idx) => (
-                                <span key={idx} className="flex items-center gap-0.5 rounded bg-primary/10 px-1 py-0.5 text-[9px] text-primary">
-                                  <Tag className="h-2 w-2" />
+                                <span key={idx} className="border border-neutral-800 text-[8px] uppercase tracking-wider text-neutral-400 px-1 py-0.5 rounded-none bg-transparent">
                                   {tag}
                                 </span>
                               ))}
                               {product.tags.length > 3 && (
-                                <span className="rounded bg-slate-800 px-1 py-0.5 text-[9px] text-slate-400">
+                                <span className="border border-neutral-800 text-[8px] uppercase tracking-wider text-neutral-500 px-1 py-0.5 rounded-none bg-transparent">
                                   +{product.tags.length - 3}
                                 </span>
                               )}
@@ -173,34 +172,34 @@ const Products = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-400 font-mono">{product.sku || "—"}</td>
-                    <td className="px-4 py-3.5 text-slate-400">
-                      <span className="rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-[10px]">
+                    <td className="px-5 py-4 text-neutral-400 font-mono text-[10px]">{product.sku || "—"}</td>
+                    <td className="px-5 py-4 text-neutral-400">
+                      <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-semibold border border-neutral-800 px-2 py-0.5">
                         {product.category || "General"}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-right font-medium">${Number(product.price).toFixed(2)}</td>
-                    <td className="px-4 py-3.5 text-right">
-                      <span className={`font-semibold ${Number(product.stock) <= 5 ? "text-rose-400" : "text-slate-200"}`}>
+                    <td className="px-5 py-4 text-right font-medium text-white">${Number(product.price).toFixed(2)}</td>
+                    <td className="px-5 py-4 text-right">
+                      <span className={`font-semibold ${Number(product.stock) <= 5 ? "text-rose-455" : "text-white"}`}>
                         {product.stock}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 text-center">
+                    <td className="px-5 py-4 text-center">
                       <button
                         onClick={() => { setSelectedProduct(product); setActiveImageIndex(0); }}
-                        className="inline-flex items-center gap-1 rounded bg-slate-900 border border-slate-800 px-2 py-1 text-[10px] text-primary hover:bg-primary/10 transition-colors"
+                        className="inline-flex items-center gap-1 border border-neutral-800 text-neutral-400 hover:text-white hover:border-white px-3 py-1.5 text-[9px] uppercase tracking-widest rounded-none transition-colors"
                       >
                         <Eye className="h-3 w-3" />
-                        View AI Content
+                        View copy
                       </button>
                     </td>
-                    <td className="px-4 py-3.5 text-right">
+                    <td className="px-5 py-4 text-right">
                       <button
                         onClick={() => handleDelete(product._id)}
-                        className="rounded p-1 text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 transition-colors"
+                        className="text-neutral-500 hover:text-rose-455 transition-colors cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
                         title="Delete Product"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -211,49 +210,49 @@ const Products = () => {
         )}
       </div>
 
-      {/* Modal to view generated AI copy and social captions */}
+      {/* Modal */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-2xl max-h-[85vh] flex flex-col p-6 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+          <div className="border border-neutral-900 bg-black w-full max-w-2xl max-h-[85vh] flex flex-col p-8 overflow-hidden rounded-none shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-950 pb-4 mb-5">
               <div>
-                <h3 className="text-sm font-semibold tracking-tight">AI Asset Details: {selectedProduct.name}</h3>
-                <p className="text-[10px] text-slate-400">Generated product details and platforms captions</p>
+                <h3 className="font-serif text-lg tracking-widest uppercase text-white">AI Generated Copy</h3>
+                <p className="text-[8px] uppercase tracking-widest text-neutral-500 mt-0.5">{selectedProduct.name}</p>
               </div>
               <button
                 onClick={() => setSelectedProduct(null)}
-                className="rounded bg-slate-900 hover:bg-slate-800 px-2 py-1 text-xs text-slate-400"
+                className="border border-neutral-800 text-neutral-450 hover:text-white hover:border-white px-3 py-1 text-[9px] uppercase tracking-widest rounded-none transition-colors"
               >
                 Close
               </button>
             </div>
 
-             <div className="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
-              <div className="grid gap-4 md:grid-cols-[180px_1fr]">
-                {/* Image Section with Gallery Selector */}
-                <div className="flex flex-col gap-2">
-                  <div className="glass-panel-soft p-2 flex items-center justify-center bg-slate-950/45 rounded-lg border border-slate-800/60 min-h-[180px] max-h-[220px]">
+            <div className="flex-1 overflow-y-auto space-y-6 pr-1 text-xs">
+              <div className="grid gap-6 md:grid-cols-[200px_1fr]">
+                {/* Image Section */}
+                <div className="flex flex-col gap-3">
+                  <div className="border border-neutral-900 p-2 flex items-center justify-center bg-[#050505] rounded-none min-h-[200px] max-h-[220px]">
                     {selectedProduct.images && selectedProduct.images[activeImageIndex] ? (
                       <img
                         src={selectedProduct.images[activeImageIndex]}
                         alt={selectedProduct.name}
-                        className="max-h-[160px] max-w-full rounded object-contain animate-fadeIn"
+                        className="max-h-[180px] max-w-full object-contain animate-fadeIn"
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center text-slate-600 text-center p-4">
-                        <Package className="h-10 w-10 mb-2" />
-                        <span className="text-[10px] text-slate-500">No Image</span>
+                      <div className="flex flex-col items-center justify-center text-neutral-600 text-center p-4">
+                        <Package className="h-8 w-8 mb-2 text-neutral-700" />
+                        <span className="text-[9px] uppercase tracking-widest text-neutral-500">No Image</span>
                       </div>
                     )}
                   </div>
                   {selectedProduct.images && selectedProduct.images.length > 1 && (
-                    <div className="flex gap-1.5 overflow-x-auto py-1 max-w-[180px] scrollbar-none">
+                    <div className="flex gap-2 overflow-x-auto py-1 max-w-[200px] scrollbar-none">
                       {selectedProduct.images.map((img, idx) => (
                         <button
                           key={idx}
                           onClick={() => setActiveImageIndex(idx)}
-                          className={`h-11 w-11 rounded border overflow-hidden shrink-0 transition-all ${
-                            idx === activeImageIndex ? 'border-primary ring-1 ring-primary' : 'border-slate-850 hover:border-slate-600'
+                          className={`h-10 w-10 border overflow-hidden shrink-0 transition-all rounded-none ${
+                            idx === activeImageIndex ? 'border-white' : 'border-neutral-900 hover:border-neutral-500'
                           }`}
                         >
                           <img src={img} alt="" className="w-full h-full object-cover" />
@@ -263,86 +262,86 @@ const Products = () => {
                   )}
                 </div>
 
-                {/* Product Specifications Grid */}
-                <div className="grid grid-cols-2 gap-3 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 h-fit">
+                {/* Specs */}
+                <div className="grid grid-cols-2 gap-4 p-4 border border-neutral-900 bg-[#070707] h-fit rounded-none text-left">
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold">SKU</span>
-                    <p className="text-slate-350 font-mono mt-0.5">{selectedProduct.sku || "—"}</p>
+                    <span className="text-[8px] uppercase tracking-widest text-neutral-500 font-semibold">SKU</span>
+                    <p className="text-white font-mono mt-0.5 text-[11px]">{selectedProduct.sku || "—"}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Category</span>
-                    <p className="text-slate-350 mt-0.5">{selectedProduct.category || "General"}</p>
+                    <span className="text-[8px] uppercase tracking-widest text-neutral-500 font-semibold">Category</span>
+                    <p className="text-white mt-0.5 text-[11px]">{selectedProduct.category || "General"}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Price</span>
-                    <p className="text-slate-350 mt-0.5 font-medium">${Number(selectedProduct.price).toFixed(2)}</p>
+                    <span className="text-[8px] uppercase tracking-widest text-neutral-500 font-semibold">Price</span>
+                    <p className="text-white mt-0.5 font-medium text-[11px]">${Number(selectedProduct.price).toFixed(2)}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold">Stock Level</span>
-                    <p className={`mt-0.5 font-semibold ${Number(selectedProduct.stock) <= 5 ? "text-rose-450" : "text-emerald-450"}`}>
+                    <span className="text-[8px] uppercase tracking-widest text-neutral-500 font-semibold">Inventory</span>
+                    <p className={`mt-0.5 font-semibold text-[11px] ${Number(selectedProduct.stock) <= 5 ? "text-rose-455" : "text-white"}`}>
                       {selectedProduct.stock} units
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Audience & Keywords */}
+              {/* Target & Keywords */}
               {(selectedProduct.audience || selectedProduct.keywords) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-neutral-900 pt-4 text-left">
                   {selectedProduct.audience && (
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-semibold">Target Audience</span>
-                      <p className="text-slate-300 mt-0.5">{selectedProduct.audience}</p>
+                      <span className="text-[8px] uppercase tracking-widest text-neutral-500 font-semibold">Target Audience</span>
+                      <p className="text-neutral-300 mt-1 text-[11px]">{selectedProduct.audience}</p>
                     </div>
                   )}
                   {selectedProduct.keywords && (
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-semibold">Key Features / Keywords</span>
-                      <p className="text-slate-300 mt-0.5">{selectedProduct.keywords}</p>
+                      <span className="text-[8px] uppercase tracking-widest text-neutral-500 font-semibold">SEO Keywords</span>
+                      <p className="text-neutral-300 mt-1 text-[11px]">{selectedProduct.keywords}</p>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Description */}
-              <div className="space-y-1">
-                <h4 className="font-semibold text-primary uppercase tracking-wide text-[10px]">Description</h4>
-                <div className="rounded-lg bg-slate-950/60 border border-slate-800 p-3 text-slate-300 leading-relaxed whitespace-pre-wrap">
-                  {selectedProduct.description || "No description provided."}
+              <div className="space-y-1.5 border-t border-neutral-900 pt-4 text-left">
+                <h4 className="font-bold text-[9px] uppercase tracking-widest text-white">Product Copywriting</h4>
+                <div className="border border-neutral-900 bg-[#050505] p-4 text-neutral-300 leading-relaxed whitespace-pre-wrap rounded-none text-[11px]">
+                  {selectedProduct.description || "No copy generated yet."}
                 </div>
               </div>
 
-              {/* Tags */}
-              <div className="space-y-1">
-                <h4 className="font-semibold text-primary uppercase tracking-wide text-[10px]">SEO Tags</h4>
-                <div className="flex flex-wrap gap-1.5 p-2 bg-slate-950/40 rounded-lg border border-slate-800/60">
+              {/* SEO Tags */}
+              <div className="space-y-1.5 border-t border-neutral-900 pt-4 text-left">
+                <h4 className="font-bold text-[9px] uppercase tracking-widest text-white">Generated SEO Tags</h4>
+                <div className="flex flex-wrap gap-1.5 p-3 border border-neutral-900 bg-[#050505] rounded-none">
                   {selectedProduct.tags && selectedProduct.tags.length > 0 ? (
                     selectedProduct.tags.map((tag, idx) => (
-                      <span key={idx} className="rounded bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
+                      <span key={idx} className="border border-neutral-800 text-[8px] uppercase tracking-wider text-neutral-400 px-2 py-0.5 bg-transparent rounded-none">
                         {tag}
                       </span>
                     ))
                   ) : (
-                    <span className="text-slate-500 text-[10px]">No tags generated.</span>
+                    <span className="text-neutral-600 text-[9px] uppercase tracking-widest">No tags generated</span>
                   )}
                 </div>
               </div>
 
-              {/* Social Media Captions */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-primary uppercase tracking-wide text-[10px]">Social Media Captions</h4>
+              {/* Captions */}
+              <div className="space-y-2 border-t border-neutral-900 pt-4 text-left">
+                <h4 className="font-bold text-[9px] uppercase tracking-widest text-white">Social Copy Variations</h4>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {["instagram", "facebook", "twitter"].map((plat) => {
                     const captionObj = selectedProduct.captions?.find(
                       (c) => c.platform?.toLowerCase() === plat
                     );
                     return (
-                      <div key={plat} className="flex flex-col rounded-lg bg-slate-950/60 border border-slate-800 p-3">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 border-b border-slate-800 pb-1">
+                      <div key={plat} className="flex flex-col border border-neutral-900 bg-[#050505] p-3 rounded-none">
+                        <span className="text-[8px] font-semibold uppercase tracking-widest text-neutral-500 mb-2 border-b border-neutral-900 pb-1.5">
                           {plat}
                         </span>
-                        <p className="text-[11px] text-slate-300 leading-normal flex-1 whitespace-pre-wrap">
-                          {captionObj?.text || `No ${plat} caption available.`}
+                        <p className="text-[10px] text-neutral-300 leading-normal flex-1 whitespace-pre-wrap">
+                          {captionObj?.text || `No copy generated.`}
                         </p>
                       </div>
                     );

@@ -302,39 +302,39 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3">
+    <div className="space-y-8 animate-fadeIn text-left">
+      <div className="flex items-center justify-between border-b border-neutral-900 pb-5">
         <div>
-          <h2 className="text-base font-semibold tracking-tight">
+          <h2 className="font-serif text-xl tracking-widest uppercase text-white">
             Create Product
           </h2>
-          <p className="text-xs text-slate-400">
-            Use AI to auto-generate high-converting descriptions, tags, and social captions.
+          <p className="text-[9px] uppercase tracking-widest text-neutral-500 mt-0.5">
+            Auto-generate high-converting copy, SEO tags, and social captions with AI.
           </p>
         </div>
         <button
           type="button"
           onClick={handleGenerateWithAI}
           disabled={aiLoading || !form.name}
-          className="btn-primary inline-flex items-center gap-2 text-xs"
+          className="border border-white hover:bg-white hover:text-black text-white px-4 py-2.5 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors inline-flex items-center gap-2"
         >
           {aiLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-3.5 w-3.5" />
           )}
-          Auto-Generate with AI
+          Generate with AI
         </button>
       </div>
 
       {message && (
         <div
-          className={`rounded-lg border p-3 text-xs ${
+          className={`border p-4 text-[9px] uppercase tracking-widest rounded-none ${
             messageType === "success"
-              ? "border-emerald-500/40 bg-emerald-950/20 text-emerald-300"
+              ? "border-white text-white bg-neutral-900"
               : messageType === "error"
-              ? "border-rose-500/40 bg-rose-950/20 text-rose-300"
-              : "border-slate-700/60 bg-slate-900/60 text-slate-300"
+              ? "border-rose-900 text-rose-500 bg-black"
+              : "border-neutral-900 text-neutral-400 bg-black"
           }`}
         >
           {message}
@@ -343,41 +343,41 @@ const AddProduct = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)]"
+        className="grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)]"
       >
         {/* Left column: core product info */}
-        <div className="space-y-4">
-          <div className="glass-panel-soft p-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">
+        <div className="space-y-6">
+          <div className="border border-neutral-900 bg-black p-6 rounded-none">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
               Product details
             </h3>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Product Name *
                 </label>
                 <input
                   type="text"
                   name="name"
-                  className="input"
-                  placeholder="E.g. Midnight Indigo Hoodie"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Linen Blend Oversized Shirt"
                   value={form.name}
                   onChange={handleChange}
                   required
                 />
-                <p className="mt-1 text-[10px] text-slate-500">
+                <p className="mt-1.5 text-[8px] uppercase tracking-wider text-neutral-500">
                   AI uses this as the primary context for copy generation.
                 </p>
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   SKU / Serial
                 </label>
                 <input
                   type="text"
                   name="sku"
-                  className="input"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="SKU-001"
                   value={form.sku}
                   onChange={handleChange}
@@ -385,13 +385,13 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Category *
                 </label>
                 <input
                   type="text"
                   name="category"
-                  className="input"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="Apparel · Streetwear"
                   value={form.category}
                   onChange={handleChange}
@@ -400,21 +400,21 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Brand
                 </label>
                 <input
                   type="text"
                   name="brand"
-                  className="input"
-                  placeholder="E.g. Nike, Apple"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Saint Laurent"
                   value={form.brand}
                   onChange={handleChange}
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Price (USD) *
                 </label>
                 <input
@@ -422,8 +422,8 @@ const AddProduct = () => {
                   name="price"
                   min="0"
                   step="0.01"
-                  className="input"
-                  placeholder="79.99"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="120.00"
                   value={form.price}
                   onChange={handleChange}
                   required
@@ -431,15 +431,15 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Initial Stock *
                 </label>
                 <input
                   type="number"
                   name="stock"
                   min="0"
-                  className="input"
-                  placeholder="100"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="50"
                   value={form.stock}
                   onChange={handleChange}
                   required
@@ -447,20 +447,20 @@ const AddProduct = () => {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-slate-300">
-                  Sizes (type variation and press Enter)
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                  Sizes (type and press Enter)
                 </label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
+                <div className="flex flex-wrap gap-2 mb-3">
                   {sizes.map((size, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px]"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-neutral-800 text-white text-[10px] uppercase tracking-wider bg-transparent rounded-none"
                     >
                       {size}
                       <button
                         type="button"
                         onClick={() => removeSize(idx)}
-                        className="hover:text-rose-450 focus:outline-none font-bold"
+                        className="text-neutral-500 hover:text-white focus:outline-none font-bold"
                       >
                         ×
                       </button>
@@ -472,26 +472,26 @@ const AddProduct = () => {
                   value={sizeInput}
                   onChange={(e) => setSizeInput(e.target.value)}
                   onKeyDown={handleSizeKeyDown}
-                  className="input text-xs"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. S, M, L, XL"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-slate-300">
-                  Colors (type variation and press Enter)
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
+                  Colors (type and press Enter)
                 </label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
+                <div className="flex flex-wrap gap-2 mb-3">
                   {colors.map((color, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px]"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-neutral-800 text-white text-[10px] uppercase tracking-wider bg-transparent rounded-none"
                     >
                       {color}
                       <button
                         type="button"
                         onClick={() => removeColor(idx)}
-                        className="hover:text-rose-450 focus:outline-none font-bold"
+                        className="text-neutral-500 hover:text-white focus:outline-none font-bold"
                       >
                         ×
                       </button>
@@ -503,18 +503,18 @@ const AddProduct = () => {
                   value={colorInput}
                   onChange={(e) => setColorInput(e.target.value)}
                   onKeyDown={handleColorKeyDown}
-                  className="input text-xs"
-                  placeholder="E.g. Black, White, Navy"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Black, White, Charcoal"
                 />
               </div>
 
-              <div className="sm:col-span-2 space-y-2">
-                <label className="mb-1 block text-xs text-slate-350 font-semibold">
+              <div className="sm:col-span-2 space-y-3">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Product Images
                 </label>
-                <div className="flex flex-col sm:flex-row gap-3 items-center">
-                  <label className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-slate-700 hover:border-primary bg-slate-900/40 text-slate-300 text-xs font-semibold cursor-pointer hover:bg-slate-900/70 transition-all">
-                    <span>Select Image Files</span>
+                <div className="flex flex-col sm:flex-row gap-4 items-center">
+                  <label className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 border border-neutral-800 hover:border-white bg-transparent text-neutral-400 hover:text-white transition-all text-[9px] tracking-widest uppercase font-bold rounded-none cursor-pointer">
+                    <span>Upload Images</span>
                     <input
                       type="file"
                       multiple
@@ -523,20 +523,20 @@ const AddProduct = () => {
                       onChange={handleImageUpload}
                     />
                   </label>
-                  <p className="text-[10px] text-slate-500">
-                    Upload multiple images of your product. Supported formats: JPG, PNG, WEBP.
+                  <p className="text-[9px] uppercase tracking-widest text-neutral-500">
+                    JPG, PNG, WEBP formats. Multiple images supported.
                   </p>
                 </div>
 
                 {uploadedImages.length > 0 && (
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 pt-2">
                     {uploadedImages.map((img, idx) => (
-                      <div key={idx} className="relative h-16 rounded border border-slate-800 bg-slate-950/60 overflow-hidden group">
+                      <div key={idx} className="relative h-16 border border-neutral-900 bg-[#050505] rounded-none overflow-hidden group">
                         <img src={img} alt="Upload preview" className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => removeUploadedImage(idx)}
-                          className="absolute inset-0 bg-rose-950/80 text-rose-200 text-[10px] font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                          className="absolute inset-0 bg-black/80 text-rose-500 text-[8px] tracking-widest uppercase font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-none"
                         >
                           Remove
                         </button>
@@ -548,32 +548,32 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="glass-panel-soft p-4 space-y-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <div className="border border-neutral-900 bg-black p-6 rounded-none space-y-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
               Description & Tags
             </h3>
             <div>
-              <label className="mb-1 block text-xs text-slate-300">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                 Product Description
               </label>
               <textarea
                 name="description"
                 rows="5"
-                className="input h-32 resize-none"
+                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-32 resize-none"
                 placeholder="A compelling, detailed description of your product..."
                 value={form.description}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs text-slate-300">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                 SEO Tags (comma-separated)
               </label>
               <input
                 type="text"
                 name="tags"
-                className="input"
-                placeholder="hoodie, streetwear, premium, cotton"
+                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                placeholder="silk, designer, premium, summer"
                 value={form.tags}
                 onChange={handleChange}
               />
@@ -582,90 +582,90 @@ const AddProduct = () => {
         </div>
 
         {/* Right column: AI prompt tuning & Social Captions */}
-        <div className="space-y-4">
-          <div className="glass-panel-soft p-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">
-              AI Prompt Enhancer (Optional)
+        <div className="space-y-6">
+          <div className="border border-neutral-900 bg-black p-6 rounded-none">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
+              AI Prompt Tuning
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Product Type
                 </label>
                 <input
                   type="text"
                   name="productType"
-                  className="input"
-                  placeholder="E.g. Oversized hoodie, wireless earphones"
+                  className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Trench Coat"
                   value={aiContext.productType}
                   onChange={handleAiContextChange}
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1.5">
                   Target Audience
                 </label>
                 <select
                   name="audienceSelection"
-                  className="input select mb-2"
+                  className="w-full bg-black border-b border-neutral-850 text-xs py-2 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                   value={audienceSelection}
                   onChange={(e) => setAudienceSelection(e.target.value)}
                 >
-                  <option value="">Select target audience...</option>
+                  <option value="" className="bg-black text-white">Select target audience...</option>
                   {dbAudiences.map((aud) => (
-                    <option key={aud} value={aud}>{aud}</option>
+                    <option key={aud} value={aud} className="bg-black text-white">{aud}</option>
                   ))}
-                  <option value="other">Other (Custom)...</option>
+                  <option value="other" className="bg-black text-white">Other (Custom)...</option>
                 </select>
                 {audienceSelection === "other" && (
                   <input
                     type="text"
                     name="customAudience"
-                    className="input mt-1 animate-fadeIn"
-                    placeholder="Enter custom target audience (e.g. Gamer dads)"
+                    className="w-full bg-black border-b border-neutral-805 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none mt-2 animate-fadeIn"
+                    placeholder="Enter custom audience (e.g. Minimalist design aficionados)"
                     value={customAudience}
                     onChange={(e) => setCustomAudience(e.target.value)}
                   />
                 )}
               </div>
               <div>
-                <label className="mb-1 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                   Tone of Voice
                 </label>
                 <select
                   name="tone"
-                  className="input select"
+                  className="w-full bg-black border-b border-neutral-850 text-xs py-2 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                   value={aiContext.tone}
                   onChange={handleAiContextChange}
                 >
-                  <option value="friendly, conversion-focused">Friendly & Persuasive</option>
-                  <option value="professional, authoritative">Professional & Clear</option>
-                  <option value="witty, engaging">Witty & Bold</option>
-                  <option value="minimalist, luxury">Minimalist & Luxury</option>
+                  <option value="friendly, conversion-focused" className="bg-black text-white">Friendly & Persuasive</option>
+                  <option value="professional, authoritative" className="bg-black text-white">Professional & Clear</option>
+                  <option value="witty, engaging" className="bg-black text-white">Witty & Bold</option>
+                  <option value="minimalist, luxury" className="bg-black text-white">Minimalist & Luxury</option>
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs text-slate-300">
+                <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1.5">
                   Key Features / Keywords
                 </label>
                 <select
                   name="keywordSelection"
-                  className="input select mb-2"
+                  className="w-full bg-black border-b border-neutral-850 text-xs py-2 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
                   value={keywordSelection}
                   onChange={(e) => setKeywordSelection(e.target.value)}
                 >
-                  <option value="">Select preset key features...</option>
+                  <option value="" className="bg-black text-white">Select preset key features...</option>
                   {dbKeywords.map((kw) => (
-                    <option key={kw} value={kw}>{kw}</option>
+                    <option key={kw} value={kw} className="bg-black text-white">{kw}</option>
                   ))}
-                  <option value="other">Other (Custom)...</option>
+                  <option value="other" className="bg-black text-white">Other (Custom)...</option>
                 </select>
                 {keywordSelection === "other" && (
                   <input
                     type="text"
                     name="customKeywords"
-                    className="input mt-1 animate-fadeIn"
-                    placeholder="Enter custom keywords (comma-separated)"
+                    className="w-full bg-black border-b border-neutral-805 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none mt-2 animate-fadeIn"
+                    placeholder="Enter keywords (comma-separated)"
                     value={customKeywords}
                     onChange={(e) => setCustomKeywords(e.target.value)}
                   />
@@ -674,44 +674,44 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="glass-panel-soft p-4 space-y-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <div className="border border-neutral-900 bg-black p-6 rounded-none space-y-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white border-b border-neutral-900 pb-3 mb-4">
               Social Media Captions (AI Generated)
             </h3>
             <div>
-              <label className="mb-1 block text-xs text-slate-300">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                 Instagram Caption
               </label>
               <textarea
                 name="captionsInstagram"
                 rows="2"
-                className="input h-16 resize-none text-[11px]"
+                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
                 placeholder="Instagram copy..."
                 value={form.captionsInstagram}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs text-slate-300">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                 Facebook Caption
               </label>
               <textarea
                 name="captionsFacebook"
                 rows="2"
-                className="input h-16 resize-none text-[11px]"
+                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
                 placeholder="Facebook copy..."
                 value={form.captionsFacebook}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs text-slate-300">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider mb-1">
                 Twitter Caption
               </label>
               <textarea
                 name="captionsTwitter"
                 rows="2"
-                className="input h-16 resize-none text-[11px]"
+                className="w-full bg-black border-b border-neutral-800 text-xs py-2 px-0 text-white focus:outline-none focus:border-white transition-colors duration-300 rounded-none h-16 resize-none text-[11px]"
                 placeholder="Twitter copy..."
                 value={form.captionsTwitter}
                 onChange={handleChange}
@@ -719,11 +719,11 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div>
             <button
               type="submit"
               disabled={submitting}
-              className="btn-primary w-full inline-flex items-center gap-2"
+              className="bg-white text-black hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-200 transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
