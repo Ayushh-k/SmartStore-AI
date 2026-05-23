@@ -172,11 +172,11 @@ const UserManagement = () => {
                       >
                         <div className="flex flex-wrap justify-between items-center border-b border-gray-200/60 dark:border-neutral-900/60 pb-3 text-[10px] uppercase tracking-widest font-mono">
                           <span className="font-semibold text-black dark:text-white">ID: {order._id}</span>
-                          <div className="flex gap-4 text-neutral-500">
+                          <div className="flex gap-4 text-neutral-550">
                             <span>Placed: {new Date(order.createdAt).toLocaleDateString()}</span>
-                            <span>Total: ${order.totalPrice.toFixed(2)}</span>
-                            <span className={order.isPaid ? "text-emerald-500 font-bold" : "text-amber-500 font-bold"}>
-                              {order.isPaid ? "Paid" : "Pending Pay"}
+                            <span>Total: ${(order.totalAmount || 0).toFixed(2)}</span>
+                            <span className={order.paymentDetails?.status === "Completed" ? "text-emerald-500 font-bold" : "text-amber-500 font-bold"}>
+                              {order.paymentDetails?.status === "Completed" ? "Paid" : "Pending Pay"}
                             </span>
                           </div>
                         </div>
