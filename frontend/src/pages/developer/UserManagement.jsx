@@ -1,6 +1,6 @@
 // frontend/src/pages/developer/UserManagement.jsx
 import React, { useState, useEffect } from "react";
-import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin, Calendar, Clock } from "lucide-react";
+import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin } from "lucide-react";
 import api from "../../utils/api.js";
 
 const UserManagement = () => {
@@ -38,14 +38,12 @@ const UserManagement = () => {
       const res = await api.put(`/api/developer/users/${userId}/ban`);
       const updatedUser = res.data.user;
 
-      // Update users state
       setUsers((prev) =>
         prev.map((u) =>
           u._id === userId ? { ...u, isBanned: updatedUser.isBanned } : u
         )
       );
 
-      // Update active activity user if loaded
       if (selectedUser && selectedUser._id === userId) {
         setSelectedUser((prev) => ({ ...prev, isBanned: updatedUser.isBanned }));
       }
@@ -90,7 +88,9 @@ const UserManagement = () => {
     }
   };
 
-  // If a user is selected, render their dedicated full-page activity log
+  // ══════════════════════════════════════════════════════════
+  // ACTIVITY DETAIL VIEW (full-page drill-down)
+  // ══════════════════════════════════════════════════════════
   if (selectedUser) {
     return (
       <div className="space-y-8 animate-fadeIn text-left">
@@ -151,15 +151,15 @@ const UserManagement = () => {
             {activityError}
           </div>
         ) : !activity ? null : selectedUser.role === "admin" ? (
-          // Vendor-specific layout (4 boxes + detailed tab section)
+          // Vendor-specific layout (4 clickable boxes + detailed tab section)
           <div className="space-y-8 w-full">
             <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full">
               {/* Box 1: STORE CATALOG */}
-              <div 
+              <div
                 onClick={() => setVendorActiveTab("catalog")}
                 className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
-                  vendorActiveTab === "catalog" 
-                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white" 
+                  vendorActiveTab === "catalog"
+                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white"
                     : "border-gray-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
                 }`}
               >
@@ -173,11 +173,11 @@ const UserManagement = () => {
               </div>
 
               {/* Box 2: LIFETIME REVENUE */}
-              <div 
+              <div
                 onClick={() => setVendorActiveTab("revenue")}
                 className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
-                  vendorActiveTab === "revenue" 
-                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white" 
+                  vendorActiveTab === "revenue"
+                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white"
                     : "border-gray-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
                 }`}
               >
@@ -191,11 +191,11 @@ const UserManagement = () => {
               </div>
 
               {/* Box 3: ORDERS RECEIVED */}
-              <div 
+              <div
                 onClick={() => setVendorActiveTab("orders")}
                 className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
-                  vendorActiveTab === "orders" 
-                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white" 
+                  vendorActiveTab === "orders"
+                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white"
                     : "border-gray-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
                 }`}
               >
@@ -248,30 +248,16 @@ const UserManagement = () => {
                           <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
                             {activity.products.map((p) => (
                               <tr key={p._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors">
-                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">
-                                  {p.name}
-                                </td>
-                                <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
-                                  {p.sku || "N/A"}
-                                </td>
-                                <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">
-                                  {p.category}
-                                </td>
-                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">
-                                  ${Number(p.price).toFixed(2)}
-                                </td>
-                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">
-                                  {p.stock} units
-                                </td>
+                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">{p.name}</td>
+                                <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{p.sku || "N/A"}</td>
+                                <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">{p.category}</td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">${Number(p.price).toFixed(2)}</td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">{p.stock} units</td>
                                 <td className="px-6 py-4">
                                   {p.isActive ? (
-                                    <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">
-                                      Active
-                                    </span>
+                                    <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
                                   ) : (
-                                    <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">
-                                      Suspended
-                                    </span>
+                                    <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Suspended</span>
                                   )}
                                 </td>
                               </tr>
@@ -309,21 +295,11 @@ const UserManagement = () => {
                           <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
                             {activity.sales.map((sale) => (
                               <tr key={sale._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors">
-                                <td className="px-6 py-4 text-neutral-550 dark:text-neutral-455 font-mono text-[11px]">
-                                  {new Date(sale.saleDate).toLocaleString()}
-                                </td>
-                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">
-                                  {sale.product?.name || "Deleted Product"}
-                                </td>
-                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">
-                                  {sale.quantity}
-                                </td>
-                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400 font-bold">
-                                  ${Number(sale.totalAmount).toFixed(2)}
-                                </td>
-                                <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">
-                                  {sale.channel || "web"}
-                                </td>
+                                <td className="px-6 py-4 text-neutral-550 dark:text-neutral-455 font-mono text-[11px]">{new Date(sale.saleDate).toLocaleString()}</td>
+                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">{sale.product?.name || "Deleted Product"}</td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">{sale.quantity}</td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400 font-bold">${Number(sale.totalAmount).toFixed(2)}</td>
+                                <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">{sale.channel || "web"}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -336,11 +312,10 @@ const UserManagement = () => {
             </div>
           </div>
         ) : (
+          // Customer-specific layout
           <div className="grid gap-8 grid-cols-1 lg:grid-cols-3">
-            
-            {/* Column 1 & 2: Orders, Cart, Wishlist */}
+            {/* Column 1 & 2: Orders, Cart */}
             <div className="lg:col-span-2 space-y-8">
-              
               {/* Order History */}
               <div className="space-y-4">
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
@@ -353,10 +328,7 @@ const UserManagement = () => {
                 ) : (
                   <div className="space-y-4">
                     {activity.orders.map((order) => (
-                      <div
-                        key={order._id}
-                        className="border border-gray-200 dark:border-neutral-900 p-5 bg-white dark:bg-[#060606] space-y-4"
-                      >
+                      <div key={order._id} className="border border-gray-200 dark:border-neutral-900 p-5 bg-white dark:bg-[#060606] space-y-4">
                         <div className="flex flex-wrap justify-between items-center border-b border-gray-200/60 dark:border-neutral-900/60 pb-3 text-[10px] uppercase tracking-widest font-mono">
                           <span className="font-semibold text-black dark:text-white">ID: {order._id}</span>
                           <div className="flex gap-4 text-neutral-550">
@@ -367,25 +339,15 @@ const UserManagement = () => {
                             </span>
                           </div>
                         </div>
-
-                        {/* Order Items */}
                         <div className="space-y-3">
                           {order.products.map((item, idx) => (
                             <div key={idx} className="flex justify-between items-center text-xs">
                               <div>
-                                <span className="font-semibold text-black dark:text-white font-serif uppercase">
-                                  {item.product?.name || "Deleted Product"}
-                                </span>
-                                {item.selectedSize && (
-                                  <span className="text-[10px] text-neutral-500 font-mono ml-2">Size: {item.selectedSize}</span>
-                                )}
-                                {item.selectedColor && (
-                                  <span className="text-[10px] text-neutral-500 font-mono ml-2">Color: {item.selectedColor}</span>
-                                )}
+                                <span className="font-semibold text-black dark:text-white font-serif uppercase">{item.product?.name || "Deleted Product"}</span>
+                                {item.selectedSize && <span className="text-[10px] text-neutral-500 font-mono ml-2">Size: {item.selectedSize}</span>}
+                                {item.selectedColor && <span className="text-[10px] text-neutral-500 font-mono ml-2">Color: {item.selectedColor}</span>}
                               </div>
-                              <span className="font-mono text-neutral-500">
-                                {item.quantity} x ${item.product?.price || 0}
-                              </span>
+                              <span className="font-mono text-neutral-500">{item.quantity} x ${item.product?.price || 0}</span>
                             </div>
                           ))}
                         </div>
@@ -395,7 +357,7 @@ const UserManagement = () => {
                 )}
               </div>
 
-              {/* Shopping Cart Items */}
+              {/* Shopping Cart */}
               <div className="space-y-4">
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                   Active Shopping Cart ({activity.user?.cart?.length || 0})
@@ -411,9 +373,7 @@ const UserManagement = () => {
                         <div className="flex items-center gap-3">
                           <ShoppingBag className="h-4 w-4 text-neutral-550" />
                           <div>
-                            <span className="font-serif uppercase font-semibold text-black dark:text-white">
-                              {item.product?.name || "Deleted Product"}
-                            </span>
+                            <span className="font-serif uppercase font-semibold text-black dark:text-white">{item.product?.name || "Deleted Product"}</span>
                             {(item.selectedSize || item.selectedColor) && (
                               <span className="text-[10px] text-neutral-500 font-mono ml-2">
                                 ({[item.selectedSize, item.selectedColor].filter(Boolean).join(", ")})
@@ -421,9 +381,7 @@ const UserManagement = () => {
                             )}
                           </div>
                         </div>
-                        <span className="font-mono text-neutral-500">
-                          {item.quantity} units &bull; ${item.product?.price || 0}
-                        </span>
+                        <span className="font-mono text-neutral-500">{item.quantity} units &bull; ${item.product?.price || 0}</span>
                       </div>
                     ))}
                   </div>
@@ -433,7 +391,6 @@ const UserManagement = () => {
 
             {/* Column 3: Wishlist & Addresses */}
             <div className="space-y-8">
-              
               {/* Wishlist */}
               <div className="space-y-4">
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
@@ -446,15 +403,10 @@ const UserManagement = () => {
                 ) : (
                   <div className="grid gap-4 grid-cols-1">
                     {activity.user.wishlist.map((item) => (
-                      <div
-                        key={item._id}
-                        className="border border-gray-200 dark:border-neutral-900 p-3 bg-white dark:bg-[#060606] flex items-center justify-between text-xs"
-                      >
+                      <div key={item._id} className="border border-gray-200 dark:border-neutral-900 p-3 bg-white dark:bg-[#060606] flex items-center justify-between text-xs">
                         <div className="flex items-center gap-3 min-w-0">
                           <Heart className="h-4 w-4 text-rose-500 shrink-0 fill-rose-500" />
-                          <span className="font-serif uppercase font-semibold text-black dark:text-white truncate">
-                            {item.name}
-                          </span>
+                          <span className="font-serif uppercase font-semibold text-black dark:text-white truncate">{item.name}</span>
                         </div>
                         <span className="font-mono font-bold">${item.price}</span>
                       </div>
@@ -475,19 +427,14 @@ const UserManagement = () => {
                 ) : (
                   <div className="space-y-4">
                     {activity.user.addresses.map((addr) => (
-                      <div
-                        key={addr._id}
-                        className="border border-gray-200 dark:border-neutral-900 p-4 bg-white dark:bg-[#060606] space-y-2 text-xs"
-                      >
+                      <div key={addr._id} className="border border-gray-200 dark:border-neutral-900 p-4 bg-white dark:bg-[#060606] space-y-2 text-xs">
                         <div className="flex justify-between items-center">
                           <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-neutral-550">
                             <MapPin className="h-3 w-3" />
                             Address Point
                           </span>
                           {addr.isDefault && (
-                            <span className="text-[8px] uppercase tracking-widest font-bold px-1.5 py-0.5 border border-black dark:border-white">
-                              Default
-                            </span>
+                            <span className="text-[8px] uppercase tracking-widest font-bold px-1.5 py-0.5 border border-black dark:border-white">Default</span>
                           )}
                         </div>
                         <p className="text-black dark:text-white leading-relaxed">
@@ -498,24 +445,28 @@ const UserManagement = () => {
                   </div>
                 )}
               </div>
-
             </div>
-
           </div>
         )}
       </div>
     );
   }
 
-  // Main list view of registered website users
+  // ══════════════════════════════════════════════════════════
+  // MAIN LIST VIEW — Split into Vendors + Customers
+  // ══════════════════════════════════════════════════════════
+  const vendors = users.filter((u) => u.role === "admin");
+  const customers = users.filter((u) => u.role !== "admin");
+
   return (
     <div className="space-y-8 animate-fadeIn text-left relative">
+      {/* Page Header */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 pb-5">
         <div>
           <h2 className="font-serif text-xl tracking-widest uppercase text-black dark:text-white">
             User Management
           </h2>
-          <p className="text-[9px] uppercase tracking-widest text-neutral-555 dark:text-neutral-455 mt-0.5">
+          <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-455 mt-0.5">
             Monitor, manage, and audit registered platform customers and vendor accounts
           </p>
         </div>
@@ -529,120 +480,231 @@ const UserManagement = () => {
       </div>
 
       {error && (
-        <div className="border border-rose-350 text-rose-600 dark:text-rose-500 bg-rose-50 dark:bg-black p-4 text-[10px] uppercase tracking-widest rounded-none">
+        <div className="border border-rose-500/30 text-rose-600 dark:text-rose-500 bg-rose-50 dark:bg-black p-4 text-[10px] uppercase tracking-widest rounded-none">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-20 text-[10px] uppercase tracking-widest text-neutral-555 dark:text-neutral-400">
+        <div className="flex items-center justify-center py-20 text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
           <Loader2 className="h-5 w-5 animate-spin text-black dark:text-white mr-2" />
           Loading platform users...
         </div>
-      ) : users.length === 0 ? (
-        <div className="border border-gray-250 dark:border-white/10 py-16 text-center text-neutral-550 text-[10px] uppercase tracking-widest">
-          No registered users found on the platform
-        </div>
       ) : (
-        <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black rounded-none overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              <thead>
-                <tr className="border-b border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-555 dark:text-neutral-455 font-bold">
-                  <th className="px-6 py-4">User Name</th>
-                  <th className="px-6 py-4">Email Address</th>
-                  <th className="px-6 py-4">Account Type</th>
-                  <th className="px-6 py-4">Joined Date</th>
-                  <th className="px-6 py-4 text-center">Activity stats</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
-                {users.map((user) => (
-                  <tr
-                    key={user._id}
-                    className={`hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors ${
-                      user.isBanned
-                        ? "opacity-50 line-through bg-neutral-50/50 dark:bg-neutral-900/10 text-neutral-400"
-                        : ""
-                    }`}
-                  >
-                    <td className="px-6 py-4 font-semibold text-black dark:text-white tracking-wide">
-                      {user.name}
-                    </td>
-                    <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
-                      {user.email}
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.role === "admin" ? (
-                        <span className="font-serif uppercase font-bold text-gold">Vendor</span>
-                      ) : (
-                        <span className="uppercase text-neutral-500 tracking-wider">Customer</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-neutral-550 dark:text-neutral-450">
-                      {new Date(user.createdAt).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.role === "admin" ? (
-                        <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-neutral-555 dark:text-neutral-400">
-                          <span title="Store Catalog Count">PRD: {user.productCount || 0}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-neutral-550 dark:text-neutral-400">
-                          <span title="Orders Placed">ORD: {user.orderCount}</span>
-                          <span>&bull;</span>
-                          <span title="Wishlist Count">WSH: {user.wishlistCount}</span>
-                          <span>&bull;</span>
-                          <span title="Cart Count">CRT: {user.cartCount}</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.isBanned ? (
-                        <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">
-                          Banned
-                        </span>
-                      ) : (
-                        <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">
-                          Active
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
-                        <button
-                          onClick={() => handleViewActivity(user)}
-                          className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
+        <div className="space-y-14">
+
+          {/* ══════════════════════════════════════════
+              SECTION 1 — VENDOR / STORE OWNERS
+          ══════════════════════════════════════════ */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block mb-0.5">
+                  Merchant Accounts
+                </span>
+                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">
+                  Vendor / Store Owners
+                </h3>
+              </div>
+              <span className="border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
+                {vendors.length} Vendors
+              </span>
+            </div>
+
+            {vendors.length === 0 ? (
+              <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
+                No vendor accounts registered on the platform
+              </div>
+            ) : (
+              <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-neutral-900 bg-amber-50/70 dark:bg-amber-950/15 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
+                        <th className="px-6 py-4">Vendor Name</th>
+                        <th className="px-6 py-4">Email Address</th>
+                        <th className="px-6 py-4">Joined Date</th>
+                        <th className="px-6 py-4 text-center">Store Catalog</th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
+                      {vendors.map((user) => (
+                        <tr
+                          key={user._id}
+                          className={`hover:bg-amber-50/40 dark:hover:bg-amber-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}
                         >
-                          View Activity
-                        </button>
-                        <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                        <button
-                          onClick={() => handleToggleBan(user._id)}
-                          className="text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
-                        >
-                          {user.isBanned ? "Unban" : "Ban"}
-                        </button>
-                        <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                        <button
-                          onClick={() => handleDeleteUser(user)}
-                          className="text-red-650 hover:opacity-70 transition-opacity cursor-pointer"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <td className="px-6 py-4">
+                            <span className="font-serif font-bold text-black dark:text-white tracking-wide uppercase block leading-tight">
+                              {user.name}
+                            </span>
+                            <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                              Vendor / Merchant
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
+                            {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="font-mono text-sm font-bold text-black dark:text-white">{user.productCount || 0}</span>
+                            <span className="text-[9px] text-neutral-400 ml-1 uppercase tracking-wider">products</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {user.isBanned ? (
+                              <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Suspended</span>
+                            ) : (
+                              <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
+                              <button
+                                onClick={() => handleViewActivity(user)}
+                                className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
+                              >
+                                View Store
+                              </button>
+                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                              <button
+                                onClick={() => handleToggleBan(user._id)}
+                                className={`transition-colors cursor-pointer ${
+                                  user.isBanned ? "text-emerald-600 hover:text-emerald-500" : "text-amber-600 hover:text-amber-500"
+                                }`}
+                              >
+                                {user.isBanned ? "Unban" : "Suspend"}
+                              </button>
+                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                              <button
+                                onClick={() => handleDeleteUser(user)}
+                                className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* Dashed Section Divider */}
+          <div className="border-t border-dashed border-gray-200 dark:border-neutral-800" />
+
+          {/* ══════════════════════════════════════════
+              SECTION 2 — CUSTOMER ACCOUNTS
+          ══════════════════════════════════════════ */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-sky-500 block mb-0.5">
+                  Registered Shoppers
+                </span>
+                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">
+                  Customer Accounts
+                </h3>
+              </div>
+              <span className="border border-sky-500/40 bg-sky-500/10 text-sky-600 dark:text-sky-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
+                {customers.length} Customers
+              </span>
+            </div>
+
+            {customers.length === 0 ? (
+              <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
+                No customer accounts registered on the platform
+              </div>
+            ) : (
+              <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-neutral-900 bg-sky-50/70 dark:bg-sky-950/15 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
+                        <th className="px-6 py-4">Customer Name</th>
+                        <th className="px-6 py-4">Email Address</th>
+                        <th className="px-6 py-4">Joined Date</th>
+                        <th className="px-6 py-4 text-center">Orders</th>
+                        <th className="px-6 py-4 text-center">Wishlist</th>
+                        <th className="px-6 py-4 text-center">Cart</th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
+                      {customers.map((user) => (
+                        <tr
+                          key={user._id}
+                          className={`hover:bg-sky-50/30 dark:hover:bg-sky-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}
+                        >
+                          <td className="px-6 py-4">
+                            <span className="font-semibold text-black dark:text-white tracking-wide block leading-tight">
+                              {user.name}
+                            </span>
+                            <span className="text-[9px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider">
+                              Customer
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
+                            {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="font-mono font-bold text-black dark:text-white">{user.orderCount ?? 0}</span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="font-mono font-bold text-black dark:text-white">{user.wishlistCount ?? 0}</span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="font-mono font-bold text-black dark:text-white">{user.cartCount ?? 0}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {user.isBanned ? (
+                              <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Banned</span>
+                            ) : (
+                              <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
+                              <button
+                                onClick={() => handleViewActivity(user)}
+                                className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
+                              >
+                                View Activity
+                              </button>
+                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                              <button
+                                onClick={() => handleToggleBan(user._id)}
+                                className="text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                              >
+                                {user.isBanned ? "Unban" : "Ban"}
+                              </button>
+                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                              <button
+                                onClick={() => handleDeleteUser(user)}
+                                className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       )}
     </div>
