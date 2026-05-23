@@ -2,6 +2,7 @@
 import User from "../models/User.js";
 import Product from "../models/Product.js";
 import Sale from "../models/Sale.js";
+import Order from "../models/Order.js";
 
 /**
   GET /api/developer/metrics
@@ -241,6 +242,122 @@ export const getAllPlatformProducts = async (req, res) => {
   } catch (error) {
     console.error("Get all platform products error:", error);
     res.status(500).json({ message: "Failed to fetch platform products." });
+  }
+};
+
+/**
+  GET /api/developer/users
+  Retrieves a list of all registered platform users/customers with stats.
+ */
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ _id: { $ne: req.user._id } })
+      .select("name email role isBanned createdAt wishlist cart addresses")
+      .sort({ createdAt: -1 });
+
+    const usersData = await Promise.all(
+      users.map(async (u) => {
+        const orderCount = await Order.countDocuments({ user: u._id });
+        return {
+          _id: u._id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          isBanned: u.isBanned,
+          createdAt: u.createdAt,
+          wishlistCount: u.wishlist ? u.wishlist.length : 0,
+          cartCount: u.cart ? u.cart.length : 0,
+          addressCount: u.addresses ? u.addresses.length : 0,
+          orderCount,
+        };
+      })
+    );
+
+    res.json(usersData);
+  } catch (error) {
+    console.error("Get all platform users error:", error);
+    res.status(500).json({ message: "Failed to fetch platform users list." });
+  }
+};
+
+/**
+  PUT /api/developer/users/:id/ban
+  Toggles isBanned flag of any user.
+ */
+export const toggleUserBan = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    user.isBanned = !user.isBanned;
+    await user.save();
+
+    res.json({
+      message: `User ${user.isBanned ? "banned" : "unbanned"} successfully.`,
+      user: {
+        id: user.id,
+        isBanned: user.isBanned,
+      },
+    });
+  } catch (error) {
+    console.error("Toggle user ban error:", error);
+    res.status(500).json({ message: "Failed to update user status." });
+  }
+};
+
+/**
+  DELETE /api/developer/users/:id
+  Permanently deletes a platform user.
+ */
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    await Order.deleteMany({ user: user._id });
+
+    if (user.role === "admin") {
+      await Product.deleteMany({ vendor: user._id });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: "User permanently deleted." });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ message: "Failed to delete user." });
+  }
+};
+
+/**
+  GET /api/developer/users/:id/activity
+  Retrieves detailed activity history for a user (orders, wishlist, cart, addresses).
+ */
+export const getUserActivity = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .populate("wishlist")
+      .populate("cart.product")
+      .select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const orders = await Order.find({ user: user._id })
+      .populate("products.product")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      user,
+      orders,
+    });
+  } catch (error) {
+    console.error("Get user activity error:", error);
+    res.status(500).json({ message: "Failed to load user activity." });
   }
 };
 

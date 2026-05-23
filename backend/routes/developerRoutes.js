@@ -9,6 +9,10 @@ import {
   getStoreCatalog,
   deleteProduct,
   getAllPlatformProducts,
+  getAllUsers,
+  toggleUserBan,
+  deleteUser,
+  getUserActivity,
 } from "../controllers/developerController.js";
 
 const router = express.Router();
@@ -20,6 +24,12 @@ router.get("/metrics", protect, superadmin, getPlatformMetrics);
 router.get("/vendors", protect, superadmin, getAllStores);
 router.put("/vendors/:id/ban", protect, superadmin, toggleStoreBan);
 router.delete("/vendors/:id", protect, superadmin, deleteStore);
+
+// User / Customer Management
+router.get("/users", protect, superadmin, getAllUsers);
+router.put("/users/:id/ban", protect, superadmin, toggleUserBan);
+router.delete("/users/:id", protect, superadmin, deleteUser);
+router.get("/users/:id/activity", protect, superadmin, getUserActivity);
 
 // Catalog Drill-Down & Moderation
 router.get("/products", protect, superadmin, getAllPlatformProducts);

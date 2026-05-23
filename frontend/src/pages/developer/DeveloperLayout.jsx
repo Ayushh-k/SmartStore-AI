@@ -49,6 +49,11 @@ const DeveloperLayout = () => {
       icon: Users,
     },
     {
+      to: "/developer/users",
+      label: "User Management",
+      icon: Users,
+    },
+    {
       to: "/developer/products",
       label: "Global Products",
       icon: Package,

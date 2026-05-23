@@ -23,6 +23,7 @@ import DeveloperLayout from "./pages/developer/DeveloperLayout.jsx";
 import PlatformOverview from "./pages/developer/PlatformOverview.jsx";
 import StoreManagement from "./pages/developer/StoreManagement.jsx";
 import GlobalProducts from "./pages/developer/GlobalProducts.jsx";
+import UserManagement from "./pages/developer/UserManagement.jsx";
 
 /**
   Authentication Guard for storefront users (e.g. shopping cart)
@@ -170,6 +171,7 @@ const App = () => {
       >
         <Route path="/developer" element={<PlatformOverview />} />
         <Route path="/developer/stores" element={<StoreManagement />} />
+        <Route path="/developer/users" element={<UserManagement />} />
         <Route path="/developer/products" element={<GlobalProducts />} />
       </Route>
 
