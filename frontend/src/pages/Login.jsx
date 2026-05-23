@@ -35,8 +35,13 @@ const Login = () => {
       localStorage.setItem("smartstoreuser", JSON.stringify(res.data.user));
       
       // Redirect based on role
-      if (res.data.user.role === "admin") {
+      const role = res.data.role || (res.data.user && res.data.user.role);
+      if (role === "superadmin") {
+        navigate("/developer");
+      } else if (role === "admin") {
         navigate("/dashboard");
+      } else if (role === "user") {
+        navigate("/profile");
       } else {
         const urlParams = new URLSearchParams(window.location.search);
         const importCart = urlParams.get("importCart");

@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
       sparse: true,
       default: "",
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
     cart: [
       {
         product: {

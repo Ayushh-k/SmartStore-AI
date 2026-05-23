@@ -12,8 +12,15 @@ import { sendOrderConfirmationEmail } from "../utils/mailer.js";
  */
 export const getPublicProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isActive: true })
-      .populate("vendor", "name storeName")
+    // Fetch all non-banned vendors
+    const activeVendors = await User.find({ isBanned: false }).select("_id");
+    const activeVendorIds = activeVendors.map((v) => v._id);
+
+    const products = await Product.find({ 
+      isActive: true,
+      vendor: { $in: activeVendorIds }
+    })
+      .populate("vendor", "name storeName isBanned")
       .sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
@@ -28,10 +35,15 @@ export const getPublicProducts = async (req, res) => {
 export const getPublicProduct = async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id, isActive: true })
-      .populate("vendor", "name storeName");
+      .populate("vendor", "name storeName isBanned");
     if (!product) {
       return res.status(404).json({ message: "Product not found or inactive." });
     }
+
+    if (product.vendor && product.vendor.isBanned) {
+      return res.status(404).json({ message: "Product no longer available (Store Suspended)." });
+    }
+
     res.json(product);
   } catch (error) {
     console.error("Get public product error:", error);

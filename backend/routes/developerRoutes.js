@@ -2,22 +2,26 @@
 import express from "express";
 import { protect, superadmin } from "../middleware/authMiddleware.js";
 import {
-  getGlobalMetrics,
-  getAllVendors,
-  getAllPlatformProducts,
-  deleteAnyProduct,
+  getPlatformMetrics,
+  getAllStores,
+  toggleStoreBan,
+  deleteStore,
+  getStoreCatalog,
+  deleteProduct,
 } from "../controllers/developerController.js";
 
 const router = express.Router();
 
-// Platform Metrics
-router.get("/metrics", protect, superadmin, getGlobalMetrics);
+// Platform Metrics (revenue, stores, products + 7-day time series trends)
+router.get("/metrics", protect, superadmin, getPlatformMetrics);
 
 // Store / Vendor Management
-router.get("/vendors", protect, superadmin, getAllVendors);
+router.get("/vendors", protect, superadmin, getAllStores);
+router.put("/vendors/:id/ban", protect, superadmin, toggleStoreBan);
+router.delete("/vendors/:id", protect, superadmin, deleteStore);
 
-// Product Moderation
-router.get("/products", protect, superadmin, getAllPlatformProducts);
-router.delete("/products/:id", protect, superadmin, deleteAnyProduct);
+// Catalog Drill-Down & Moderation
+router.get("/vendors/:vendorId/catalog", protect, superadmin, getStoreCatalog);
+router.delete("/products/:id", protect, superadmin, deleteProduct);
 
 export default router;

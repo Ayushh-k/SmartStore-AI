@@ -39,8 +39,11 @@ const Signup = () => {
       localStorage.setItem("smartstoreuser", JSON.stringify(res.data.user));
       
       // Redirect based on role
-      if (res.data.user.role === "admin") {
+      const role = res.data.role || (res.data.user && res.data.user.role);
+      if (role === "admin") {
         navigate("/dashboard");
+      } else if (role === "superadmin") {
+        navigate("/developer");
       } else {
         navigate("/");
       }

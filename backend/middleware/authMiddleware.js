@@ -28,6 +28,10 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ message: "User not found." });
     }
 
+    if (user.isBanned) {
+      return res.status(403).json({ message: "Account has been banned by the platform administrator." });
+    }
+
     req.user = user;
     next();
   } catch (error) {
