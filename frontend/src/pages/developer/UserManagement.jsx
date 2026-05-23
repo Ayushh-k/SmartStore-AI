@@ -1,6 +1,6 @@
 // frontend/src/pages/developer/UserManagement.jsx
 import React, { useState, useEffect } from "react";
-import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin } from "lucide-react";
+import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin, X, Package, Tag, Layers, Palette } from "lucide-react";
 import api from "../../utils/api.js";
 
 const UserManagement = () => {
@@ -14,6 +14,7 @@ const UserManagement = () => {
   const [activityLoading, setActivityLoading] = useState(false);
   const [activityError, setActivityError] = useState("");
   const [vendorActiveTab, setVendorActiveTab] = useState("catalog");
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const fetchUsers = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -76,6 +77,7 @@ const UserManagement = () => {
     setActivityError("");
     setActivity(null);
     setVendorActiveTab("catalog");
+    setSelectedProduct(null);
 
     try {
       const res = await api.get(`/api/developer/users/${user._id}/activity`);
@@ -89,7 +91,7 @@ const UserManagement = () => {
   };
 
   // ══════════════════════════════════════════════════════════
-  // ACTIVITY DETAIL VIEW (full-page drill-down)
+  // ACTIVITY DETAIL VIEW
   // ══════════════════════════════════════════════════════════
   if (selectedUser) {
     return (
@@ -101,6 +103,7 @@ const UserManagement = () => {
               onClick={() => {
                 setSelectedUser(null);
                 setActivity(null);
+                setSelectedProduct(null);
               }}
               className="text-[10px] uppercase tracking-[0.25em] font-semibold text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer mb-2 block"
             >
@@ -124,8 +127,8 @@ const UserManagement = () => {
               onClick={() => handleToggleBan(selectedUser._id)}
               className={`border px-4 py-2 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors cursor-pointer ${
                 selectedUser.isBanned
-                  ? "border-emerald-500 text-emerald-600 dark:text-emerald-450 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500"
-                  : "border-amber-500 text-amber-600 dark:text-amber-450 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500"
+                  ? "border-emerald-500 text-emerald-600 dark:text-emerald-450 hover:bg-emerald-500 hover:text-white"
+                  : "border-amber-500 text-amber-600 dark:text-amber-450 hover:bg-amber-500 hover:text-white"
               }`}
             >
               {selectedUser.isBanned ? "Unban Account" : "Ban Account"}
@@ -151,10 +154,10 @@ const UserManagement = () => {
             {activityError}
           </div>
         ) : !activity ? null : selectedUser.role === "admin" ? (
-          // Vendor-specific layout (4 clickable boxes + detailed tab section)
+          // ── VENDOR DETAIL VIEW ──
           <div className="space-y-8 w-full">
+            {/* 4 Metric Boxes */}
             <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full">
-              {/* Box 1: STORE CATALOG */}
               <div
                 onClick={() => setVendorActiveTab("catalog")}
                 className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
@@ -164,15 +167,10 @@ const UserManagement = () => {
                 }`}
               >
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE CATALOG</span>
-                <p className="text-3xl font-serif text-black dark:text-white mt-1">
-                  {activity.vendorStats?.productCount ?? 0}
-                </p>
-                <span className="text-[9px] uppercase tracking-widest text-neutral-405 font-mono block mt-1">
-                  Active Products Listed &rarr;
-                </span>
+                <p className="text-3xl font-serif text-black dark:text-white mt-1">{activity.vendorStats?.productCount ?? 0}</p>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">Active Products Listed &rarr;</span>
               </div>
 
-              {/* Box 2: LIFETIME REVENUE */}
               <div
                 onClick={() => setVendorActiveTab("revenue")}
                 className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
@@ -185,12 +183,9 @@ const UserManagement = () => {
                 <p className="text-3xl font-serif text-black dark:text-white mt-1">
                   ${(activity.vendorStats?.lifetimeRevenue ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
-                <span className="text-[9px] uppercase tracking-widest text-neutral-405 font-mono block mt-1">
-                  Total Revenue Generated &rarr;
-                </span>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">Total Revenue Generated &rarr;</span>
               </div>
 
-              {/* Box 3: ORDERS RECEIVED */}
               <div
                 onClick={() => setVendorActiveTab("orders")}
                 className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
@@ -200,34 +195,28 @@ const UserManagement = () => {
                 }`}
               >
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">ORDERS RECEIVED</span>
-                <p className="text-3xl font-serif text-black dark:text-white mt-1">
-                  {activity.vendorStats?.salesCount ?? 0}
-                </p>
-                <span className="text-[9px] uppercase tracking-widest text-neutral-405 font-mono block mt-1">
-                  Customer Purchases &rarr;
-                </span>
+                <p className="text-3xl font-serif text-black dark:text-white mt-1">{activity.vendorStats?.salesCount ?? 0}</p>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">Customer Purchases &rarr;</span>
               </div>
 
-              {/* Box 4: STORE STATUS */}
               <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE STATUS</span>
-                <p className={`text-3xl font-serif mt-1 ${selectedUser.isBanned ? "text-rose-500 font-bold" : "text-emerald-500 font-bold"}`}>
+                <p className={`text-3xl font-serif mt-1 font-bold ${selectedUser.isBanned ? "text-rose-500" : "text-emerald-500"}`}>
                   {selectedUser.isBanned ? "SUSPENDED" : "ACTIVE"}
                 </p>
-                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
-                  Platform Status
-                </span>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">Platform Status</span>
               </div>
             </div>
 
-            {/* Detailed Tab Content */}
+            {/* Tab Content */}
             <div className="pt-4">
               {vendorActiveTab === "catalog" && (
                 <div className="space-y-4">
                   <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                     Store Catalog ({activity.products?.length || 0})
+                    <span className="ml-3 text-[8px] font-normal text-neutral-400 normal-case tracking-normal">Click a row to view full product details</span>
                   </h3>
-                  {activity.products?.length === 0 ? (
+                  {!activity.products || activity.products.length === 0 ? (
                     <div className="border border-gray-250 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-450">
                       No products listed in this store
                     </div>
@@ -247,8 +236,19 @@ const UserManagement = () => {
                           </thead>
                           <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
                             {activity.products.map((p) => (
-                              <tr key={p._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors">
-                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">{p.name}</td>
+                              <tr
+                                key={p._id}
+                                onClick={() => setSelectedProduct(p)}
+                                className="hover:bg-amber-50/40 dark:hover:bg-amber-950/10 transition-colors cursor-pointer group"
+                              >
+                                <td className="px-6 py-4">
+                                  <span className="font-semibold text-black dark:text-white uppercase font-serif group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors block">
+                                    {p.name}
+                                  </span>
+                                  <span className="text-[9px] text-neutral-400 font-mono uppercase tracking-wider">
+                                    Click to view details
+                                  </span>
+                                </td>
                                 <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{p.sku || "N/A"}</td>
                                 <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">{p.category}</td>
                                 <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">${Number(p.price).toFixed(2)}</td>
@@ -275,7 +275,7 @@ const UserManagement = () => {
                   <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                     {vendorActiveTab === "revenue" ? "Revenue Generation Log" : "Orders Received Log"} ({activity.sales?.length || 0})
                   </h3>
-                  {activity.sales?.length === 0 ? (
+                  {!activity.sales || activity.sales.length === 0 ? (
                     <div className="border border-gray-250 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-450">
                       No sales or orders recorded for this store yet
                     </div>
@@ -312,16 +312,15 @@ const UserManagement = () => {
             </div>
           </div>
         ) : (
-          // Customer-specific layout
+          // ── CUSTOMER DETAIL VIEW ──
           <div className="grid gap-8 grid-cols-1 lg:grid-cols-3">
-            {/* Column 1 & 2: Orders, Cart */}
             <div className="lg:col-span-2 space-y-8">
               {/* Order History */}
               <div className="space-y-4">
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                   Order History ({activity.orders?.length || 0})
                 </h3>
-                {activity.orders?.length === 0 ? (
+                {!activity.orders || activity.orders.length === 0 ? (
                   <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-[10px] uppercase tracking-widest text-neutral-400">
                     No orders recorded for this user
                   </div>
@@ -362,7 +361,7 @@ const UserManagement = () => {
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                   Active Shopping Cart ({activity.user?.cart?.length || 0})
                 </h3>
-                {activity.user?.cart?.length === 0 ? (
+                {!activity.user?.cart || activity.user.cart.length === 0 ? (
                   <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-[10px] uppercase tracking-widest text-neutral-400">
                     Shopping cart is currently empty
                   </div>
@@ -391,12 +390,11 @@ const UserManagement = () => {
 
             {/* Column 3: Wishlist & Addresses */}
             <div className="space-y-8">
-              {/* Wishlist */}
               <div className="space-y-4">
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                   Wishlist Collection ({activity.user?.wishlist?.length || 0})
                 </h3>
-                {activity.user?.wishlist?.length === 0 ? (
+                {!activity.user?.wishlist || activity.user.wishlist.length === 0 ? (
                   <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-[10px] uppercase tracking-widest text-neutral-400">
                     Wishlist is currently empty
                   </div>
@@ -415,12 +413,11 @@ const UserManagement = () => {
                 )}
               </div>
 
-              {/* Addresses */}
               <div className="space-y-4">
                 <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
                   Registered Addresses ({activity.user?.addresses?.length || 0})
                 </h3>
-                {activity.user?.addresses?.length === 0 ? (
+                {!activity.user?.addresses || activity.user.addresses.length === 0 ? (
                   <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-[10px] uppercase tracking-widest text-neutral-400">
                     No shipping addresses saved
                   </div>
@@ -444,6 +441,197 @@ const UserManagement = () => {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════
+            PRODUCT DETAIL SIDE PANEL (slide-in overlay)
+        ══════════════════════════════════════════════════════ */}
+        {selectedProduct && (
+          <div
+            className="fixed inset-0 z-50 flex items-start justify-end bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedProduct(null)}
+          >
+            <div
+              className="relative h-full w-full max-w-xl bg-white dark:bg-[#080808] overflow-y-auto shadow-2xl border-l border-gray-200 dark:border-neutral-800"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Panel Header */}
+              <div className="sticky top-0 z-10 bg-white dark:bg-[#080808] border-b border-gray-200 dark:border-neutral-900 px-8 py-5 flex items-center justify-between">
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block">Product Details</span>
+                  <h3 className="font-serif text-lg tracking-widest uppercase text-black dark:text-white mt-0.5">
+                    {selectedProduct.name}
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="border border-gray-200 dark:border-neutral-800 p-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white transition-colors cursor-pointer"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Product Image */}
+              <div className="bg-neutral-100 dark:bg-neutral-900 aspect-[4/3] overflow-hidden flex items-center justify-center">
+                {selectedProduct.images && selectedProduct.images[0] ? (
+                  <img
+                    src={selectedProduct.images[0]}
+                    alt={selectedProduct.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.style.display = "none"; }}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center text-neutral-400 dark:text-neutral-600">
+                    <Package className="h-12 w-12 mb-2 stroke-[1.2]" />
+                    <span className="text-[10px] uppercase tracking-widest">No Image Available</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Image thumbnails strip */}
+              {selectedProduct.images && selectedProduct.images.length > 1 && (
+                <div className="flex gap-2 px-8 py-3 overflow-x-auto bg-neutral-50 dark:bg-neutral-900/50 border-b border-gray-200 dark:border-neutral-900">
+                  {selectedProduct.images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt={`View ${i + 1}`}
+                      className="h-14 w-14 object-cover shrink-0 border border-gray-200 dark:border-neutral-800"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Details Body */}
+              <div className="px-8 py-6 space-y-6">
+
+                {/* Status badges */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  {selectedProduct.isActive ? (
+                    <span className="border border-emerald-500 bg-emerald-500/10 text-emerald-600 px-3 py-1 text-[8px] uppercase tracking-widest font-bold">Active</span>
+                  ) : (
+                    <span className="border border-rose-500 bg-rose-500/10 text-rose-500 px-3 py-1 text-[8px] uppercase tracking-widest font-bold">Suspended</span>
+                  )}
+                  <span className="border border-gray-200 dark:border-neutral-700 px-3 py-1 text-[8px] uppercase tracking-widest font-bold text-neutral-500">
+                    {selectedProduct.category || "Uncategorized"}
+                  </span>
+                  {selectedProduct.brand && (
+                    <span className="border border-gray-200 dark:border-neutral-700 px-3 py-1 text-[8px] uppercase tracking-widest font-bold text-neutral-500">
+                      {selectedProduct.brand}
+                    </span>
+                  )}
+                </div>
+
+                {/* Price + Stock */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="border border-gray-200 dark:border-neutral-900 p-4 bg-gray-50 dark:bg-neutral-900/40">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block mb-1">Price</span>
+                    <span className="font-serif text-2xl text-black dark:text-white">
+                      ${Number(selectedProduct.price).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="border border-gray-200 dark:border-neutral-900 p-4 bg-gray-50 dark:bg-neutral-900/40">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block mb-1">Stock</span>
+                    <span className={`font-serif text-2xl ${
+                      Number(selectedProduct.stock) <= 0 ? "text-rose-500" :
+                      Number(selectedProduct.stock) <= 5 ? "text-amber-500" :
+                      "text-black dark:text-white"
+                    }`}>
+                      {selectedProduct.stock} <span className="text-sm font-sans">units</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* SKU */}
+                {selectedProduct.sku && (
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block">SKU / Product Code</span>
+                    <span className="font-mono text-sm text-black dark:text-white bg-neutral-100 dark:bg-neutral-900 px-3 py-1.5 inline-block border border-gray-200 dark:border-neutral-800">
+                      {selectedProduct.sku}
+                    </span>
+                  </div>
+                )}
+
+                {/* Description */}
+                {(selectedProduct.description || selectedProduct.aiNarrative) && (
+                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 flex items-center gap-2">
+                      <Tag className="h-3 w-3" /> Product Description
+                    </span>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
+                      {selectedProduct.aiNarrative || selectedProduct.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Sizes */}
+                {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
+                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 flex items-center gap-2">
+                      <Layers className="h-3 w-3" /> Available Sizes
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.sizes.map((size, i) => (
+                        <span key={i} className="border border-gray-300 dark:border-neutral-700 px-3 py-1 text-[10px] uppercase tracking-wider font-mono text-black dark:text-white">
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Colors */}
+                {selectedProduct.colors && selectedProduct.colors.length > 0 && (
+                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 flex items-center gap-2">
+                      <Palette className="h-3 w-3" /> Available Colors
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.colors.map((color, i) => (
+                        <span key={i} className="border border-gray-300 dark:border-neutral-700 px-3 py-1 text-[10px] uppercase tracking-wider font-mono text-black dark:text-white">
+                          {color}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* AI Marketing Captions */}
+                {selectedProduct.aiCaptions && selectedProduct.aiCaptions.length > 0 && (
+                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block">AI Marketing Captions</span>
+                    <div className="space-y-2">
+                      {selectedProduct.aiCaptions.map((caption, i) => (
+                        <p key={i} className="text-[11px] italic text-neutral-500 dark:text-neutral-400 border-l-2 border-amber-400 pl-3 leading-relaxed">
+                          {caption}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Platform Metadata */}
+                <div className="border-t border-gray-100 dark:border-neutral-900 pt-4 space-y-2">
+                  <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block">Platform Metadata</span>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                    <div>
+                      <span className="text-neutral-400 block uppercase tracking-wider text-[8px] mb-0.5">Product ID</span>
+                      <span className="text-black dark:text-white break-all">{selectedProduct._id}</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-400 block uppercase tracking-wider text-[8px] mb-0.5">Listed On</span>
+                      <span className="text-black dark:text-white">
+                        {selectedProduct.createdAt
+                          ? new Date(selectedProduct.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -493,18 +681,12 @@ const UserManagement = () => {
       ) : (
         <div className="space-y-14">
 
-          {/* ══════════════════════════════════════════
-              SECTION 1 — VENDOR / STORE OWNERS
-          ══════════════════════════════════════════ */}
+          {/* ══ SECTION 1: VENDOR / STORE OWNERS ══ */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block mb-0.5">
-                  Merchant Accounts
-                </span>
-                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">
-                  Vendor / Store Owners
-                </h3>
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block mb-0.5">Merchant Accounts</span>
+                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">Vendor / Store Owners</h3>
               </div>
               <span className="border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
                 {vendors.length} Vendors
@@ -531,21 +713,12 @@ const UserManagement = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
                       {vendors.map((user) => (
-                        <tr
-                          key={user._id}
-                          className={`hover:bg-amber-50/40 dark:hover:bg-amber-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}
-                        >
+                        <tr key={user._id} className={`hover:bg-amber-50/40 dark:hover:bg-amber-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}>
                           <td className="px-6 py-4">
-                            <span className="font-serif font-bold text-black dark:text-white tracking-wide uppercase block leading-tight">
-                              {user.name}
-                            </span>
-                            <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                              Vendor / Merchant
-                            </span>
+                            <span className="font-serif font-bold text-black dark:text-white tracking-wide uppercase block leading-tight">{user.name}</span>
+                            <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 uppercase tracking-wider">Vendor / Merchant</span>
                           </td>
-                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
-                            {user.email}
-                          </td>
+                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
                           <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
                             {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                           </td>
@@ -562,28 +735,13 @@ const UserManagement = () => {
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
-                              <button
-                                onClick={() => handleViewActivity(user)}
-                                className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
-                              >
-                                View Store
-                              </button>
+                              <button onClick={() => handleViewActivity(user)} className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer">View Store</button>
                               <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button
-                                onClick={() => handleToggleBan(user._id)}
-                                className={`transition-colors cursor-pointer ${
-                                  user.isBanned ? "text-emerald-600 hover:text-emerald-500" : "text-amber-600 hover:text-amber-500"
-                                }`}
-                              >
+                              <button onClick={() => handleToggleBan(user._id)} className={`transition-colors cursor-pointer ${user.isBanned ? "text-emerald-600 hover:text-emerald-500" : "text-amber-600 hover:text-amber-500"}`}>
                                 {user.isBanned ? "Unban" : "Suspend"}
                               </button>
                               <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button
-                                onClick={() => handleDeleteUser(user)}
-                                className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer"
-                              >
-                                Delete
-                              </button>
+                              <button onClick={() => handleDeleteUser(user)} className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer">Delete</button>
                             </div>
                           </td>
                         </tr>
@@ -595,21 +753,15 @@ const UserManagement = () => {
             )}
           </div>
 
-          {/* Dashed Section Divider */}
+          {/* Dashed Divider */}
           <div className="border-t border-dashed border-gray-200 dark:border-neutral-800" />
 
-          {/* ══════════════════════════════════════════
-              SECTION 2 — CUSTOMER ACCOUNTS
-          ══════════════════════════════════════════ */}
+          {/* ══ SECTION 2: CUSTOMER ACCOUNTS ══ */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-sky-500 block mb-0.5">
-                  Registered Shoppers
-                </span>
-                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">
-                  Customer Accounts
-                </h3>
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-sky-500 block mb-0.5">Registered Shoppers</span>
+                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">Customer Accounts</h3>
               </div>
               <span className="border border-sky-500/40 bg-sky-500/10 text-sky-600 dark:text-sky-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
                 {customers.length} Customers
@@ -638,33 +790,18 @@ const UserManagement = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
                       {customers.map((user) => (
-                        <tr
-                          key={user._id}
-                          className={`hover:bg-sky-50/30 dark:hover:bg-sky-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}
-                        >
+                        <tr key={user._id} className={`hover:bg-sky-50/30 dark:hover:bg-sky-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}>
                           <td className="px-6 py-4">
-                            <span className="font-semibold text-black dark:text-white tracking-wide block leading-tight">
-                              {user.name}
-                            </span>
-                            <span className="text-[9px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider">
-                              Customer
-                            </span>
+                            <span className="font-semibold text-black dark:text-white tracking-wide block leading-tight">{user.name}</span>
+                            <span className="text-[9px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider">Customer</span>
                           </td>
-                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
-                            {user.email}
-                          </td>
+                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
                           <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
                             {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                           </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="font-mono font-bold text-black dark:text-white">{user.orderCount ?? 0}</span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="font-mono font-bold text-black dark:text-white">{user.wishlistCount ?? 0}</span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="font-mono font-bold text-black dark:text-white">{user.cartCount ?? 0}</span>
-                          </td>
+                          <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.orderCount ?? 0}</span></td>
+                          <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.wishlistCount ?? 0}</span></td>
+                          <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.cartCount ?? 0}</span></td>
                           <td className="px-6 py-4">
                             {user.isBanned ? (
                               <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Banned</span>
@@ -674,26 +811,13 @@ const UserManagement = () => {
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
-                              <button
-                                onClick={() => handleViewActivity(user)}
-                                className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
-                              >
-                                View Activity
-                              </button>
+                              <button onClick={() => handleViewActivity(user)} className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer">View Activity</button>
                               <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button
-                                onClick={() => handleToggleBan(user._id)}
-                                className="text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
-                              >
+                              <button onClick={() => handleToggleBan(user._id)} className="text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
                                 {user.isBanned ? "Unban" : "Ban"}
                               </button>
                               <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button
-                                onClick={() => handleDeleteUser(user)}
-                                className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer"
-                              >
-                                Delete
-                              </button>
+                              <button onClick={() => handleDeleteUser(user)} className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer">Delete</button>
                             </div>
                           </td>
                         </tr>
