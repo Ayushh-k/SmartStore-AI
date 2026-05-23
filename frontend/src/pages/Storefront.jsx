@@ -200,7 +200,8 @@ const Storefront = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [addingToCart, setAddingToCart] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -369,6 +370,11 @@ const Storefront = () => {
           console.error("Error parsing shared cart data:", err);
         }
       }
+
+      const urlSearchQuery = urlParams.get("search") || urlParams.get("q");
+      if (urlSearchQuery) {
+        setSearchQuery(urlSearchQuery);
+      }
     };
 
     handleQueryParams();
@@ -390,7 +396,7 @@ const Storefront = () => {
 
   const handleVibeSearch = async (e) => {
     if (e) e.preventDefault();
-    if (!search.trim()) {
+    if (!searchQuery.trim()) {
       setSearchMode("text");
       setAiSearchResults([]);
       return;
@@ -399,7 +405,7 @@ const Storefront = () => {
     setAiSearchLoading(true);
     setError("");
     try {
-      const res = await api.post("/api/ai/user/search", { query: search });
+      const res = await api.post("/api/ai/user/search", { query: searchQuery });
       setAiSearchResults(res.data || []);
       setSearchMode("ai");
     } catch (err) {
@@ -412,7 +418,8 @@ const Storefront = () => {
   };
 
   const handleResetSearch = () => {
-    setSearch("");
+    setSearchQuery("");
+    setSelectedCategory("All");
     setSearchMode("text");
     setAiSearchResults([]);
     setError("");
@@ -501,15 +508,14 @@ const Storefront = () => {
     }
   };
 
-  const filteredProducts = searchMode === "ai"
-    ? aiSearchResults
-    : products.filter((p) => {
-        const query = search.toLowerCase();
-        return (
-          (p.name || "").toLowerCase().includes(query) ||
-          (p.category || "").toLowerCase().includes(query)
-        );
-      });
+  const baseProducts = searchMode === "ai" ? aiSearchResults : products;
+  const filteredProducts = baseProducts.filter((product) => {
+    const matchesSearch = !searchQuery ||
+                          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (product.category && product.category.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   // ==================== RENDERING LOGGED-OUT LUXURY LANDING ====================
   if (!isLoggedIn) {
@@ -546,17 +552,20 @@ const Storefront = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-12 py-16 space-y-16">
           
           {/* Borderless text category navigation links */}
-          <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-black/5 dark:border-white/5">
-            {CATEGORIES.map((cat, idx) => (
-              <button
-                key={idx}
-                className="font-sans text-[11px] uppercase tracking-[0.2em] text-neutral-500 hover:text-black dark:hover:text-white pb-1.5 transition-colors duration-300"
-                onClick={() => alert("Please sign in or register to browse products.")}
-              >
-                {cat.name}
-              </button>
-            ))}
+          <div className="max-w-full border-b border-black/5 dark:border-white/5">
+            <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide no-scrollbar w-full py-2 gap-6 snap-x md:justify-center md:items-center">
+              {CATEGORIES.map((cat, idx) => (
+                <button
+                  key={idx}
+                  className="shrink-0 snap-start font-sans text-[11px] uppercase tracking-[0.2em] text-neutral-500 hover:text-black dark:hover:text-white pb-1.5 transition-colors duration-300"
+                  onClick={() => alert("Please sign in or register to browse products.")}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
           </div>
+
 
           {/* Deals of the Season (Minimalist grid of portrait cards) */}
           <div className="space-y-12">
@@ -658,38 +667,36 @@ const Storefront = () => {
       <div id="catalog" className="max-w-7xl mx-auto px-6 sm:px-12 py-12 space-y-10 scroll-mt-24">
         
         {/* Sleek, borderless category navigation */}
-        <div className="flex justify-center items-center overflow-x-auto whitespace-nowrap gap-8 py-6 border-b border-black/5 dark:border-white/5">
-          <button
-            onClick={() => {
-              setSearch("");
-              setSearchMode("text");
-              setAiSearchResults([]);
-            }}
-            className={`font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
-              search === ""
-                ? "text-black dark:text-white border-b border-black dark:border-white"
-                : "text-neutral-500 hover:text-black dark:hover:text-white"
-            }`}
-          >
-            All Collections
-          </button>
-          {CATEGORIES.map((cat, idx) => (
+        <div className="max-w-full border-b border-black/5 dark:border-white/5">
+          <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide no-scrollbar w-full py-2 gap-6 snap-x md:justify-center md:items-center">
             <button
-              key={idx}
               onClick={() => {
-                setSearch(search === cat.name ? "" : cat.name);
-                setSearchMode("text");
-                setAiSearchResults([]);
+                setSelectedCategory("All");
               }}
-              className={`font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
-                search === cat.name
+              className={`shrink-0 snap-start font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
+                selectedCategory === "All"
                   ? "text-black dark:text-white border-b border-black dark:border-white"
                   : "text-neutral-500 hover:text-black dark:hover:text-white"
               }`}
             >
-              {cat.name}
+              All Collections
             </button>
-          ))}
+            {CATEGORIES.map((cat, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setSelectedCategory(selectedCategory === cat.name ? "All" : cat.name);
+                }}
+                className={`shrink-0 snap-start font-sans text-[11px] uppercase tracking-[0.2em] pb-1.5 transition-all duration-300 ${
+                  selectedCategory === cat.name
+                    ? "text-black dark:text-white border-b border-black dark:border-white"
+                    : "text-neutral-500 hover:text-black dark:hover:text-white"
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Minimalist Bottom-Bordered AI Vibe Search */}
@@ -697,10 +704,10 @@ const Storefront = () => {
           <form onSubmit={handleVibeSearch} className="w-full max-w-lg relative flex items-center">
             <input
               type="text"
-              placeholder="Vibe Search (e.g. cold trekking gear) + Enter"
+              placeholder="Search products... (e.g. cold trekking gear) + Enter"
               className="w-full border-b border-black/10 dark:border-white/10 bg-transparent focus:outline-none focus:border-black dark:focus:border-white px-0 py-3.5 text-black dark:text-white placeholder-neutral-400 dark:placeholder-neutral-700 font-serif text-lg tracking-wide transition-colors duration-300"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button
               type="submit"

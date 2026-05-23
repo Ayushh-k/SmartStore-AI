@@ -347,6 +347,40 @@ export const getUserActivity = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
+    if (user.role === "admin") {
+      // Fetch all products owned by this vendor
+      const vendorProducts = await Product.find({ vendor: user._id }).select("_id isActive");
+      const vendorProductIds = vendorProducts.map((p) => p._id);
+
+      // Active products listed
+      const activeProductCount = vendorProducts.filter((p) => p.isActive).length;
+
+      // Count of sales (purchases of their products)
+      const salesCount = await Sale.countDocuments({ product: { $in: vendorProductIds } });
+
+      // Aggregate total revenue for vendor's products
+      const revenueAgg = await Sale.aggregate([
+        { $match: { product: { $in: vendorProductIds } } },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$totalAmount" },
+          },
+        },
+      ]);
+      const lifetimeRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
+
+      return res.json({
+        user,
+        vendorStats: {
+          productCount: activeProductCount,
+          lifetimeRevenue,
+          salesCount,
+          status: user.isBanned ? "Suspended" : "Active",
+        },
+      });
+    }
+
     const orders = await Order.find({ user: user._id })
       .populate("products.product")
       .sort({ createdAt: -1 });
@@ -360,4 +394,5 @@ export const getUserActivity = async (req, res) => {
     res.status(500).json({ message: "Failed to load user activity." });
   }
 };
+
 

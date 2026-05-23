@@ -148,7 +148,54 @@ const UserManagement = () => {
           <div className="border border-rose-350 bg-rose-50 dark:bg-black p-4 text-[10px] uppercase tracking-widest text-rose-500">
             {activityError}
           </div>
-        ) : !activity ? null : (
+        ) : !activity ? null : selectedUser.role === "admin" ? (
+          // Vendor-specific layout (4 boxes)
+          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full">
+            {/* Box 1: STORE CATALOG */}
+            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE CATALOG</span>
+              <p className="text-3xl font-serif text-black dark:text-white mt-1">
+                {activity.vendorStats?.productCount ?? 0}
+              </p>
+              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
+                Active Products Listed
+              </span>
+            </div>
+
+            {/* Box 2: LIFETIME REVENUE */}
+            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">LIFETIME REVENUE</span>
+              <p className="text-3xl font-serif text-black dark:text-white mt-1">
+                ${(activity.vendorStats?.lifetimeRevenue ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
+                Total Revenue Generated
+              </span>
+            </div>
+
+            {/* Box 3: ORDERS RECEIVED */}
+            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">ORDERS RECEIVED</span>
+              <p className="text-3xl font-serif text-black dark:text-white mt-1">
+                {activity.vendorStats?.salesCount ?? 0}
+              </p>
+              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
+                Customer Purchases
+              </span>
+            </div>
+
+            {/* Box 4: STORE STATUS */}
+            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE STATUS</span>
+              <p className={`text-3xl font-serif mt-1 ${selectedUser.isBanned ? "text-rose-500 font-bold" : "text-emerald-500 font-bold"}`}>
+                {selectedUser.isBanned ? "SUSPENDED" : "ACTIVE"}
+              </p>
+              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
+                Platform Status
+              </span>
+            </div>
+          </div>
+        ) : (
           <div className="grid gap-8 grid-cols-1 lg:grid-cols-3">
             
             {/* Column 1 & 2: Orders, Cart, Wishlist */}
@@ -222,7 +269,7 @@ const UserManagement = () => {
                     {activity.user.cart.map((item, idx) => (
                       <div key={idx} className="p-4 flex justify-between items-center text-xs">
                         <div className="flex items-center gap-3">
-                          <ShoppingBag className="h-4 w-4 text-neutral-500" />
+                          <ShoppingBag className="h-4 w-4 text-neutral-550" />
                           <div>
                             <span className="font-serif uppercase font-semibold text-black dark:text-white">
                               {item.product?.name || "Deleted Product"}
@@ -293,7 +340,7 @@ const UserManagement = () => {
                         className="border border-gray-200 dark:border-neutral-900 p-4 bg-white dark:bg-[#060606] space-y-2 text-xs"
                       >
                         <div className="flex justify-between items-center">
-                          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-neutral-500">
+                          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-neutral-550">
                             <MapPin className="h-3 w-3" />
                             Address Point
                           </span>
