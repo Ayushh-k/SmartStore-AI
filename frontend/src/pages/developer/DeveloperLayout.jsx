@@ -1,5 +1,5 @@
 // frontend/src/pages/developer/DeveloperLayout.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -17,13 +17,18 @@ import {
 const DeveloperLayout = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const rawUser = localStorage.getItem("smartstoreuser");
-  let user = { name: "Developer", storeName: "Platform Admin" };
-  if (rawUser) {
-    try {
-      user = JSON.parse(rawUser);
-    } catch (e) {}
-  }
+  const [user, setUser] = useState({ name: "Developer", email: "", role: "" });
+
+  useEffect(() => {
+    const rawUser = localStorage.getItem("smartstoreuser");
+    if (rawUser) {
+      try {
+        setUser(JSON.parse(rawUser));
+      } catch (e) {
+        console.error("Error parsing user context in developer portal:", e);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("smartstoretoken");
@@ -116,11 +121,19 @@ const DeveloperLayout = () => {
             })}
           </nav>
 
-          {/* Footer */}
+          {/* Footer with Active User Display */}
           <div className="mt-4 border-t border-gray-200 dark:border-neutral-900 pt-4 text-left">
+            <div className="px-2 pb-3.5 space-y-0.5">
+              <div className="text-[10px] font-bold text-black dark:text-white uppercase tracking-wider truncate">
+                {user.name}
+              </div>
+              <div className="text-[8px] font-mono text-neutral-450 dark:text-neutral-500 truncate">
+                {user.email}
+              </div>
+            </div>
             <button
               onClick={handleLogout}
-              className="flex w-full items-center justify-between px-2 py-2 text-neutral-600 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer rounded-none"
+              className="flex w-full items-center justify-between px-2 py-2 text-neutral-600 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer rounded-none border-t border-gray-250 dark:border-neutral-900 pt-2.5"
             >
               <span className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-semibold">
                 <LogOut className="h-4 w-4" />
@@ -156,6 +169,15 @@ const DeveloperLayout = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Active Super Admin info displayed clearly on top header */}
+              <div className="hidden sm:flex flex-col text-right">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white">
+                  {user.name}
+                </span>
+                <span className="text-[8px] font-mono text-neutral-450 dark:text-neutral-500">
+                  {user.email}
+                </span>
+              </div>
               <span className="text-[9px] uppercase tracking-widest border border-black dark:border-white px-2.5 py-1 text-black dark:text-white font-bold font-mono">
                 GOD MODE ACTIVE
               </span>
