@@ -57,7 +57,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a] text-white">
+    <div className="flex min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white transition-colors duration-300">
       {/* Editorial Split-Screen Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 w-full">
         
@@ -80,13 +80,13 @@ const Login = () => {
         </div>
 
         {/* Right Side: Form Area */}
-        <div className="flex flex-col justify-center items-center px-8 sm:px-16 md:px-24 py-12 bg-black">
+        <div className="flex flex-col justify-center items-center px-8 sm:px-16 md:px-24 py-12 bg-white dark:bg-black transition-colors duration-300">
           <div className="w-full max-w-md space-y-10 text-left">
             <div className="space-y-3">
               <h2 className="text-3xl sm:text-4xl font-serif font-light tracking-wide uppercase">
                 Sign In
               </h2>
-              <p className="text-xs text-neutral-400 font-sans tracking-widest uppercase">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-sans tracking-widest uppercase">
                 Welcome back to your luxury experience.
               </p>
             </div>
@@ -99,7 +99,7 @@ const Login = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-sans font-medium">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
                   Email Address
                 </label>
                 <input
@@ -108,13 +108,13 @@ const Login = () => {
                   required
                   value={form.email}
                   onChange={handleChange}
-                  className="input"
+                  className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
                   placeholder="name@domain.com"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-sans font-medium">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
                   Password
                 </label>
                 <input
@@ -124,7 +124,7 @@ const Login = () => {
                   minLength={6}
                   value={form.password}
                   onChange={handleChange}
-                  className="input"
+                  className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
                   placeholder="••••••••"
                 />
               </div>
@@ -133,7 +133,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-white text-black py-4 uppercase tracking-[0.2em] font-semibold text-xs rounded-none hover:bg-neutral-250 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 uppercase tracking-[0.2em] font-semibold text-xs rounded-none hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -144,15 +144,15 @@ const Login = () => {
               </div>
             </form>
 
-            <div className="border-t border-white/5 pt-6 space-y-4">
+            <div className="border-t border-black/10 dark:border-white/5 pt-6 space-y-4">
               <p className="text-xs text-neutral-500 font-sans tracking-wider">
                 Don't have an account?{" "}
-                <Link to="/signup" className="text-white hover:text-gold transition-colors font-medium">
+                <Link to="/signup" className="text-black dark:text-white hover:text-gold transition-colors font-medium">
                   Create Account
                 </Link>
               </p>
-              <p className="text-[10px] text-neutral-600 font-sans tracking-widest uppercase">
-                <Link to="/" className="hover:text-white transition-colors">
+              <p className="text-[10px] text-neutral-600 dark:text-neutral-450 font-sans tracking-widest uppercase">
+                <Link to="/" className="text-neutral-550 hover:text-black dark:hover:text-white transition-colors">
                   Browse as Guest / Back to Home
                 </Link>
               </p>
