@@ -141,11 +141,13 @@ const AdminLayout = () => {
       to: "/products",
       label: "Products",
       icon: Package,
+      end: true,
     },
     {
       to: "/products/new",
       label: "Add Product",
       icon: PackagePlus,
+      end: true,
     },
     {
       to: "/admin/orders",

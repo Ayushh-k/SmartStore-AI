@@ -138,13 +138,13 @@ export const getVendorProducts = async (req, res) => {
  */
 export const createVendorProduct = async (req, res) => {
   try {
-    const productData = { ...req.body, vendor: req.user._id };
-    const product = new Product(productData);
+    req.body.vendor = req.user._id;
+    const product = new Product(req.body);
     await product.save();
     res.status(201).json(product);
   } catch (error) {
     console.error("Create vendor product error:", error);
-    res.status(500).json({ message: "Failed to create product." });
+    res.status(400).json({ message: error.message || "Failed to create product." });
   }
 };
 

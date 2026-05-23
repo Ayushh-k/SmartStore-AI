@@ -14,12 +14,13 @@ const router = express.Router();
 // Create product
 router.post("/", protect, admin, async (req, res) => {
   try {
+    req.body.vendor = req.user._id;
     const product = new Product(req.body);
     await product.save();
     res.status(201).json(product);
   } catch (error) {
     console.error("Create product error:", error);
-    res.status(500).json({ message: "Failed to create product." });
+    res.status(400).json({ message: error.message || "Failed to create product." });
   }
 });
 
