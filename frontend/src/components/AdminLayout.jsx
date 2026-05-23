@@ -1,5 +1,3 @@
-// frontend/src/components/AdminLayout.jsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
@@ -12,7 +10,8 @@ import {
   Check,
   X,
   ClipboardList,
-  Menu
+  Menu,
+  Settings
 } from "lucide-react";
 import api from "../utils/api.js";
 
@@ -26,9 +25,25 @@ const AdminLayout = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "" });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [user, setUser] = useState({ name: "", storeName: "" });
   
   const notificationRef = useRef(null);
   const latestNotificationIdRef = useRef(null);
+
+  const loadUser = () => {
+    const raw = localStorage.getItem("smartstoreuser");
+    if (raw) {
+      try {
+        setUser(JSON.parse(raw));
+      } catch (e) {}
+    }
+  };
+
+  useEffect(() => {
+    loadUser();
+    window.addEventListener("storeSettingsUpdated", loadUser);
+    return () => window.removeEventListener("storeSettingsUpdated", loadUser);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("smartstoretoken");
@@ -137,6 +152,11 @@ const AdminLayout = () => {
       label: "Orders",
       icon: ClipboardList,
     },
+    {
+      to: "/admin/settings",
+      label: "Store Settings",
+      icon: Settings,
+    },
   ];
 
   return (
@@ -185,7 +205,7 @@ const AdminLayout = () => {
                   SmartStore
                 </div>
                 <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
-                  Admin Console
+                  {user.storeName || "Admin Console"}
                 </div>
               </div>
             </div>

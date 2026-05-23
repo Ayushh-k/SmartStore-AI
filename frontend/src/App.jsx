@@ -18,6 +18,11 @@ import AdminOrders from "./pages/AdminOrders.jsx";
 import Footer from "./components/Footer.jsx";
 import Terms from "./pages/Terms.jsx";
 import Privacy from "./pages/Privacy.jsx";
+import StoreSettings from "./pages/StoreSettings.jsx";
+import DeveloperLayout from "./pages/developer/DeveloperLayout.jsx";
+import PlatformOverview from "./pages/developer/PlatformOverview.jsx";
+import StoreManagement from "./pages/developer/StoreManagement.jsx";
+import GlobalProducts from "./pages/developer/GlobalProducts.jsx";
 
 /**
   Authentication Guard for storefront users (e.g. shopping cart)
@@ -31,7 +36,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 /**
-  Authentication & Authorization Guard for administrative dashboard
+  Authentication & Authorization Guard for administrative dashboard (Vendors)
  */
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem("smartstoretoken");
@@ -51,6 +56,29 @@ const AdminRoute = ({ children }) => {
   }
 
   // Not an admin, redirect to user storefront shop
+  return <Navigate to="/" replace />;
+};
+
+/**
+  Authentication & Authorization Guard for Super Admin (Developer) Portal
+ */
+const SuperAdminRoute = ({ children }) => {
+  const token = localStorage.getItem("smartstoretoken");
+  const rawUser = localStorage.getItem("smartstoreuser");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  try {
+    const user = JSON.parse(rawUser);
+    if (user && user.role === "superadmin") {
+      return children;
+    }
+  } catch (err) {
+    console.error("Superadmin check parsing error:", err);
+  }
+
   return <Navigate to="/" replace />;
 };
 
@@ -129,6 +157,20 @@ const App = () => {
         <Route path="/products" element={<Products />} />
         <Route path="/products/new" element={<AddProduct />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/admin/settings" element={<StoreSettings />} />
+      </Route>
+
+      {/* Super Admin / Developer Routes */}
+      <Route
+        element={
+          <SuperAdminRoute>
+            <DeveloperLayout />
+          </SuperAdminRoute>
+        }
+      >
+        <Route path="/developer" element={<PlatformOverview />} />
+        <Route path="/developer/stores" element={<StoreManagement />} />
+        <Route path="/developer/products" element={<GlobalProducts />} />
       </Route>
 
       {/* Fallback */}

@@ -505,9 +505,15 @@ const ProductPage = () => {
           <div className="lg:col-span-6 space-y-8 text-left">
             {/* Header Metadata */}
             <div className="space-y-4">
-              <span className="text-[10px] text-[#D4AF37] font-bold uppercase tracking-[0.3em] block">
-                {product.brand || "SmartStore Atelier"}
-              </span>
+              <div className="flex flex-wrap items-center gap-x-3 text-[10px] uppercase tracking-[0.3em] font-bold">
+                <span className="text-[#D4AF37]">
+                  {product.brand || "SmartStore Atelier"}
+                </span>
+                <span className="text-neutral-300 dark:text-neutral-700">/</span>
+                <span className="text-neutral-550">
+                  Curated by: {product.vendor?.storeName || product.vendor?.name || "SmartStore"}
+                </span>
+              </div>
               <h1 className="text-3xl sm:text-4xl font-serif text-neutral-900 dark:text-white tracking-wider leading-tight uppercase">
                 {product.name}
               </h1>

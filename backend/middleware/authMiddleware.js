@@ -46,3 +46,14 @@ export const admin = (req, res, next) => {
     res.status(403).json({ message: "Not authorized as an admin. Access denied." });
   }
 };
+
+/**
+  Express middleware to verify user is a superadmin
+ */
+export const superadmin = (req, res, next) => {
+  if (req.user && req.user.role === "superadmin") {
+    next();
+  } else {
+    res.status(403).json({ message: "Not authorized as superadmin. Access denied." });
+  }
+};

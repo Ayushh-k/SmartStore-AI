@@ -8,7 +8,8 @@ import Product from "../models/Product.js";
  */
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+      .populate("vendor", "name storeName");
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }

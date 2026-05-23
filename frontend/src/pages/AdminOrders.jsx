@@ -15,7 +15,7 @@ const AdminOrders = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await api.get("/api/admin/orders");
+      const res = await api.get("/api/vendor/orders");
       setOrders(res.data || []);
     } catch (err) {
       console.error("Fetch admin orders error:", err);

@@ -173,6 +173,10 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
           </h3>
         </Link>
 
+        <div className="text-[8px] uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500">
+          Curated by: {product.vendor?.storeName || product.vendor?.name || "SmartStore"}
+        </div>
+
         <div className="flex justify-between items-baseline">
           <span className="font-sans text-xs tracking-wider text-neutral-400">
             ${Number(product.price).toFixed(2)}

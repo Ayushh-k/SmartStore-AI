@@ -43,8 +43,8 @@ const Dashboard = () => {
       if (showLoading) setLoading(true);
       setError("");
       try {
-        const res = await api.get("/api/dashboard");
-        setMetrics(res.data.metrics || { totalProducts: 0, totalOrders: 0, totalRevenue: 0 });
+        const res = await api.get("/api/vendor/dashboard");
+        setMetrics(res.data.metrics || { totalProducts: 0, totalOrders: 0, totalRevenue: 0, lowStockCount: 0 });
         setDailySales(res.data.dailySales || []);
         setRecentSales(res.data.recentSales || []);
       } catch (err) {
@@ -203,7 +203,7 @@ const Dashboard = () => {
             {(metrics.totalProducts || 0).toLocaleString()}
           </div>
           <div className="mt-2 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-            Low-stock alerts
+            {metrics.lowStockCount || 0} low-stock alerts
           </div>
         </div>
       </div>

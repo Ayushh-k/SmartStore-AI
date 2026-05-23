@@ -255,7 +255,7 @@ const AddProduct = () => {
         ].filter(Boolean),
       };
 
-      await api.post("/api/products", payload);
+      await api.post("/api/vendor/products", payload);
       setMessage("Product created successfully with AI-enhanced content!");
       setMessageType("success");
 

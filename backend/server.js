@@ -12,6 +12,8 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import storeRoutes from "./routes/storeRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import vendorRoutes from "./routes/vendorRoutes.js";
+import developerRoutes from "./routes/developerRoutes.js";
 
 dotenv.config();
 
@@ -63,6 +65,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/vendor", vendorRoutes);
+app.use("/api/developer", developerRoutes);
 
 // Global error handler (fallback)
 app.use((err, req, res, next) => {

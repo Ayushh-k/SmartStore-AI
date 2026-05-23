@@ -12,7 +12,9 @@ import { sendOrderConfirmationEmail } from "../utils/mailer.js";
  */
 export const getPublicProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isActive: true }).sort({ createdAt: -1 });
+    const products = await Product.find({ isActive: true })
+      .populate("vendor", "name storeName")
+      .sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
     console.error("Get public products error:", error);
@@ -25,7 +27,8 @@ export const getPublicProducts = async (req, res) => {
  */
 export const getPublicProduct = async (req, res) => {
   try {
-    const product = await Product.findOne({ _id: req.params.id, isActive: true });
+    const product = await Product.findOne({ _id: req.params.id, isActive: true })
+      .populate("vendor", "name storeName");
     if (!product) {
       return res.status(404).json({ message: "Product not found or inactive." });
     }

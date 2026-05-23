@@ -171,6 +171,17 @@ const UserNavbar = () => {
             </NavLink>
           )}
 
+          {user && user.role === "superadmin" && (
+            <Link
+              to="/developer"
+              onClick={() => setIsMenuOpen(false)}
+              className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-neutral-800 dark:hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-2 flex items-center gap-1.5 w-max"
+            >
+              <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
+              <span>Developer Portal</span>
+            </Link>
+          )}
+
           {user && user.role === "admin" && (
             <Link
               to="/dashboard"
@@ -240,6 +251,16 @@ const UserNavbar = () => {
                 <Heart className="h-3.5 w-3.5 stroke-[1.5]" />
                 <span>Wishlist</span>
               </NavLink>
+            )}
+
+            {user && user.role === "superadmin" && (
+              <Link
+                to="/developer"
+                className="font-montserrat text-[10px] tracking-[0.2em] uppercase text-gold hover:text-neutral-800 dark:hover:text-white transition-colors duration-300 border border-gold/30 px-3 py-1 flex items-center gap-1.5"
+              >
+                <LayoutDashboard className="h-3 w-3 stroke-[1.5]" />
+                <span>Developer</span>
+              </Link>
             )}
 
             {user && user.role === "admin" && (
