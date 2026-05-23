@@ -13,6 +13,7 @@ const UserManagement = () => {
   const [activity, setActivity] = useState(null);
   const [activityLoading, setActivityLoading] = useState(false);
   const [activityError, setActivityError] = useState("");
+  const [vendorActiveTab, setVendorActiveTab] = useState("catalog");
 
   const fetchUsers = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -76,6 +77,7 @@ const UserManagement = () => {
     setActivityLoading(true);
     setActivityError("");
     setActivity(null);
+    setVendorActiveTab("catalog");
 
     try {
       const res = await api.get(`/api/developer/users/${user._id}/activity`);
@@ -149,50 +151,188 @@ const UserManagement = () => {
             {activityError}
           </div>
         ) : !activity ? null : selectedUser.role === "admin" ? (
-          // Vendor-specific layout (4 boxes)
-          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full">
-            {/* Box 1: STORE CATALOG */}
-            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE CATALOG</span>
-              <p className="text-3xl font-serif text-black dark:text-white mt-1">
-                {activity.vendorStats?.productCount ?? 0}
-              </p>
-              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
-                Active Products Listed
-              </span>
+          // Vendor-specific layout (4 boxes + detailed tab section)
+          <div className="space-y-8 w-full">
+            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full">
+              {/* Box 1: STORE CATALOG */}
+              <div 
+                onClick={() => setVendorActiveTab("catalog")}
+                className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
+                  vendorActiveTab === "catalog" 
+                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white" 
+                    : "border-gray-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
+                }`}
+              >
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE CATALOG</span>
+                <p className="text-3xl font-serif text-black dark:text-white mt-1">
+                  {activity.vendorStats?.productCount ?? 0}
+                </p>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-405 font-mono block mt-1">
+                  Active Products Listed &rarr;
+                </span>
+              </div>
+
+              {/* Box 2: LIFETIME REVENUE */}
+              <div 
+                onClick={() => setVendorActiveTab("revenue")}
+                className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
+                  vendorActiveTab === "revenue" 
+                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white" 
+                    : "border-gray-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
+                }`}
+              >
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">LIFETIME REVENUE</span>
+                <p className="text-3xl font-serif text-black dark:text-white mt-1">
+                  ${(activity.vendorStats?.lifetimeRevenue ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-405 font-mono block mt-1">
+                  Total Revenue Generated &rarr;
+                </span>
+              </div>
+
+              {/* Box 3: ORDERS RECEIVED */}
+              <div 
+                onClick={() => setVendorActiveTab("orders")}
+                className={`border p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none cursor-pointer transition-all duration-300 ${
+                  vendorActiveTab === "orders" 
+                    ? "border-black dark:border-white ring-1 ring-black dark:ring-white" 
+                    : "border-gray-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
+                }`}
+              >
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">ORDERS RECEIVED</span>
+                <p className="text-3xl font-serif text-black dark:text-white mt-1">
+                  {activity.vendorStats?.salesCount ?? 0}
+                </p>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-405 font-mono block mt-1">
+                  Customer Purchases &rarr;
+                </span>
+              </div>
+
+              {/* Box 4: STORE STATUS */}
+              <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE STATUS</span>
+                <p className={`text-3xl font-serif mt-1 ${selectedUser.isBanned ? "text-rose-500 font-bold" : "text-emerald-500 font-bold"}`}>
+                  {selectedUser.isBanned ? "SUSPENDED" : "ACTIVE"}
+                </p>
+                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
+                  Platform Status
+                </span>
+              </div>
             </div>
 
-            {/* Box 2: LIFETIME REVENUE */}
-            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">LIFETIME REVENUE</span>
-              <p className="text-3xl font-serif text-black dark:text-white mt-1">
-                ${(activity.vendorStats?.lifetimeRevenue ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
-              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
-                Total Revenue Generated
-              </span>
-            </div>
+            {/* Detailed Tab Content */}
+            <div className="pt-4">
+              {vendorActiveTab === "catalog" && (
+                <div className="space-y-4">
+                  <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
+                    Store Catalog ({activity.products?.length || 0})
+                  </h3>
+                  {activity.products?.length === 0 ? (
+                    <div className="border border-gray-250 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-450">
+                      No products listed in this store
+                    </div>
+                  ) : (
+                    <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black rounded-none overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-555 dark:text-neutral-455 font-bold">
+                              <th className="px-6 py-4">Product</th>
+                              <th className="px-6 py-4">SKU</th>
+                              <th className="px-6 py-4">Category</th>
+                              <th className="px-6 py-4">Price</th>
+                              <th className="px-6 py-4">Stock</th>
+                              <th className="px-6 py-4">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
+                            {activity.products.map((p) => (
+                              <tr key={p._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors">
+                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">
+                                  {p.name}
+                                </td>
+                                <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">
+                                  {p.sku || "N/A"}
+                                </td>
+                                <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">
+                                  {p.category}
+                                </td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">
+                                  ${Number(p.price).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">
+                                  {p.stock} units
+                                </td>
+                                <td className="px-6 py-4">
+                                  {p.isActive ? (
+                                    <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">
+                                      Active
+                                    </span>
+                                  ) : (
+                                    <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">
+                                      Suspended
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
-            {/* Box 3: ORDERS RECEIVED */}
-            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">ORDERS RECEIVED</span>
-              <p className="text-3xl font-serif text-black dark:text-white mt-1">
-                {activity.vendorStats?.salesCount ?? 0}
-              </p>
-              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
-                Customer Purchases
-              </span>
-            </div>
-
-            {/* Box 4: STORE STATUS */}
-            <div className="border border-gray-200 dark:border-neutral-900 p-6 bg-white dark:bg-[#060606] space-y-2 rounded-none">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">STORE STATUS</span>
-              <p className={`text-3xl font-serif mt-1 ${selectedUser.isBanned ? "text-rose-500 font-bold" : "text-emerald-500 font-bold"}`}>
-                {selectedUser.isBanned ? "SUSPENDED" : "ACTIVE"}
-              </p>
-              <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">
-                Platform Status
-              </span>
+              {(vendorActiveTab === "revenue" || vendorActiveTab === "orders") && (
+                <div className="space-y-4">
+                  <h3 className="text-xs uppercase font-bold tracking-widest text-neutral-500 border-b border-gray-200 dark:border-neutral-900 pb-2">
+                    {vendorActiveTab === "revenue" ? "Revenue Generation Log" : "Orders Received Log"} ({activity.sales?.length || 0})
+                  </h3>
+                  {activity.sales?.length === 0 ? (
+                    <div className="border border-gray-250 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-450">
+                      No sales or orders recorded for this store yet
+                    </div>
+                  ) : (
+                    <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black rounded-none overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-555 dark:text-neutral-455 font-bold">
+                              <th className="px-6 py-4">Sale Date</th>
+                              <th className="px-6 py-4">Product Name</th>
+                              <th className="px-6 py-4">Quantity Sold</th>
+                              <th className="px-6 py-4">Total Amount</th>
+                              <th className="px-6 py-4">Sales Channel</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
+                            {activity.sales.map((sale) => (
+                              <tr key={sale._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors">
+                                <td className="px-6 py-4 text-neutral-550 dark:text-neutral-455 font-mono text-[11px]">
+                                  {new Date(sale.saleDate).toLocaleString()}
+                                </td>
+                                <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">
+                                  {sale.product?.name || "Deleted Product"}
+                                </td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">
+                                  {sale.quantity}
+                                </td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400 font-bold">
+                                  ${Number(sale.totalAmount).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">
+                                  {sale.channel || "web"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -449,13 +589,19 @@ const UserManagement = () => {
                       })}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-neutral-550 dark:text-neutral-400">
-                        <span title="Orders Placed">ORD: {user.orderCount}</span>
-                        <span>&bull;</span>
-                        <span title="Wishlist Count">WSH: {user.wishlistCount}</span>
-                        <span>&bull;</span>
-                        <span title="Cart Count">CRT: {user.cartCount}</span>
-                      </div>
+                      {user.role === "admin" ? (
+                        <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-neutral-555 dark:text-neutral-400">
+                          <span title="Store Catalog Count">PRD: {user.productCount || 0}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-neutral-550 dark:text-neutral-400">
+                          <span title="Orders Placed">ORD: {user.orderCount}</span>
+                          <span>&bull;</span>
+                          <span title="Wishlist Count">WSH: {user.wishlistCount}</span>
+                          <span>&bull;</span>
+                          <span title="Cart Count">CRT: {user.cartCount}</span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {user.isBanned ? (

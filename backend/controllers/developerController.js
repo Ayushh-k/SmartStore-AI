@@ -258,6 +258,10 @@ export const getAllUsers = async (req, res) => {
     const usersData = await Promise.all(
       users.map(async (u) => {
         const orderCount = await Order.countDocuments({ user: u._id });
+        let productCount = 0;
+        if (u.role === "admin") {
+          productCount = await Product.countDocuments({ vendor: u._id });
+        }
         return {
           _id: u._id,
           name: u.name,
@@ -269,6 +273,7 @@ export const getAllUsers = async (req, res) => {
           cartCount: u.cart ? u.cart.length : 0,
           addressCount: u.addresses ? u.addresses.length : 0,
           orderCount,
+          productCount,
         };
       })
     );
@@ -370,6 +375,11 @@ export const getUserActivity = async (req, res) => {
       ]);
       const lifetimeRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
 
+      const products = await Product.find({ vendor: user._id }).sort({ createdAt: -1 });
+      const sales = await Sale.find({ product: { $in: vendorProductIds } })
+        .populate("product", "name price sku category")
+        .sort({ saleDate: -1 });
+
       return res.json({
         user,
         vendorStats: {
@@ -378,6 +388,8 @@ export const getUserActivity = async (req, res) => {
           salesCount,
           status: user.isBanned ? "Suspended" : "Active",
         },
+        products,
+        sales,
       });
     }
 
