@@ -1,6 +1,6 @@
 // frontend/src/pages/developer/GlobalProducts.jsx
 import React, { useState, useEffect } from "react";
-import { Loader2, RefreshCw, Trash2, Package } from "lucide-react";
+import { Loader2, RefreshCw, Package } from "lucide-react";
 import api from "../../utils/api.js";
 
 const GlobalProducts = () => {
@@ -57,7 +57,7 @@ const GlobalProducts = () => {
         </div>
         <button
           onClick={fetchAllProducts}
-          className="border border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white px-4 py-2 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors inline-flex items-center gap-2"
+          className="border border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white px-4 py-2 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors inline-flex items-center gap-2 cursor-pointer"
         >
           <RefreshCw className="h-3 w-3" />
           <span>Refresh</span>
@@ -76,8 +76,10 @@ const GlobalProducts = () => {
           Loading marketplace products...
         </div>
       ) : products.length === 0 ? (
-        <div className="border border-dashed border-gray-200 dark:border-neutral-900 py-16 text-center text-neutral-500 dark:text-neutral-550 text-[10px] uppercase tracking-widest">
-          No catalog products have been registered on the platform
+        <div className="border border-black/10 dark:border-white/10 py-24 text-center rounded-none bg-white dark:bg-black">
+          <span className="text-xs font-serif tracking-[0.2em] uppercase text-neutral-600 dark:text-neutral-450 font-light">
+            NO CATALOG PRODUCTS REGISTERED ON THE PLATFORM.
+          </span>
         </div>
       ) : (
         <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black rounded-none overflow-hidden">
@@ -85,11 +87,10 @@ const GlobalProducts = () => {
             <table className="w-full border-collapse text-left text-xs">
               <thead>
                 <tr className="border-b border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-550 dark:text-neutral-450 font-bold">
+                  <th className="px-6 py-4">Image</th>
                   <th className="px-6 py-4">Product Name</th>
                   <th className="px-6 py-4">Vendor Name</th>
-                  <th className="px-6 py-4">Store Brand</th>
                   <th className="px-6 py-4 text-right">Price</th>
-                  <th className="px-6 py-4 text-right">Stock</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -100,43 +101,40 @@ const GlobalProducts = () => {
                     className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors"
                   >
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 border border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-black overflow-hidden flex items-center justify-center shrink-0 rounded-none">
-                          {product.images && product.images[0] ? (
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.parentNode.querySelector(".fallback-pkg").classList.remove("hidden");
-                              }}
-                            />
-                          ) : null}
-                          <Package className={`fallback-pkg h-4 w-4 text-neutral-400 dark:text-neutral-500 ${product.images && product.images[0] ? "hidden" : ""}`} />
-                        </div>
-                        <div className="font-semibold text-black dark:text-white tracking-wide">
-                          {product.name}
-                        </div>
+                      <div className="h-12 w-10 border border-gray-200 dark:border-neutral-900 bg-gray-50 dark:bg-black overflow-hidden flex items-center justify-center shrink-0 rounded-none">
+                        {product.images && product.images[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                              e.target.parentNode.querySelector(".fallback-pkg").classList.remove("hidden");
+                            }}
+                          />
+                        ) : null}
+                        <Package className={`fallback-pkg h-4 w-4 text-neutral-400 dark:text-neutral-500 ${product.images && product.images[0] ? "hidden" : ""}`} />
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-neutral-550 dark:text-neutral-400">
-                      {product.vendor?.name || "Unknown Merchant"}
+                    <td className="px-6 py-4 font-semibold text-black dark:text-white tracking-wide">
+                      {product.name}
                     </td>
-                    <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300 font-serif">
-                      {product.vendor?.storeName || "Unnamed Store"}
+                    <td className="px-6 py-4">
+                      <div className="text-neutral-800 dark:text-white font-medium">
+                        {product.vendor?.name || "Unknown Merchant"}
+                      </div>
+                      <div className="text-[10px] text-neutral-500 font-serif">
+                        {product.vendor?.storeName || "Unnamed Store"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right font-medium text-black dark:text-white">
                       ${Number(product.price).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 text-right text-neutral-550 dark:text-neutral-400">
-                      {product.stock}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleDelete(product._id)}
                         disabled={deletingId === product._id}
-                        className="text-red-500 hover:text-white hover:bg-red-600 border border-transparent hover:border-red-600 px-3 py-1 text-[10px] tracking-wider uppercase font-semibold transition-colors duration-250 cursor-pointer rounded-none bg-transparent"
+                        className="text-red-650 font-semibold text-xs tracking-widest uppercase hover:opacity-70 transition-opacity bg-transparent cursor-pointer"
                       >
                         {deletingId === product._id ? "Deleting..." : "DELETE"}
                       </button>

@@ -8,6 +8,7 @@ import {
   deleteStore,
   getStoreCatalog,
   deleteProduct,
+  getAllPlatformProducts,
 } from "../controllers/developerController.js";
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.put("/vendors/:id/ban", protect, superadmin, toggleStoreBan);
 router.delete("/vendors/:id", protect, superadmin, deleteStore);
 
 // Catalog Drill-Down & Moderation
+router.get("/products", protect, superadmin, getAllPlatformProducts);
 router.get("/vendors/:vendorId/catalog", protect, superadmin, getStoreCatalog);
 router.delete("/products/:id", protect, superadmin, deleteProduct);
 

@@ -227,3 +227,20 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Failed to delete product." });
   }
 };
+
+/**
+  GET /api/developer/products
+  Retrieves all products on the platform populated with vendor info.
+ */
+export const getAllPlatformProducts = async (req, res) => {
+  try {
+    const products = await Product.find({})
+      .populate("vendor", "name storeName email")
+      .sort({ createdAt: -1 });
+    res.json(products);
+  } catch (error) {
+    console.error("Get all platform products error:", error);
+    res.status(500).json({ message: "Failed to fetch platform products." });
+  }
+};
+
