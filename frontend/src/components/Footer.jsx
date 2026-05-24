@@ -9,11 +9,13 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSent, setIsSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !message) return;
+    if (!email || !message || isSending) return;
     
+    setIsSending(true);
     try {
       await api.post("/api/contact", { email, message });
       setIsSent(true);
@@ -25,6 +27,8 @@ const Footer = () => {
     } catch (err) {
       console.error("Send message error:", err);
       alert(err?.response?.data?.message || "Failed to send your message. Please try again.");
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -140,10 +144,17 @@ const Footer = () => {
                 </div>
                 <button
                   type="submit"
-                  className="bg-black text-white dark:bg-white dark:text-black py-3 px-6 text-[10px] uppercase tracking-widest font-semibold hover:bg-neutral-805 dark:hover:bg-neutral-200 transition-colors w-full rounded-none text-center flex items-center justify-center gap-2"
+                  disabled={isSending}
+                  className="bg-black text-white dark:bg-white dark:text-black py-3 px-6 text-[10px] uppercase tracking-widest font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors w-full rounded-none text-center flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="h-3 w-3 stroke-[1.5]" />
-                  <span>Send Message</span>
+                  {isSending ? (
+                    <span className="animate-pulse">Sending...</span>
+                  ) : (
+                    <>
+                      <Send className="h-3 w-3 stroke-[1.5]" />
+                      <span>Send Message</span>
+                    </>
+                  )}
                 </button>
               </form>
             )}
