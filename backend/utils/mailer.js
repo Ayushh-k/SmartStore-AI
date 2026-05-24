@@ -1,6 +1,6 @@
 // backend/utils/mailer.js
 
-import nodemailer from "nodemailer";
+import { transporter } from "../config/mail.js";
 
 /**
  * Sends a premium "Luxury Store Editorial" HTML confirmation email for a completed order.
@@ -9,19 +9,6 @@ import nodemailer from "nodemailer";
  * @param {object} order Order document from Database
  */
 export const sendOrderConfirmationEmail = async (userEmail, userName, order) => {
-  // Check if credentials exist
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn("Mail environment variables not configured. Skipping confirmation email.");
-    return;
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
 
   // Calculate items count
   const itemsCount = order.products?.reduce((acc, curr) => acc + curr.quantity, 0) || 0;
@@ -166,6 +153,17 @@ export const sendOrderConfirmationEmail = async (userEmail, userName, order) => 
                   <td style="padding: 12px 0 0 0; text-align: right; font-size: 14px; font-weight: bold; color: #000000;">$${order.totalAmount.toFixed(2)}</td>
                 </tr>
               </table>
+            </td>
+          </tr>
+
+          <!-- Tracking Link Link -->
+          <tr>
+            <td style="padding: 0 40px 40px 40px; text-align: center;">
+              <div style="margin-top: 10px;">
+                <a href="${process.env.CLIENTURL || 'http://localhost:5173'}/profile" style="display: inline-block; background-color: #000000; color: #ffffff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: bold; text-decoration: none; text-transform: uppercase; letter-spacing: 0.15em; padding: 14px 28px; border: 1px solid #000000;">
+                  Track Order In Profile
+                </a>
+              </div>
             </td>
           </tr>
 

@@ -3,23 +3,29 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Send, Check } from "lucide-react";
+import api from "../utils/api.js";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSent, setIsSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !message) return;
     
-    // Simulate API call
-    setIsSent(true);
-    setTimeout(() => {
-      setEmail("");
-      setMessage("");
-      setIsSent(false);
-    }, 3000);
+    try {
+      await api.post("/api/contact", { email, message });
+      setIsSent(true);
+      setTimeout(() => {
+        setEmail("");
+        setMessage("");
+        setIsSent(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Send message error:", err);
+      alert(err?.response?.data?.message || "Failed to send your message. Please try again.");
+    }
   };
 
   return (
