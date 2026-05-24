@@ -1,6 +1,6 @@
 // frontend/src/pages/developer/UserManagement.jsx
 import React, { useState, useEffect } from "react";
-import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin, X, Package, Tag, Layers, Palette } from "lucide-react";
+import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin, X, Package, Tag, Layers, Palette, Store, Users, ChevronRight, ArrowLeft } from "lucide-react";
 import api from "../../utils/api.js";
 
 const UserManagement = () => {
@@ -15,6 +15,8 @@ const UserManagement = () => {
   const [activityError, setActivityError] = useState("");
   const [vendorActiveTab, setVendorActiveTab] = useState("catalog");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  // null = show picker, "vendors" = show vendor table, "customers" = show customer table
+  const [activeView, setActiveView] = useState(null);
 
   const fetchUsers = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -641,7 +643,7 @@ const UserManagement = () => {
   }
 
   // ══════════════════════════════════════════════════════════
-  // MAIN LIST VIEW — Split into Vendors + Customers
+  // MAIN LIST VIEW — Role Picker → then show selected table
   // ══════════════════════════════════════════════════════════
   const vendors = users.filter((u) => u.role === "admin");
   const customers = users.filter((u) => u.role !== "admin");
@@ -650,13 +652,28 @@ const UserManagement = () => {
     <div className="space-y-8 animate-fadeIn text-left relative">
       {/* Page Header */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 pb-5">
-        <div>
-          <h2 className="font-serif text-xl tracking-widest uppercase text-black dark:text-white">
-            User Management
-          </h2>
-          <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-455 mt-0.5">
-            Monitor, manage, and audit registered platform customers and vendor accounts
-          </p>
+        <div className="flex items-center gap-4">
+          {activeView && (
+            <button
+              onClick={() => setActiveView(null)}
+              className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.25em] font-semibold text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="h-3 w-3" />
+              All Users
+            </button>
+          )}
+          <div>
+            <h2 className="font-serif text-xl tracking-widest uppercase text-black dark:text-white">
+              {activeView === "vendors" ? "Vendor / Store Owners" : activeView === "customers" ? "Customer Accounts" : "User Management"}
+            </h2>
+            <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-455 mt-0.5">
+              {activeView === "vendors"
+                ? "Merchant accounts and their store catalog"
+                : activeView === "customers"
+                ? "Registered shopper accounts and activity"
+                : "Select an account type to manage"}
+            </p>
+          </div>
         </div>
         <button
           onClick={() => fetchUsers(true)}
@@ -678,158 +695,258 @@ const UserManagement = () => {
           <Loader2 className="h-5 w-5 animate-spin text-black dark:text-white mr-2" />
           Loading platform users...
         </div>
-      ) : (
-        <div className="space-y-14">
+      ) : !activeView ? (
 
-          {/* ══ SECTION 1: VENDOR / STORE OWNERS ══ */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block mb-0.5">Merchant Accounts</span>
-                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">Vendor / Store Owners</h3>
-              </div>
-              <span className="border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
-                {vendors.length} Vendors
-              </span>
-            </div>
+        // ══════════════════════════════════════════════════════════
+        // ROLE PICKER — Choose which table to view
+        // ══════════════════════════════════════════════════════════
+        <div className="space-y-6">
+          <p className="text-[10px] uppercase tracking-widest text-neutral-400 font-mono">
+            Select an account category to view and manage
+          </p>
 
-            {vendors.length === 0 ? (
-              <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
-                No vendor accounts registered on the platform
-              </div>
-            ) : (
-              <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-neutral-900 bg-amber-50/70 dark:bg-amber-950/15 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
-                        <th className="px-6 py-4">Vendor Name</th>
-                        <th className="px-6 py-4">Email Address</th>
-                        <th className="px-6 py-4">Joined Date</th>
-                        <th className="px-6 py-4 text-center">Store Catalog</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
-                      {vendors.map((user) => (
-                        <tr key={user._id} className={`hover:bg-amber-50/40 dark:hover:bg-amber-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}>
-                          <td className="px-6 py-4">
-                            <span className="font-serif font-bold text-black dark:text-white tracking-wide uppercase block leading-tight">{user.name}</span>
-                            <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 uppercase tracking-wider">Vendor / Merchant</span>
-                          </td>
-                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
-                          <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
-                            {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="font-mono text-sm font-bold text-black dark:text-white">{user.productCount || 0}</span>
-                            <span className="text-[9px] text-neutral-400 ml-1 uppercase tracking-wider">products</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            {user.isBanned ? (
-                              <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Suspended</span>
-                            ) : (
-                              <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
-                              <button onClick={() => handleViewActivity(user)} className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer">View Store</button>
-                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button onClick={() => handleToggleBan(user._id)} className={`transition-colors cursor-pointer ${user.isBanned ? "text-emerald-600 hover:text-emerald-500" : "text-amber-600 hover:text-amber-500"}`}>
-                                {user.isBanned ? "Unban" : "Suspend"}
-                              </button>
-                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button onClick={() => handleDeleteUser(user)} className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer">Delete</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* ── VENDOR CARD ── */}
+            <button
+              onClick={() => setActiveView("vendors")}
+              className="group text-left border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#060606] hover:border-amber-400 dark:hover:border-amber-500 p-8 rounded-none transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5 cursor-pointer"
+            >
+              <div className="flex items-start justify-between">
+                <div className="border border-amber-400/30 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-none group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30 transition-colors">
+                  <Store className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                 </div>
+                <ChevronRight className="h-5 w-5 text-neutral-300 dark:text-neutral-700 group-hover:text-amber-500 group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            )}
-          </div>
 
-          {/* Dashed Divider */}
-          <div className="border-t border-dashed border-gray-200 dark:border-neutral-800" />
-
-          {/* ══ SECTION 2: CUSTOMER ACCOUNTS ══ */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-sky-500 block mb-0.5">Registered Shoppers</span>
-                <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">Customer Accounts</h3>
+              <div className="mt-6">
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block mb-1">
+                  Merchant Accounts
+                </span>
+                <h3 className="font-serif text-2xl tracking-widest uppercase text-black dark:text-white">
+                  Vendors
+                </h3>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed">
+                  View and manage store owners, their product catalogs, revenue, and platform standing.
+                </p>
               </div>
-              <span className="border border-sky-500/40 bg-sky-500/10 text-sky-600 dark:text-sky-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
-                {customers.length} Customers
-              </span>
-            </div>
 
-            {customers.length === 0 ? (
-              <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
-                No customer accounts registered on the platform
-              </div>
-            ) : (
-              <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-neutral-900 bg-sky-50/70 dark:bg-sky-950/15 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
-                        <th className="px-6 py-4">Customer Name</th>
-                        <th className="px-6 py-4">Email Address</th>
-                        <th className="px-6 py-4">Joined Date</th>
-                        <th className="px-6 py-4 text-center">Orders</th>
-                        <th className="px-6 py-4 text-center">Wishlist</th>
-                        <th className="px-6 py-4 text-center">Cart</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
-                      {customers.map((user) => (
-                        <tr key={user._id} className={`hover:bg-sky-50/30 dark:hover:bg-sky-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}>
-                          <td className="px-6 py-4">
-                            <span className="font-semibold text-black dark:text-white tracking-wide block leading-tight">{user.name}</span>
-                            <span className="text-[9px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider">Customer</span>
-                          </td>
-                          <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
-                          <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
-                            {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                          </td>
-                          <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.orderCount ?? 0}</span></td>
-                          <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.wishlistCount ?? 0}</span></td>
-                          <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.cartCount ?? 0}</span></td>
-                          <td className="px-6 py-4">
-                            {user.isBanned ? (
-                              <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Banned</span>
-                            ) : (
-                              <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
-                              <button onClick={() => handleViewActivity(user)} className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer">View Activity</button>
-                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button onClick={() => handleToggleBan(user._id)} className="text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
-                                {user.isBanned ? "Unban" : "Ban"}
-                              </button>
-                              <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
-                              <button onClick={() => handleDeleteUser(user)} className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer">Delete</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <div className="mt-6 pt-4 border-t border-gray-100 dark:border-neutral-900 flex items-center gap-6">
+                <div>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{vendors.length}</span>
+                  <span className="text-[9px] text-neutral-400 uppercase tracking-widest ml-1">Registered</span>
                 </div>
+                <div>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{vendors.filter(v => !v.isBanned).length}</span>
+                  <span className="text-[9px] text-emerald-500 uppercase tracking-widest ml-1">Active</span>
+                </div>
+                {vendors.filter(v => v.isBanned).length > 0 && (
+                  <div>
+                    <span className="text-2xl font-serif font-bold text-rose-500">{vendors.filter(v => v.isBanned).length}</span>
+                    <span className="text-[9px] text-rose-400 uppercase tracking-widest ml-1">Suspended</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </button>
 
+            {/* ── CUSTOMER CARD ── */}
+            <button
+              onClick={() => setActiveView("customers")}
+              className="group text-left border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#060606] hover:border-sky-400 dark:hover:border-sky-500 p-8 rounded-none transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/5 cursor-pointer"
+            >
+              <div className="flex items-start justify-between">
+                <div className="border border-sky-400/30 bg-sky-50 dark:bg-sky-950/20 p-3 rounded-none group-hover:bg-sky-100 dark:group-hover:bg-sky-900/30 transition-colors">
+                  <Users className="h-6 w-6 text-sky-600 dark:text-sky-400" />
+                </div>
+                <ChevronRight className="h-5 w-5 text-neutral-300 dark:text-neutral-700 group-hover:text-sky-500 group-hover:translate-x-1 transition-all duration-300" />
+              </div>
+
+              <div className="mt-6">
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-sky-500 block mb-1">
+                  Registered Shoppers
+                </span>
+                <h3 className="font-serif text-2xl tracking-widest uppercase text-black dark:text-white">
+                  Customers
+                </h3>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed">
+                  View and manage shoppers, their order history, wishlist, cart activity, and account status.
+                </p>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-100 dark:border-neutral-900 flex items-center gap-6">
+                <div>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{customers.length}</span>
+                  <span className="text-[9px] text-neutral-400 uppercase tracking-widest ml-1">Registered</span>
+                </div>
+                <div>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{customers.filter(c => !c.isBanned).length}</span>
+                  <span className="text-[9px] text-emerald-500 uppercase tracking-widest ml-1">Active</span>
+                </div>
+                {customers.filter(c => c.isBanned).length > 0 && (
+                  <div>
+                    <span className="text-2xl font-serif font-bold text-rose-500">{customers.filter(c => c.isBanned).length}</span>
+                    <span className="text-[9px] text-rose-400 uppercase tracking-widest ml-1">Banned</span>
+                  </div>
+                )}
+              </div>
+            </button>
+
+          </div>
         </div>
+
+      ) : activeView === "vendors" ? (
+
+        // ══════════════════════════════════════════════════════════
+        // VENDOR TABLE
+        // ══════════════════════════════════════════════════════════
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block mb-0.5">Merchant Accounts</span>
+              <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">Vendor / Store Owners</h3>
+            </div>
+            <span className="border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
+              {vendors.length} Vendors
+            </span>
+          </div>
+
+          {vendors.length === 0 ? (
+            <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
+              No vendor accounts registered on the platform
+            </div>
+          ) : (
+            <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-neutral-900 bg-amber-50/70 dark:bg-amber-950/15 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
+                      <th className="px-6 py-4">Vendor Name</th>
+                      <th className="px-6 py-4">Email Address</th>
+                      <th className="px-6 py-4">Joined Date</th>
+                      <th className="px-6 py-4 text-center">Store Catalog</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
+                    {vendors.map((user) => (
+                      <tr key={user._id} className={`hover:bg-amber-50/40 dark:hover:bg-amber-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}>
+                        <td className="px-6 py-4">
+                          <span className="font-serif font-bold text-black dark:text-white tracking-wide uppercase block leading-tight">{user.name}</span>
+                          <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 uppercase tracking-wider">Vendor / Merchant</span>
+                        </td>
+                        <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
+                        <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
+                          {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="font-mono text-sm font-bold text-black dark:text-white">{user.productCount || 0}</span>
+                          <span className="text-[9px] text-neutral-400 ml-1 uppercase tracking-wider">products</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {user.isBanned ? (
+                            <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Suspended</span>
+                          ) : (
+                            <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
+                            <button onClick={() => handleViewActivity(user)} className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer">View Store</button>
+                            <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                            <button onClick={() => handleToggleBan(user._id)} className={`transition-colors cursor-pointer ${user.isBanned ? "text-emerald-600 hover:text-emerald-500" : "text-amber-600 hover:text-amber-500"}`}>
+                              {user.isBanned ? "Unban" : "Suspend"}
+                            </button>
+                            <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                            <button onClick={() => handleDeleteUser(user)} className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+      ) : (
+
+        // ══════════════════════════════════════════════════════════
+        // CUSTOMER TABLE
+        // ══════════════════════════════════════════════════════════
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-sky-500 block mb-0.5">Registered Shoppers</span>
+              <h3 className="font-serif text-base tracking-widest uppercase text-black dark:text-white">Customer Accounts</h3>
+            </div>
+            <span className="border border-sky-500/40 bg-sky-500/10 text-sky-600 dark:text-sky-400 px-3 py-1 text-[9px] uppercase tracking-widest font-bold font-mono">
+              {customers.length} Customers
+            </span>
+          </div>
+
+          {customers.length === 0 ? (
+            <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
+              No customer accounts registered on the platform
+            </div>
+          ) : (
+            <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-neutral-900 bg-sky-50/70 dark:bg-sky-950/15 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
+                      <th className="px-6 py-4">Customer Name</th>
+                      <th className="px-6 py-4">Email Address</th>
+                      <th className="px-6 py-4">Joined Date</th>
+                      <th className="px-6 py-4 text-center">Orders</th>
+                      <th className="px-6 py-4 text-center">Wishlist</th>
+                      <th className="px-6 py-4 text-center">Cart</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
+                    {customers.map((user) => (
+                      <tr key={user._id} className={`hover:bg-sky-50/30 dark:hover:bg-sky-950/10 transition-colors ${user.isBanned ? "opacity-50" : ""}`}>
+                        <td className="px-6 py-4">
+                          <span className="font-semibold text-black dark:text-white tracking-wide block leading-tight">{user.name}</span>
+                          <span className="text-[9px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider">Customer</span>
+                        </td>
+                        <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
+                        <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
+                          {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                        </td>
+                        <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.orderCount ?? 0}</span></td>
+                        <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.wishlistCount ?? 0}</span></td>
+                        <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.cartCount ?? 0}</span></td>
+                        <td className="px-6 py-4">
+                          {user.isBanned ? (
+                            <span className="inline-block border border-rose-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-rose-500/10 text-rose-500">Banned</span>
+                          ) : (
+                            <span className="inline-block border border-emerald-500 px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-500">Active</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-3 text-xs uppercase tracking-widest font-semibold">
+                            <button onClick={() => handleViewActivity(user)} className="text-black dark:text-white hover:opacity-70 transition-opacity cursor-pointer">View Activity</button>
+                            <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                            <button onClick={() => handleToggleBan(user._id)} className="text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                              {user.isBanned ? "Unban" : "Ban"}
+                            </button>
+                            <span className="text-neutral-300 dark:text-neutral-700 select-none">&bull;</span>
+                            <button onClick={() => handleDeleteUser(user)} className="text-rose-600 hover:opacity-70 transition-opacity cursor-pointer">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
       )}
     </div>
   );
