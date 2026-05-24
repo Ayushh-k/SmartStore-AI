@@ -17,6 +17,7 @@ export const transporter = nodemailer.createTransport({
   },
   connectionTimeout: 10000,
   socketTimeout: 10000,
+  family: 4,
 });
 
 // Robust error logging on the transporter verification check
