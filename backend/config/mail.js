@@ -8,15 +8,13 @@ const emailUser = process.env.EMAIL_USER || "ayushkamboj9690@gmail.com";
 const emailPass = process.env.EMAIL_PASS || "uixdgepsnsmyysol";
 
 export const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
     user: emailUser,
     pass: emailPass,
   },
-  connectionTimeout: 10000,
-  socketTimeout: 10000,
+  connectionTimeout: 15000,
+  socketTimeout: 15000,
   family: 4,
 });
 
