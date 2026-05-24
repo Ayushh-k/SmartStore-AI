@@ -53,8 +53,28 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Auth error:", err);
-      if (err?.response?.status === 403 && err.response.data?.message === "Account Suspended") {
-        navigate("/suspended", { state: { reason: err.response.data.banReason } });
+      if (err?.response?.status === 403) {
+        if (err.response.data?.message === "Account Suspended") {
+          navigate("/suspended", { state: { reason: err.response.data.banReason } });
+        } else if (err.response.data?.message === "Account not verified.") {
+          const email = err.response.data.unverifiedEmail;
+          setError(
+            <span>
+              Account not verified.{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/signup", { state: { email, step: 2 } })}
+                className="underline font-bold text-black dark:text-white hover:text-gold transition-colors focus:outline-none ml-1 cursor-pointer"
+              >
+                Click here to verify your account
+              </button>
+            </span>
+          );
+        } else {
+          setError(
+            err.response.data?.message || "Access denied."
+          );
+        }
       } else {
         setError(
           err?.response?.data?.message || "Authentication failed. Please check your credentials."

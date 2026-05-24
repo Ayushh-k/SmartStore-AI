@@ -1,14 +1,20 @@
 // frontend/src/pages/Signup.jsx
 
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api from "../utils/api.js";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [step, setStep] = useState(location.state?.step || 1);
+  const [unverifiedEmail, setUnverifiedEmail] = useState(location.state?.email || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resendSuccess, setResendSuccess] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -21,23 +27,51 @@ const Signup = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Step 1: Handle registration submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setResendSuccess("");
 
     try {
-      const res = await api.post("/api/auth/register", {
+      await api.post("/api/auth/register", {
         name: form.name,
         email: form.email,
         password: form.password,
         role: form.role,
       });
       
-      // Store token and user info
+      // Navigate to OTP step
+      setUnverifiedEmail(form.email);
+      setStep(2);
+    } catch (err) {
+      console.error("Auth registration error:", err);
+      setError(
+        err?.response?.data?.message || "Registration failed. Please check your inputs."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Handle OTP verification submit
+  const handleVerifySubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setResendSuccess("");
+
+    try {
+      const res = await api.post("/api/auth/verify", {
+        email: unverifiedEmail,
+        otp: otpCode,
+      });
+
+      // Store token and user details on verification success
       localStorage.setItem("smartstoretoken", res.data.token);
       localStorage.setItem("smartstoreuser", JSON.stringify(res.data.user));
-      
+
       // Redirect based on role
       const role = res.data.role || (res.data.user && res.data.user.role);
       if (role === "admin") {
@@ -48,9 +82,30 @@ const Signup = () => {
         navigate("/");
       }
     } catch (err) {
-      console.error("Auth registration error:", err);
+      console.error("Auth verification error:", err);
       setError(
-        err?.response?.data?.message || "Registration failed. Please check your inputs."
+        err?.response?.data?.message || "Verification failed. Please check the code."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Handle resending OTP code
+  const handleResendOtp = async () => {
+    setLoading(true);
+    setError("");
+    setResendSuccess("");
+
+    try {
+      const res = await api.post("/api/auth/resend-otp", {
+        email: unverifiedEmail,
+      });
+      setResendSuccess(res.data.message || "A new code has been sent.");
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+      setError(
+        err?.response?.data?.message || "Failed to resend verification code."
       );
     } finally {
       setLoading(false);
@@ -80,114 +135,199 @@ const Signup = () => {
           </div>
         </div>
 
-        {/* Right Side: Form Area */}
+        {/* Right Side: Dynamic Form Area */}
         <div className="flex flex-col justify-center items-center px-8 sm:px-16 md:px-24 py-12 bg-white dark:bg-black transition-colors duration-300">
           <div className="w-full max-w-md space-y-8 text-left">
-            <div className="space-y-3">
-              <h2 className="text-3xl sm:text-4xl font-serif font-light tracking-wide uppercase">
-                Create Account
-              </h2>
-              <p className="text-xs text-neutral-550 dark:text-neutral-400 font-sans tracking-widest uppercase">
-                Register to explore the editorial collection.
-              </p>
-            </div>
+            
+            {step === 1 ? (
+              // Step 1: Standard Sign Up Form
+              <>
+                <div className="space-y-3">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-light tracking-wide uppercase">
+                    Create Account
+                  </h2>
+                  <p className="text-xs text-neutral-550 dark:text-neutral-400 font-sans tracking-widest uppercase">
+                    Register to explore the editorial collection.
+                  </p>
+                </div>
 
-            {error && (
-              <div className="border-l border-rose-500 bg-rose-950/10 px-4 py-3 text-xs text-rose-450 font-sans">
-                {error}
-              </div>
+                {error && (
+                  <div className="border-l border-rose-500 bg-rose-950/10 px-4 py-3 text-xs text-rose-450 font-sans">
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      value={form.name}
+                      onChange={handleChange}
+                      className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
+                      placeholder="John Doe"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
+                      Register As
+                    </label>
+                    <select
+                      name="role"
+                      value={form.role}
+                      onChange={handleChange}
+                      className="input cursor-pointer border-b border-black/15 dark:border-white/20 bg-transparent text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white select-luxury text-sm py-2.5 w-full rounded-none"
+                    >
+                      <option value="user" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Customer (Storefront)</option>
+                      <option value="admin" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Administrator (Dashboard)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={form.email}
+                      onChange={handleChange}
+                      className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
+                      placeholder="name@domain.com"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      required
+                      minLength={6}
+                      value={form.password}
+                      onChange={handleChange}
+                      className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-black dark:bg-white text-white dark:text-black py-4 uppercase tracking-[0.2em] font-semibold text-xs rounded-none hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Register"
+                      )}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="border-t border-black/10 dark:border-white/5 pt-6 space-y-4">
+                  <p className="text-xs text-neutral-500 font-sans tracking-wider">
+                    Already have an account?{" "}
+                    <Link to="/login" className="text-black dark:text-white hover:text-gold transition-colors font-medium">
+                      Sign In
+                    </Link>
+                  </p>
+                  <p className="text-[10px] text-neutral-600 dark:text-neutral-450 font-sans tracking-widest uppercase">
+                    <Link to="/" className="text-neutral-550 hover:text-black dark:hover:text-white transition-colors">
+                      Browse as Guest / Back to Home
+                    </Link>
+                  </p>
+                </div>
+              </>
+            ) : (
+              // Step 2: OTP Verification UI
+              <>
+                <div className="space-y-3">
+                  <h2 className="text-3xl sm:text-4xl font-serif font-light tracking-wide uppercase">
+                    VERIFY YOUR IDENTITY
+                  </h2>
+                  <p className="text-xs text-neutral-550 dark:text-neutral-400 font-sans tracking-widest uppercase leading-relaxed">
+                    A 6-digit authorization code has been dispatched to <strong className="text-black dark:text-white font-medium">{unverifiedEmail}</strong>.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="border-l border-rose-500 bg-rose-950/10 px-4 py-3 text-xs text-rose-450 font-sans">
+                    {error}
+                  </div>
+                )}
+
+                {resendSuccess && (
+                  <div className="border-l border-emerald-500 bg-emerald-950/10 px-4 py-3 text-xs text-emerald-450 font-sans">
+                    {resendSuccess}
+                  </div>
+                )}
+
+                <form onSubmit={handleVerifySubmit} className="space-y-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
+                      Authorization Code
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      required
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      className="border-b border-gray-300 dark:border-white/20 bg-transparent text-center text-2xl tracking-[1em] focus:outline-none w-full py-4 text-black dark:text-white font-sans font-light pl-[0.5em]"
+                      placeholder="000000"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={loading || otpCode.length !== 6}
+                      className="w-full bg-black dark:bg-white text-white dark:text-black py-4 uppercase tracking-[0.2em] font-semibold text-xs rounded-none hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Verify Account"
+                      )}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="border-t border-black/10 dark:border-white/5 pt-6 flex justify-between items-center text-xs font-sans tracking-wider">
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={handleResendOtp}
+                    className="text-black dark:text-white hover:text-gold transition-colors underline font-medium cursor-pointer disabled:opacity-50"
+                  >
+                    Resend Code
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => {
+                      setStep(1);
+                      setError("");
+                      setResendSuccess("");
+                    }}
+                    className="text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                  >
+                    Back to Signup
+                  </button>
+                </div>
+              </>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={form.name}
-                  onChange={handleChange}
-                  className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
-                  placeholder="John Doe"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
-                  Register As
-                </label>
-                <select
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  className="input cursor-pointer border-b border-black/15 dark:border-white/20 bg-transparent text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white select-luxury text-sm py-2.5 w-full rounded-none"
-                >
-                  <option value="user" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Customer (Storefront)</option>
-                  <option value="admin" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Administrator (Dashboard)</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={form.email}
-                  onChange={handleChange}
-                  className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
-                  placeholder="name@domain.com"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  minLength={6}
-                  value={form.password}
-                  onChange={handleChange}
-                  className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 uppercase tracking-[0.2em] font-semibold text-xs rounded-none hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Register"
-                  )}
-                </button>
-              </div>
-            </form>
-
-            <div className="border-t border-black/10 dark:border-white/5 pt-6 space-y-4">
-              <p className="text-xs text-neutral-500 font-sans tracking-wider">
-                Already have an account?{" "}
-                <Link to="/login" className="text-black dark:text-white hover:text-gold transition-colors font-medium">
-                  Sign In
-                </Link>
-              </p>
-              <p className="text-[10px] text-neutral-600 dark:text-neutral-450 font-sans tracking-widest uppercase">
-                <Link to="/" className="text-neutral-550 hover:text-black dark:hover:text-white transition-colors">
-                  Browse as Guest / Back to Home
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
 

@@ -41,6 +41,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationOtp: {
+      type: String,
+    },
+    otpExpire: {
+      type: Date,
+    },
     cart: [
       {
         product: {
