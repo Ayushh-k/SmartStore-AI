@@ -13,8 +13,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("smartstoretoken");
-    if (token) {
+    if (token && token !== "undefined" && token !== "null" && token.trim() !== "") {
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      // Ensure we don't send a bad header
+      delete config.headers.Authorization;
     }
     return config;
   },

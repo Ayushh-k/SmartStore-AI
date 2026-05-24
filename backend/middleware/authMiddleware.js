@@ -16,8 +16,9 @@ export const protect = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
 
-  if (!token) {
-    return res.status(401).json({ message: "Not authorized, no token." });
+  // CRITICAL CHECK: Reject undefined, null, or empty token strings
+  if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+    return res.status(401).json({ message: "Not authorized, token failed or is undefined" });
   }
 
   try {

@@ -248,18 +248,22 @@ export const verifyAccount = async (req, res) => {
     user.otpExpire = undefined;
     await user.save();
 
-    const token = generateToken(user.id);
+    const token = generateToken(user._id);
 
-    res.json({
-      message: "Account verified successfully.",
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: token,
       user: {
         id: user.id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
-        storeName: user.storeName,
+        storeName: user.storeName || "",
       },
-      token,
     });
   } catch (error) {
     console.error("Verification error:", error);
