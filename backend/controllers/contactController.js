@@ -1,5 +1,4 @@
-// backend/controllers/contactController.js
-import { transporter } from "../config/mail.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 /**
  * Handles dual-route contact form submission.
@@ -141,17 +140,21 @@ ${message}
       html: userHtml,
     };
 
-    // Execute both asynchronously in the background (non-blocking)
-    Promise.all([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(userMailOptions),
-    ])
-      .then(() => {
-        console.log(`[CONTACT METRICS] Successfully processed storefront ticket from ${userEmail}`);
-      })
-      .catch((mailError) => {
-        console.error("❌ Dual contact email background dispatch error:", mailError);
-      });
+    // Execute both asynchronously using Promise.all
+    await Promise.all([
+      sendEmail({
+        to: process.env.EMAIL_USER || "ayushkamboj9690@gmail.com",
+        subject: `[PLATFORM ISSUE LOG] - Storefront Ticket from ${userEmail}`,
+        htmlContent: adminHtml,
+      }),
+      sendEmail({
+        to: userEmail,
+        subject: "We have received your request — SMARTSTORE",
+        htmlContent: userHtml,
+      }),
+    ]);
+
+    console.log(`[CONTACT METRICS] Successfully processed storefront ticket from ${userEmail}`);
 
     res.status(200).json({
       success: true,

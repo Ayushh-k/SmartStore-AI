@@ -1,6 +1,4 @@
-// backend/utils/mailer.js
-
-import { transporter } from "../config/mail.js";
+import { sendEmail } from "./sendEmail.js";
 
 /**
  * Sends a premium "Luxury Store Editorial" HTML confirmation email for a completed order.
@@ -203,16 +201,12 @@ export const sendOrderConfirmationEmail = async (userEmail, userName, order) => 
 </html>
   `;
 
-  const mailOptions = {
-    from: `"SmartStore Atelier" <${process.env.EMAIL_USER}>`,
-    to: userEmail,
-    subject: `Order Confirmation - Order #${order._id}`,
-    html: htmlContent,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Order confirmation email sent successfully to", userEmail);
+    await sendEmail({
+      to: userEmail,
+      subject: `Order Confirmation - Order #${order._id}`,
+      htmlContent: htmlContent,
+    });
   } catch (error) {
     console.error("Error sending order confirmation email:", error);
   }
