@@ -23,6 +23,10 @@ const UserManagement = () => {
   const [banTargetId, setBanTargetId] = useState(null);
   const [banReason, setBanReason] = useState("");
 
+  // Search States
+  const [vendorSearch, setVendorSearch] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
+
   const fetchUsers = async (showLoading = true) => {
     if (showLoading) setLoading(true);
     setError("");
@@ -662,8 +666,18 @@ const UserManagement = () => {
   // ══════════════════════════════════════════════════════════
   // MAIN LIST VIEW — Role Picker → then show selected table
   // ══════════════════════════════════════════════════════════
-  const vendors = users.filter((u) => u.role === "admin");
-  const customers = users.filter((u) => u.role !== "admin");
+  const allVendors = users.filter((u) => u.role === "admin");
+  const allCustomers = users.filter((u) => u.role !== "admin");
+
+  const vendors = allVendors.filter((u) =>
+    u.name.toLowerCase().includes(vendorSearch.toLowerCase()) ||
+    u.email.toLowerCase().includes(vendorSearch.toLowerCase()) ||
+    (u.storeName && u.storeName.toLowerCase().includes(vendorSearch.toLowerCase()))
+  );
+  const customers = allCustomers.filter((u) =>
+    u.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    u.email.toLowerCase().includes(customerSearch.toLowerCase())
+  );
 
   return (
     <div className="space-y-8 animate-fadeIn text-left relative">
@@ -672,7 +686,11 @@ const UserManagement = () => {
         <div className="flex items-center gap-4">
           {activeView && (
             <button
-              onClick={() => setActiveView(null)}
+              onClick={() => {
+                setActiveView(null);
+                setVendorSearch("");
+                setCustomerSearch("");
+              }}
               className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.25em] font-semibold text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
             >
               <ArrowLeft className="h-3 w-3" />
@@ -750,16 +768,16 @@ const UserManagement = () => {
 
               <div className="mt-6 pt-4 border-t border-gray-100 dark:border-neutral-900 flex items-center gap-6">
                 <div>
-                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{vendors.length}</span>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{allVendors.length}</span>
                   <span className="text-[9px] text-neutral-400 uppercase tracking-widest ml-1">Registered</span>
                 </div>
                 <div>
-                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{vendors.filter(v => !v.isBanned).length}</span>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{allVendors.filter(v => !v.isBanned).length}</span>
                   <span className="text-[9px] text-emerald-500 uppercase tracking-widest ml-1">Active</span>
                 </div>
-                {vendors.filter(v => v.isBanned).length > 0 && (
+                {allVendors.filter(v => v.isBanned).length > 0 && (
                   <div>
-                    <span className="text-2xl font-serif font-bold text-rose-500">{vendors.filter(v => v.isBanned).length}</span>
+                    <span className="text-2xl font-serif font-bold text-rose-500">{allVendors.filter(v => v.isBanned).length}</span>
                     <span className="text-[9px] text-rose-400 uppercase tracking-widest ml-1">Suspended</span>
                   </div>
                 )}
@@ -792,16 +810,16 @@ const UserManagement = () => {
 
               <div className="mt-6 pt-4 border-t border-gray-100 dark:border-neutral-900 flex items-center gap-6">
                 <div>
-                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{customers.length}</span>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{allCustomers.length}</span>
                   <span className="text-[9px] text-neutral-400 uppercase tracking-widest ml-1">Registered</span>
                 </div>
                 <div>
-                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{customers.filter(c => !c.isBanned).length}</span>
+                  <span className="text-2xl font-serif font-bold text-black dark:text-white">{allCustomers.filter(c => !c.isBanned).length}</span>
                   <span className="text-[9px] text-emerald-500 uppercase tracking-widest ml-1">Active</span>
                 </div>
-                {customers.filter(c => c.isBanned).length > 0 && (
+                {allCustomers.filter(c => c.isBanned).length > 0 && (
                   <div>
-                    <span className="text-2xl font-serif font-bold text-rose-500">{customers.filter(c => c.isBanned).length}</span>
+                    <span className="text-2xl font-serif font-bold text-rose-500">{allCustomers.filter(c => c.isBanned).length}</span>
                     <span className="text-[9px] text-rose-400 uppercase tracking-widest ml-1">Banned</span>
                   </div>
                 )}
@@ -827,9 +845,24 @@ const UserManagement = () => {
             </span>
           </div>
 
-          {vendors.length === 0 ? (
+          {/* Search bar */}
+          <div className="w-full max-w-md">
+            <input
+              type="text"
+              value={vendorSearch}
+              onChange={(e) => setVendorSearch(e.target.value)}
+              placeholder="SEARCH VENDORS BY NAME, EMAIL, OR STORE..."
+              className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 focus:border-black dark:focus:border-white py-2 text-[10px] uppercase tracking-widest font-mono text-black dark:text-white focus:outline-none placeholder-neutral-400"
+            />
+          </div>
+
+          {allVendors.length === 0 ? (
             <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
               No vendor accounts registered on the platform
+            </div>
+          ) : vendors.length === 0 ? (
+            <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
+              No vendors match your search term
             </div>
           ) : (
             <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
@@ -903,9 +936,24 @@ const UserManagement = () => {
             </span>
           </div>
 
-          {customers.length === 0 ? (
+          {/* Search bar */}
+          <div className="w-full max-w-md">
+            <input
+              type="text"
+              value={customerSearch}
+              onChange={(e) => setCustomerSearch(e.target.value)}
+              placeholder="SEARCH CUSTOMERS BY NAME OR EMAIL..."
+              className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 focus:border-black dark:focus:border-white py-2 text-[10px] uppercase tracking-widest font-mono text-black dark:text-white focus:outline-none placeholder-neutral-400"
+            />
+          </div>
+
+          {allCustomers.length === 0 ? (
             <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
               No customer accounts registered on the platform
+            </div>
+          ) : customers.length === 0 ? (
+            <div className="border border-gray-200 dark:border-white/10 py-10 text-center text-neutral-500 text-[10px] uppercase tracking-widest">
+              No customers match your search term
             </div>
           ) : (
             <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-black overflow-hidden">
