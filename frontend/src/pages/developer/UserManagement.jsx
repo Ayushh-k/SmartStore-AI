@@ -470,192 +470,176 @@ const UserManagement = () => {
         )}
 
         {/* ══════════════════════════════════════════════════════
-            PRODUCT DETAIL SIDE PANEL (slide-in overlay)
+            PRODUCT DETAIL SPECIFICATIONS OVERLAY
         ══════════════════════════════════════════════════════ */}
         {selectedProduct && (
-          <div
-            className="fixed inset-0 z-50 flex items-start justify-end bg-black/60 backdrop-blur-sm"
-            onClick={() => setSelectedProduct(null)}
-          >
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div
-              className="relative h-full w-full max-w-xl bg-white dark:bg-[#080808] overflow-y-auto shadow-2xl border-l border-gray-200 dark:border-neutral-800"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Panel Header */}
-              <div className="sticky top-0 z-10 bg-white dark:bg-[#080808] border-b border-gray-200 dark:border-neutral-900 px-8 py-5 flex items-center justify-between">
+              className="absolute inset-0"
+              onClick={() => setSelectedProduct(null)}
+            />
+            <div className="relative bg-white dark:bg-black border border-neutral-200 dark:border-neutral-900 w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl rounded-none overflow-hidden z-10 animate-fadeIn text-black dark:text-white">
+              
+              {/* Header */}
+              <div className="flex items-start justify-between border-b border-neutral-200 dark:border-neutral-900 p-6">
                 <div>
-                  <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-amber-500 block">Product Details</span>
-                  <h3 className="font-serif text-lg tracking-widest uppercase text-black dark:text-white mt-0.5">
+                  <span className="text-[8px] uppercase tracking-[0.25em] font-semibold text-neutral-500 dark:text-neutral-400 font-mono">
+                    Product Specifications
+                  </span>
+                  <h3 className="font-serif text-xl tracking-wide uppercase mt-1 leading-snug">
                     {selectedProduct.name}
                   </h3>
+                  {selectedProduct.brand && (
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-500 mt-1 font-serif">
+                      Brand: {selectedProduct.brand}
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={() => setSelectedProduct(null)}
-                  className="border border-gray-200 dark:border-neutral-800 p-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white transition-colors cursor-pointer"
+                  className="border border-black dark:border-white p-1.5 text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors rounded-none cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* Product Image */}
-              <div className="bg-neutral-100 dark:bg-neutral-900 aspect-[4/3] overflow-hidden flex items-center justify-center">
-                {selectedProduct.images && selectedProduct.images[0] ? (
-                  <img
-                    src={selectedProduct.images[0]}
-                    alt={selectedProduct.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.target.style.display = "none"; }}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center text-neutral-400 dark:text-neutral-600">
-                    <Package className="h-12 w-12 mb-2 stroke-[1.2]" />
-                    <span className="text-[10px] uppercase tracking-widest">No Image Available</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Image thumbnails strip */}
-              {selectedProduct.images && selectedProduct.images.length > 1 && (
-                <div className="flex gap-2 px-8 py-3 overflow-x-auto bg-neutral-50 dark:bg-neutral-900/50 border-b border-gray-200 dark:border-neutral-900">
-                  {selectedProduct.images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`View ${i + 1}`}
-                      className="h-14 w-14 object-cover shrink-0 border border-gray-200 dark:border-neutral-800"
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Details Body */}
-              <div className="px-8 py-6 space-y-6">
-
-                {/* Status badges */}
-                <div className="flex items-center gap-3 flex-wrap">
-                  {selectedProduct.isActive ? (
-                    <span className="border border-emerald-500 bg-emerald-500/10 text-emerald-600 px-3 py-1 text-[8px] uppercase tracking-widest font-bold">Active</span>
-                  ) : (
-                    <span className="border border-rose-500 bg-rose-500/10 text-rose-500 px-3 py-1 text-[8px] uppercase tracking-widest font-bold">Suspended</span>
-                  )}
-                  <span className="border border-gray-200 dark:border-neutral-700 px-3 py-1 text-[8px] uppercase tracking-widest font-bold text-neutral-500">
-                    {selectedProduct.category || "Uncategorized"}
-                  </span>
-                  {selectedProduct.brand && (
-                    <span className="border border-gray-200 dark:border-neutral-700 px-3 py-1 text-[8px] uppercase tracking-widest font-bold text-neutral-500">
-                      {selectedProduct.brand}
-                    </span>
-                  )}
-                </div>
-
-                {/* Price + Stock */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="border border-gray-200 dark:border-neutral-900 p-4 bg-gray-50 dark:bg-neutral-900/40">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block mb-1">Price</span>
-                    <span className="font-serif text-2xl text-black dark:text-white">
-                      ${Number(selectedProduct.price).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="border border-gray-200 dark:border-neutral-900 p-4 bg-gray-50 dark:bg-neutral-900/40">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block mb-1">Stock</span>
-                    <span className={`font-serif text-2xl ${
-                      Number(selectedProduct.stock) <= 0 ? "text-rose-500" :
-                      Number(selectedProduct.stock) <= 5 ? "text-amber-500" :
-                      "text-black dark:text-white"
-                    }`}>
-                      {selectedProduct.stock} <span className="text-sm font-sans">units</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* SKU */}
-                {selectedProduct.sku && (
-                  <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block">SKU / Product Code</span>
-                    <span className="font-mono text-sm text-black dark:text-white bg-neutral-100 dark:bg-neutral-900 px-3 py-1.5 inline-block border border-gray-200 dark:border-neutral-800">
-                      {selectedProduct.sku}
-                    </span>
-                  </div>
-                )}
-
-                {/* Description */}
-                {(selectedProduct.description || selectedProduct.aiNarrative) && (
-                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 flex items-center gap-2">
-                      <Tag className="h-3 w-3" /> Product Description
-                    </span>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-                      {selectedProduct.aiNarrative || selectedProduct.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Sizes */}
-                {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
-                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 flex items-center gap-2">
-                      <Layers className="h-3 w-3" /> Available Sizes
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProduct.sizes.map((size, i) => (
-                        <span key={i} className="border border-gray-300 dark:border-neutral-700 px-3 py-1 text-[10px] uppercase tracking-wider font-mono text-black dark:text-white">
-                          {size}
+              {/* Scrollable Specs Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* Image gallery */}
+                  <div className="space-y-4">
+                    <div className="aspect-square w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-900 overflow-hidden flex items-center justify-center rounded-none">
+                      {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                        <img
+                          src={selectedProduct.images[0]}
+                          alt={selectedProduct.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+                          No Product Image
                         </span>
-                      ))}
+                      )}
+                    </div>
+                    {selectedProduct.images && selectedProduct.images.length > 1 && (
+                      <div className="grid grid-cols-5 gap-2">
+                        {selectedProduct.images.map((img, idx) => (
+                          <div key={idx} className="aspect-square border border-neutral-200 dark:border-neutral-900 overflow-hidden bg-neutral-50 dark:bg-neutral-950">
+                            <img src={img} alt="Spec preview" className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Core specifications */}
+                  <div className="space-y-4 text-xs text-left">
+                    <div className="border border-neutral-200 dark:border-neutral-900 bg-neutral-50 dark:bg-[#080808] p-4 space-y-2 font-mono text-[11px] leading-relaxed">
+                      <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
+                        <span className="text-neutral-500 uppercase">Product ID:</span>
+                        <span className="font-mono text-[10px] break-all">{selectedProduct._id}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
+                        <span className="text-neutral-500 uppercase">SKU / Serial:</span>
+                        <span className="font-semibold">{selectedProduct.sku || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
+                        <span className="text-neutral-500 uppercase">Unit Price:</span>
+                        <span className="font-bold">${selectedProduct.price}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
+                        <span className="text-neutral-500 uppercase">Stock Level:</span>
+                        <span className="font-semibold">{selectedProduct.stock || 0} units</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
+                        <span className="text-neutral-500 uppercase">Category:</span>
+                        <span className="font-semibold">{selectedProduct.category}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
+                        <span className="text-neutral-500 uppercase">Listed On:</span>
+                        <span className="font-semibold">
+                          {selectedProduct.createdAt
+                            ? new Date(selectedProduct.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+                            : "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between font-sans font-mono text-[11px]">
+                        <span className="text-neutral-500 uppercase">Live Status:</span>
+                        <span className={selectedProduct.isActive ? "text-emerald-500 font-bold" : "text-amber-500 font-bold"}>
+                          {selectedProduct.isActive ? "Live in Store" : "Inactive Draft"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Variation details */}
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-neutral-500">Available Variations</h4>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-[10px] text-neutral-400 uppercase block mb-1">Sizes:</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedProduct.sizes && selectedProduct.sizes.length > 0 ? (
+                              selectedProduct.sizes.map((s) => (
+                                <span key={s} className="px-2 py-0.5 border border-neutral-200 dark:border-neutral-800 text-[10px] uppercase">{s}</span>
+                              ))
+                            ) : (
+                              <span className="text-[10px] text-neutral-500 italic">No sizes specified</span>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-neutral-400 uppercase block mb-1">Colors:</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedProduct.colors && selectedProduct.colors.length > 0 ? (
+                              selectedProduct.colors.map((c) => (
+                                <span key={c} className="px-2 py-0.5 border border-neutral-200 dark:border-neutral-800 text-[10px] uppercase">{c}</span>
+                              ))
+                            ) : (
+                              <span className="text-[10px] text-neutral-500 italic">No colors specified</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
 
-                {/* Colors */}
-                {selectedProduct.colors && selectedProduct.colors.length > 0 && (
-                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 flex items-center gap-2">
-                      <Palette className="h-3 w-3" /> Available Colors
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProduct.colors.map((color, i) => (
-                        <span key={i} className="border border-gray-300 dark:border-neutral-700 px-3 py-1 text-[10px] uppercase tracking-wider font-mono text-black dark:text-white">
-                          {color}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </div>
+
+                {/* Narrative description */}
+                <div className="space-y-2 text-left">
+                  <h4 className="text-[10px] uppercase font-bold tracking-widest text-neutral-500 font-mono">Product Narrative</h4>
+                  <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif whitespace-pre-line border-l-2 border-black dark:border-white pl-4">
+                    {selectedProduct.aiNarrative || selectedProduct.description || "No description provided."}
+                  </p>
+                </div>
 
                 {/* AI Marketing Captions */}
                 {selectedProduct.aiCaptions && selectedProduct.aiCaptions.length > 0 && (
-                  <div className="space-y-2 border-t border-gray-100 dark:border-neutral-900 pt-4">
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block">AI Marketing Captions</span>
-                    <div className="space-y-2">
-                      {selectedProduct.aiCaptions.map((caption, i) => (
-                        <p key={i} className="text-[11px] italic text-neutral-500 dark:text-neutral-400 border-l-2 border-amber-400 pl-3 leading-relaxed">
-                          {caption}
-                        </p>
+                  <div className="space-y-3 pt-2 text-left">
+                    <h4 className="text-[10px] uppercase font-bold tracking-widest text-neutral-500 font-mono">AI Marketing Captions</h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      {selectedProduct.aiCaptions.map((caption, index) => (
+                        <div key={index} className="border border-neutral-200 dark:border-neutral-900 p-3.5 bg-neutral-50 dark:bg-[#070707] text-[11px] leading-relaxed">
+                          <p className="text-neutral-700 dark:text-neutral-300 italic">"{caption}"</p>
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Platform Metadata */}
-                <div className="border-t border-gray-100 dark:border-neutral-900 pt-4 space-y-2">
-                  <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 block">Platform Metadata</span>
-                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
-                    <div>
-                      <span className="text-neutral-400 block uppercase tracking-wider text-[8px] mb-0.5">Product ID</span>
-                      <span className="text-black dark:text-white break-all">{selectedProduct._id}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-400 block uppercase tracking-wider text-[8px] mb-0.5">Listed On</span>
-                      <span className="text-black dark:text-white">
-                        {selectedProduct.createdAt
-                          ? new Date(selectedProduct.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
-                          : "N/A"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
               </div>
+
+              {/* Close controls */}
+              <div className="border-t border-neutral-200 dark:border-neutral-900 p-6 bg-neutral-50 dark:bg-[#050505] flex justify-end">
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 px-6 py-2.5 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors cursor-pointer"
+                >
+                  Close Details
+                </button>
+              </div>
+
             </div>
           </div>
         )}
