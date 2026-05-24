@@ -114,7 +114,7 @@ const UserManagement = () => {
             <h2 className="font-serif text-2xl tracking-widest uppercase text-black dark:text-white mt-1">
               User Activity Log: {selectedUser.name}
             </h2>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[10px] text-neutral-550 dark:text-neutral-450 uppercase tracking-widest font-mono">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-mono">
               <span>Role: {selectedUser.role === "admin" ? "Vendor / Merchant" : "Customer / Client"}</span>
               <span>&bull;</span>
               <span>Email: {selectedUser.email}</span>
@@ -129,8 +129,8 @@ const UserManagement = () => {
               onClick={() => handleToggleBan(selectedUser._id)}
               className={`border px-4 py-2 text-[9px] uppercase tracking-widest font-bold rounded-none transition-colors cursor-pointer ${
                 selectedUser.isBanned
-                  ? "border-emerald-500 text-emerald-600 dark:text-emerald-450 hover:bg-emerald-500 hover:text-white"
-                  : "border-amber-500 text-amber-600 dark:text-amber-450 hover:bg-amber-500 hover:text-white"
+                  ? "border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white"
+                  : "border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white"
               }`}
             >
               {selectedUser.isBanned ? "Unban Account" : "Ban Account"}
@@ -147,12 +147,12 @@ const UserManagement = () => {
 
         {/* Activity Details Body */}
         {activityLoading ? (
-          <div className="flex flex-col items-center justify-center py-32 text-[10px] uppercase tracking-widest text-neutral-550">
+          <div className="flex flex-col items-center justify-center py-32 text-[10px] uppercase tracking-widest text-neutral-500">
             <Loader2 className="h-6 w-6 animate-spin text-black dark:text-white mb-2" />
             Loading user activity details...
           </div>
         ) : activityError ? (
-          <div className="border border-rose-350 bg-rose-50 dark:bg-black p-4 text-[10px] uppercase tracking-widest text-rose-500">
+          <div className="border border-rose-300 bg-rose-50 dark:bg-black p-4 text-[10px] uppercase tracking-widest text-rose-500">
             {activityError}
           </div>
         ) : !activity ? null : selectedUser.role === "admin" ? (
@@ -219,7 +219,7 @@ const UserManagement = () => {
                     <span className="ml-3 text-[8px] font-normal text-neutral-400 normal-case tracking-normal">Click a row to view full product details</span>
                   </h3>
                   {!activity.products || activity.products.length === 0 ? (
-                    <div className="border border-gray-250 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-450">
+                    <div className="border border-gray-200 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-400">
                       No products listed in this store
                     </div>
                   ) : (
@@ -227,7 +227,7 @@ const UserManagement = () => {
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-left text-xs">
                           <thead>
-                            <tr className="border-b border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-555 dark:text-neutral-455 font-bold">
+                            <tr className="border-b border-gray-200 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
                               <th className="px-6 py-4">Product</th>
                               <th className="px-6 py-4">SKU</th>
                               <th className="px-6 py-4">Category</th>
@@ -278,7 +278,7 @@ const UserManagement = () => {
                     {vendorActiveTab === "revenue" ? "Revenue Generation Log" : "Orders Received Log"} ({activity.sales?.length || 0})
                   </h3>
                   {!activity.sales || activity.sales.length === 0 ? (
-                    <div className="border border-gray-250 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-450">
+                    <div className="border border-gray-200 dark:border-white/10 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-400">
                       No sales or orders recorded for this store yet
                     </div>
                   ) : (
@@ -286,7 +286,7 @@ const UserManagement = () => {
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-left text-xs">
                           <thead>
-                            <tr className="border-b border-gray-250 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-555 dark:text-neutral-455 font-bold">
+                            <tr className="border-b border-gray-200 dark:border-neutral-900 bg-gray-50 dark:bg-[#0a0a0a] text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">
                               <th className="px-6 py-4">Sale Date</th>
                               <th className="px-6 py-4">Product Name</th>
                               <th className="px-6 py-4">Quantity Sold</th>
@@ -297,7 +297,7 @@ const UserManagement = () => {
                           <tbody className="divide-y divide-gray-200 dark:divide-neutral-900">
                             {activity.sales.map((sale) => (
                               <tr key={sale._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-900/30 transition-colors">
-                                <td className="px-6 py-4 text-neutral-550 dark:text-neutral-455 font-mono text-[11px]">{new Date(sale.saleDate).toLocaleString()}</td>
+                                <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400 font-mono text-[11px]">{new Date(sale.saleDate).toLocaleString()}</td>
                                 <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">{sale.product?.name || "Deleted Product"}</td>
                                 <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">{sale.quantity}</td>
                                 <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400 font-bold">${Number(sale.totalAmount).toFixed(2)}</td>
@@ -332,7 +332,7 @@ const UserManagement = () => {
                       <div key={order._id} className="border border-gray-200 dark:border-neutral-900 p-5 bg-white dark:bg-[#060606] space-y-4">
                         <div className="flex flex-wrap justify-between items-center border-b border-gray-200/60 dark:border-neutral-900/60 pb-3 text-[10px] uppercase tracking-widest font-mono">
                           <span className="font-semibold text-black dark:text-white">ID: {order._id}</span>
-                          <div className="flex gap-4 text-neutral-550">
+                          <div className="flex gap-4 text-neutral-500">
                             <span>Placed: {new Date(order.createdAt).toLocaleDateString()}</span>
                             <span>Total: ${(order.totalAmount || 0).toFixed(2)}</span>
                             <span className={order.paymentDetails?.status === "Completed" ? "text-emerald-500 font-bold" : "text-amber-500 font-bold"}>
@@ -372,7 +372,7 @@ const UserManagement = () => {
                     {activity.user.cart.map((item, idx) => (
                       <div key={idx} className="p-4 flex justify-between items-center text-xs">
                         <div className="flex items-center gap-3">
-                          <ShoppingBag className="h-4 w-4 text-neutral-550" />
+                          <ShoppingBag className="h-4 w-4 text-neutral-500" />
                           <div>
                             <span className="font-serif uppercase font-semibold text-black dark:text-white">{item.product?.name || "Deleted Product"}</span>
                             {(item.selectedSize || item.selectedColor) && (
@@ -428,7 +428,7 @@ const UserManagement = () => {
                     {activity.user.addresses.map((addr) => (
                       <div key={addr._id} className="border border-gray-200 dark:border-neutral-900 p-4 bg-white dark:bg-[#060606] space-y-2 text-xs">
                         <div className="flex justify-between items-center">
-                          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-neutral-550">
+                          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-neutral-500">
                             <MapPin className="h-3 w-3" />
                             Address Point
                           </span>
@@ -666,7 +666,7 @@ const UserManagement = () => {
             <h2 className="font-serif text-xl tracking-widest uppercase text-black dark:text-white">
               {activeView === "vendors" ? "Vendor / Store Owners" : activeView === "customers" ? "Customer Accounts" : "User Management"}
             </h2>
-            <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-455 mt-0.5">
+            <p className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
               {activeView === "vendors"
                 ? "Merchant accounts and their store catalog"
                 : activeView === "customers"
@@ -836,7 +836,7 @@ const UserManagement = () => {
                           <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 uppercase tracking-wider">Vendor / Merchant</span>
                         </td>
                         <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
-                        <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
+                        <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400 font-mono text-[11px]">
                           {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                         </td>
                         <td className="px-6 py-4 text-center">
@@ -914,7 +914,7 @@ const UserManagement = () => {
                           <span className="text-[9px] font-mono text-sky-600 dark:text-sky-400 uppercase tracking-wider">Customer</span>
                         </td>
                         <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{user.email}</td>
-                        <td className="px-6 py-4 text-neutral-500 dark:text-neutral-450 font-mono text-[11px]">
+                        <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400 font-mono text-[11px]">
                           {new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                         </td>
                         <td className="px-6 py-4 text-center"><span className="font-mono font-bold text-black dark:text-white">{user.orderCount ?? 0}</span></td>

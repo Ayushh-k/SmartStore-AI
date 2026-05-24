@@ -195,7 +195,7 @@ const ProductDetails = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="glass-panel w-full max-w-6xl h-[90vh] md:h-[85vh] flex flex-col p-6 overflow-hidden bg-slate-950/90 border border-slate-800/80">
+      <div className="glass-panel w-full max-w-6xl h-[90vh] md:h-[85vh] flex flex-col p-6 overflow-hidden bg-slate-950/90 border border-slate-800/80 text-slate-200">
         
         {/* Header Section */}
         <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-4">
@@ -227,7 +227,7 @@ const ProductDetails = ({
           </div>
           <button
             onClick={onClose}
-            className="rounded bg-slate-900 hover:bg-slate-800 p-2 text-slate-450 hover:text-slate-200 transition-all cursor-pointer"
+            className="rounded bg-slate-900 hover:bg-slate-800 p-2 text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
             title="Close details"
           >
             <X className="h-4 w-4" />
@@ -260,7 +260,7 @@ const ProductDetails = ({
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center text-slate-700">
+                <div className="flex flex-col items-center justify-center text-slate-500">
                   <Package className="h-10 w-10 mb-2" />
                   <span className="text-[10px] text-slate-500 font-medium">No Image</span>
                 </div>
@@ -271,13 +271,13 @@ const ProductDetails = ({
                 <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2">
                   <button
                     onClick={prevImage}
-                    className="rounded-full bg-slate-950/80 border border-slate-850 p-1 text-slate-400 hover:text-white cursor-pointer"
+                    className="rounded-full bg-slate-950/80 border border-slate-800 p-1 text-slate-400 hover:text-white cursor-pointer"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="rounded-full bg-slate-950/80 border border-slate-850 p-1 text-slate-400 hover:text-white cursor-pointer"
+                    className="rounded-full bg-slate-950/80 border border-slate-800 p-1 text-slate-400 hover:text-white cursor-pointer"
                   >
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
@@ -294,7 +294,7 @@ const ProductDetails = ({
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
                     className={`h-10 w-10 rounded border overflow-hidden shrink-0 transition-all cursor-pointer ${
-                      idx === activeImageIndex ? 'border-primary ring-1 ring-primary' : 'border-slate-850 hover:border-slate-700'
+                      idx === activeImageIndex ? 'border-primary ring-1 ring-primary' : 'border-slate-800 hover:border-slate-700'
                     }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -402,7 +402,7 @@ const ProductDetails = ({
               <h4 className="font-semibold text-primary uppercase text-[9px] tracking-wider">
                 AI Product Copywriting
               </h4>
-              <p className="rounded-lg bg-slate-950/50 border border-slate-900 p-3 whitespace-pre-wrap leading-relaxed text-slate-350">
+              <p className="rounded-lg bg-slate-950/50 border border-slate-900 p-3 whitespace-pre-wrap leading-relaxed text-slate-300">
                 {product.description || "No description catalog info available."}
               </p>
             </div>
@@ -425,7 +425,7 @@ const ProductDetails = ({
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         <span>Pros</span>
                       </div>
-                      <ul className="space-y-1 list-disc pl-3.5 text-slate-350 leading-snug">
+                      <ul className="space-y-1 list-disc pl-3.5 text-slate-300 leading-snug">
                         {reviewSummary.pros && reviewSummary.pros.length > 0 ? (
                           reviewSummary.pros.map((pro, i) => <li key={i}>{pro}</li>)
                         ) : (
@@ -442,7 +442,7 @@ const ProductDetails = ({
                         <XCircle className="h-3.5 w-3.5" />
                         <span>Cons</span>
                       </div>
-                      <ul className="space-y-1 list-disc pl-3.5 text-slate-350 leading-snug">
+                      <ul className="space-y-1 list-disc pl-3.5 text-slate-300 leading-snug">
                         {reviewSummary.cons && reviewSummary.cons.length > 0 ? (
                           reviewSummary.cons.map((con, i) => <li key={i}>{con}</li>)
                         ) : (
@@ -523,7 +523,7 @@ const ProductDetails = ({
           {/* Column 3: Ask AI Chatbox */}
           <div className="flex flex-col h-full bg-slate-950/60 rounded-lg border border-slate-900 overflow-hidden">
             {/* Header */}
-            <div className="bg-slate-900 px-3 py-2 border-b border-slate-850 flex items-center gap-1.5 shrink-0 select-none">
+            <div className="bg-slate-900 px-3 py-2 border-b border-slate-800 flex items-center gap-1.5 shrink-0 select-none">
               <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
               <span className="text-[10px] uppercase font-bold text-slate-200 tracking-wider">Ask Shopping AI</span>
             </div>
@@ -539,7 +539,7 @@ const ProductDetails = ({
                     className={`rounded-lg px-3 py-2 max-w-[85%] leading-relaxed ${
                       msg.sender === "user" 
                         ? "bg-primary text-slate-100 font-medium rounded-tr-none text-right"
-                        : "bg-slate-900 text-slate-300 border border-slate-850 rounded-tl-none text-left"
+                        : "bg-slate-900 text-slate-300 border border-slate-800 rounded-tl-none text-left"
                     }`}
                   >
                     {msg.text}
@@ -559,7 +559,7 @@ const ProductDetails = ({
             </div>
 
             {/* Input Bar */}
-            <form onSubmit={handleAskAI} className="p-2 border-t border-slate-850 bg-slate-900/40 flex gap-1.5 shrink-0">
+            <form onSubmit={handleAskAI} className="p-2 border-t border-slate-800 bg-slate-900/40 flex gap-1.5 shrink-0">
               <input
                 type="text"
                 placeholder="Ask about materials, specs, features..."
@@ -584,7 +584,7 @@ const ProductDetails = ({
         <div className="mt-auto pt-3 border-t border-slate-800/40 flex gap-3 shrink-0">
           <button
             onClick={onShareProduct}
-            className="btn-outline flex items-center justify-center gap-1.5 py-2 px-4 text-xs font-semibold cursor-pointer border border-slate-850 bg-slate-950 hover:bg-slate-900"
+            className="btn-outline flex items-center justify-center gap-1.5 py-2 px-4 text-xs font-semibold cursor-pointer border border-slate-800 bg-slate-950 hover:bg-slate-900"
             title="Recommend this product to a friend"
           >
             {copiedLink ? (
