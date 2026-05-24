@@ -53,9 +53,13 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Auth error:", err);
-      setError(
-        err?.response?.data?.message || "Authentication failed. Please check your credentials."
-      );
+      if (err?.response?.status === 403 && err.response.data?.message === "Account Suspended") {
+        navigate("/suspended", { state: { reason: err.response.data.banReason } });
+      } else {
+        setError(
+          err?.response?.data?.message || "Authentication failed. Please check your credentials."
+        );
+      }
     } finally {
       setLoading(false);
     }

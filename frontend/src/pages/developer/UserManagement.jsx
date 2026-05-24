@@ -18,6 +18,11 @@ const UserManagement = () => {
   // null = show picker, "vendors" = show vendor table, "customers" = show customer table
   const [activeView, setActiveView] = useState(null);
 
+  // Ban Modal State
+  const [banModalOpen, setBanModalOpen] = useState(false);
+  const [banTargetId, setBanTargetId] = useState(null);
+  const [banReason, setBanReason] = useState("");
+
   const fetchUsers = async (showLoading = true) => {
     if (showLoading) setLoading(true);
     setError("");
@@ -36,20 +41,32 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  const handleToggleBan = async (userId) => {
+  const handleToggleBan = async (userId, reason = "") => {
+    const user = users.find(u => u._id === userId) || (selectedUser && selectedUser._id === userId ? selectedUser : null);
+    if (user && !user.isBanned && !reason) {
+      setBanTargetId(userId);
+      setBanReason("");
+      setBanModalOpen(true);
+      return;
+    }
+
     try {
-      const res = await api.put(`/api/developer/users/${userId}/ban`);
+      const res = await api.put(`/api/developer/users/${userId}/ban`, { banReason: reason });
       const updatedUser = res.data.user;
 
       setUsers((prev) =>
         prev.map((u) =>
-          u._id === userId ? { ...u, isBanned: updatedUser.isBanned } : u
+          u._id === userId ? { ...u, isBanned: updatedUser.isBanned, banReason: updatedUser.banReason } : u
         )
       );
 
       if (selectedUser && selectedUser._id === userId) {
-        setSelectedUser((prev) => ({ ...prev, isBanned: updatedUser.isBanned }));
+        setSelectedUser((prev) => ({ ...prev, isBanned: updatedUser.isBanned, banReason: updatedUser.banReason }));
       }
+
+      setBanModalOpen(false);
+      setBanTargetId(null);
+      setBanReason("");
     } catch (err) {
       console.error("User ban toggle error:", err);
       alert(err?.response?.data?.message || "Failed to toggle user ban status.");
@@ -947,6 +964,51 @@ const UserManagement = () => {
           )}
         </div>
 
+      )}
+
+      {/* Ban Reason Modal */}
+      {banModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-neutral-900 p-8 w-full max-w-md rounded-none shadow-2xl space-y-6 text-left">
+            <h3 className="font-serif text-lg tracking-widest uppercase text-black dark:text-white">
+              Suspend Account
+            </h3>
+            <p className="text-[10px] uppercase tracking-widest text-neutral-400 font-mono">
+              Provide a reason for suspending this user/vendor account.
+            </p>
+            <div className="space-y-1">
+              <label className="text-[9px] uppercase tracking-[0.2em] text-neutral-500 font-bold block">
+                Reason for Suspension
+              </label>
+              <textarea
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                className="w-full bg-transparent border-b border-gray-300 dark:border-neutral-800 focus:border-black dark:focus:border-white py-2 text-xs font-sans text-black dark:text-white focus:outline-none resize-none h-20"
+                placeholder="Specify policy violation details..."
+                required
+              />
+            </div>
+            <div className="flex gap-4 pt-2">
+              <button
+                onClick={() => {
+                  setBanModalOpen(false);
+                  setBanTargetId(null);
+                  setBanReason("");
+                }}
+                className="flex-1 border border-black dark:border-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-black dark:text-white py-3 text-[10px] uppercase tracking-widest font-bold rounded-none transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleToggleBan(banTargetId, banReason)}
+                disabled={!banReason.trim()}
+                className="flex-1 bg-rose-600 hover:bg-rose-755 text-white py-3 text-[10px] uppercase tracking-widest font-bold rounded-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                Confirm Suspension
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

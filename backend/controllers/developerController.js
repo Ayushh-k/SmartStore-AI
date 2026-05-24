@@ -115,7 +115,7 @@ export const getPlatformMetrics = async (req, res) => {
 export const getAllStores = async (req, res) => {
   try {
     const vendors = await User.find({ role: "admin" })
-      .select("name email storeName isBanned createdAt")
+      .select("name email storeName isBanned banReason createdAt")
       .sort({ createdAt: -1 });
 
     const stores = await Promise.all(
@@ -153,6 +153,11 @@ export const toggleStoreBan = async (req, res) => {
 
     // Toggle ban
     user.isBanned = !user.isBanned;
+    if (user.isBanned) {
+      user.banReason = req.body.banReason || "Violation of platform terms and policies.";
+    } else {
+      user.banReason = "";
+    }
     await user.save();
 
     res.json({
@@ -160,6 +165,7 @@ export const toggleStoreBan = async (req, res) => {
       user: {
         id: user.id,
         isBanned: user.isBanned,
+        banReason: user.banReason,
       },
     });
   } catch (error) {
@@ -252,7 +258,7 @@ export const getAllPlatformProducts = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: req.user._id } })
-      .select("name email role isBanned createdAt wishlist cart addresses")
+      .select("name email role isBanned banReason createdAt wishlist cart addresses")
       .sort({ createdAt: -1 });
 
     const usersData = await Promise.all(
@@ -297,6 +303,11 @@ export const toggleUserBan = async (req, res) => {
     }
 
     user.isBanned = !user.isBanned;
+    if (user.isBanned) {
+      user.banReason = req.body.banReason || "Violation of platform terms and policies.";
+    } else {
+      user.banReason = "";
+    }
     await user.save();
 
     res.json({
@@ -304,6 +315,7 @@ export const toggleUserBan = async (req, res) => {
       user: {
         id: user.id,
         isBanned: user.isBanned,
+        banReason: user.banReason,
       },
     });
   } catch (error) {

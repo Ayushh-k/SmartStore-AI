@@ -24,6 +24,7 @@ import PlatformOverview from "./pages/developer/PlatformOverview.jsx";
 import StoreManagement from "./pages/developer/StoreManagement.jsx";
 import GlobalProducts from "./pages/developer/GlobalProducts.jsx";
 import UserManagement from "./pages/developer/UserManagement.jsx";
+import Suspended from "./pages/Suspended.jsx";
 
 /**
   Authentication Guard for storefront users (e.g. shopping cart)
@@ -106,6 +107,7 @@ const App = () => {
       {/* Login / Auth */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/suspended" element={<Suspended />} />
 
       {/* User / Storefront Layout Routes */}
       <Route element={<UserLayout />}>
