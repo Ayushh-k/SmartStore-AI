@@ -120,26 +120,35 @@ export const register = async (req, res) => {
     // Send the OTP via our HTTPS Brevo utility
     const luxuryOtpTemplate = getLuxuryOtpTemplate(user.name, otpCode);
     try {
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: user.email,
-        subject: "AUTHORIZE YOUR ACCOUNT",
+        subject: "AUTHORIZE YOUR ACCOUNT - SMARTSTORE",
         htmlContent: luxuryOtpTemplate,
       });
-    } catch (mailErr) {
-      console.error("❌ Failed to dispatch Brevo OTP email:", mailErr);
-      // We still return 201 so the user knows account is registered in DB
-    }
 
-    res.status(201).json({
-      message: "Account registered. Please check your email for the authorization code.",
-      user: {
-        id: user.id,
-        name: user.name,
+      if (!emailResult) {
+        throw new Error("Brevo HTTP API returned empty response status (check your BREVO_API_KEY environment variable).");
+      }
+
+      res.status(201).json({
+        message: "User registered. OTP sent to email.",
         email: user.email,
-        role: user.role,
-        storeName: user.storeName,
-      },
-    });
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          storeName: user.storeName,
+        },
+      });
+    } catch (mailErr) {
+      // If email fails, delete the unverified user so they can try again
+      await User.findByIdAndDelete(user._id);
+      console.error("Brevo Email Error:", mailErr.message);
+      return res.status(500).json({
+        message: "Failed to send verification email. Please try again later.",
+      });
+    }
   } catch (error) {
     console.error("Register error:", error);
     res.status(500).json({ message: "Server error during registration." });
