@@ -8,11 +8,15 @@ const emailUser = process.env.EMAIL_USER || "ayushkamboj9690@gmail.com";
 const emailPass = process.env.EMAIL_PASS || "uixdgepsnsmyysol";
 
 export const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: emailUser,
     pass: emailPass,
   },
+  connectionTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 // Robust error logging on the transporter verification check

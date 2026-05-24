@@ -141,13 +141,17 @@ ${message}
       html: userHtml,
     };
 
-    // Execute both asynchronously using Promise.all
-    await Promise.all([
+    // Execute both asynchronously in the background (non-blocking)
+    Promise.all([
       transporter.sendMail(adminMailOptions),
       transporter.sendMail(userMailOptions),
-    ]);
-
-    console.log(`[CONTACT METRICS] Successfully processed storefront ticket from ${userEmail}`);
+    ])
+      .then(() => {
+        console.log(`[CONTACT METRICS] Successfully processed storefront ticket from ${userEmail}`);
+      })
+      .catch((mailError) => {
+        console.error("❌ Dual contact email background dispatch error:", mailError);
+      });
 
     res.status(200).json({
       success: true,
