@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Products from "./pages/Products.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
 import EditProduct from "./pages/EditProduct.jsx";
+import AdminProfile from "./pages/AdminProfile.jsx";
 import { Analytics } from "@vercel/analytics/react";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
@@ -165,6 +166,7 @@ const App = () => {
           <Route path="/products/edit/:id" element={<EditProduct />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/settings" element={<StoreSettings />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
         </Route>
 
         {/* Super Admin / Developer Routes */}
@@ -179,6 +181,7 @@ const App = () => {
           <Route path="/developer/stores" element={<StoreManagement />} />
           <Route path="/developer/users" element={<UserManagement />} />
           <Route path="/developer/products" element={<GlobalProducts />} />
+          <Route path="/developer/profile" element={<AdminProfile />} />
         </Route>
 
         {/* Fallback */}

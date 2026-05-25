@@ -43,12 +43,15 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    if (req.body.name) user.name = req.body.name;
-    if (req.body.email) user.email = req.body.email.toLowerCase();
+    if (req.body.name !== undefined) user.name = req.body.name;
+    if (req.body.email !== undefined) user.email = req.body.email.toLowerCase();
+    if (req.body.phone !== undefined) user.phone = req.body.phone;
+    if (req.body.address !== undefined) user.address = req.body.address;
+    if (req.body.avatar !== undefined) user.avatar = req.body.avatar;
     
     // settings
     if (user.profileSettings) {
-      if (req.body.language) user.profileSettings.language = req.body.language;
+      if (req.body.language !== undefined) user.profileSettings.language = req.body.language;
       if (req.body.notifications !== undefined) user.profileSettings.notifications = req.body.notifications;
     } else {
       user.profileSettings = {

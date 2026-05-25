@@ -301,7 +301,11 @@ const UserNavbar = () => {
             {user ? (
               <div className="flex items-center gap-6">
                 <Link to="/profile" className={actionClass}>
-                  <User className="h-3.5 w-3.5 stroke-[1.5]" />
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="Profile" className="h-4.5 w-4.5 rounded-none object-cover border border-black/10 dark:border-white/10" />
+                  ) : (
+                    <User className="h-3.5 w-3.5 stroke-[1.5]" />
+                  )}
                   <span>{user.name.split(" ")[0]}</span>
                 </Link>
                 <button onClick={handleLogout} className={logoutClass}>
@@ -319,7 +323,11 @@ const UserNavbar = () => {
           {/* Mobile Profile Icon */}
           {user && (
             <Link to="/profile" className="md:hidden text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white p-1">
-              <User className="h-4 w-4 stroke-[1.5]" />
+              {user.avatar ? (
+                <img src={user.avatar} alt="Profile" className="h-5 w-5 rounded-none object-cover border border-black/10 dark:border-white/10" />
+              ) : (
+                <User className="h-4 w-4 stroke-[1.5]" />
+              )}
             </Link>
           )}
         </div>

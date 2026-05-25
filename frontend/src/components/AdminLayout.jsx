@@ -11,7 +11,8 @@ import {
   X,
   ClipboardList,
   Menu,
-  Settings
+  Settings,
+  User
 } from "lucide-react";
 import api from "../utils/api.js";
 import ThemeToggle from "./ThemeToggle.jsx";
@@ -159,6 +160,11 @@ const AdminLayout = () => {
       to: "/admin/settings",
       label: "Store Settings",
       icon: Settings,
+    },
+    {
+      to: "/admin/profile",
+      label: "Profile",
+      icon: User,
     },
   ];
 

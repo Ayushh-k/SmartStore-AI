@@ -21,6 +21,7 @@ import {
   X
 } from "lucide-react";
 import api from "../utils/api.js";
+import AvatarUpload from "../components/AvatarUpload.jsx";
 
 const UserProfile = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,7 +55,10 @@ const UserProfile = () => {
     name: "",
     email: "",
     language: "en",
-    notifications: true
+    notifications: true,
+    phone: "",
+    address: "",
+    avatar: ""
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
 
@@ -86,7 +90,10 @@ const UserProfile = () => {
         name: res.data.user.name || "",
         email: res.data.user.email || "",
         language: res.data.user.profileSettings?.language || "en",
-        notifications: res.data.user.profileSettings?.notifications !== false
+        notifications: res.data.user.profileSettings?.notifications !== false,
+        phone: res.data.user.phone || "",
+        address: res.data.user.address || "",
+        avatar: res.data.user.avatar || ""
       });
     } catch (err) {
       console.error("Error fetching profile details:", err);
@@ -729,6 +736,13 @@ const UserProfile = () => {
                 Account Details
               </h3>
 
+              <div className="flex flex-col items-center justify-center py-4 border-b border-gray-200 dark:border-neutral-900">
+                <AvatarUpload
+                  value={settingsForm.avatar}
+                  onChange={(base64) => setSettingsForm(prev => ({ ...prev, avatar: base64 }))}
+                />
+              </div>
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
@@ -755,6 +769,32 @@ const UserProfile = () => {
                     value={settingsForm.email}
                     onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="E.g. +91 99999 88888"
+                    className="input text-xs"
+                    value={settingsForm.phone}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                    Corporate Address
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
+                    className="input text-xs"
+                    value={settingsForm.address}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
                   />
                 </div>
 

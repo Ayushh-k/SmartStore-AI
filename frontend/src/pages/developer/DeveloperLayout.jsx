@@ -8,7 +8,8 @@ import {
   LogOut,
   ShoppingBag,
   Menu,
-  X
+  X,
+  User
 } from "lucide-react";
 import ThemeToggle from "../../components/ThemeToggle.jsx";
 
@@ -58,6 +59,11 @@ const DeveloperLayout = () => {
       to: "/developer/products",
       label: "Global Products",
       icon: Package,
+    },
+    {
+      to: "/developer/profile",
+      label: "Profile",
+      icon: User,
     },
   ];
 
