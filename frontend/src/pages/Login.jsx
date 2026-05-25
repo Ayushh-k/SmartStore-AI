@@ -174,7 +174,7 @@ const Login = () => {
               <div className="flex justify-center w-full my-6">
                 <ReCAPTCHA
                   ref={recaptchaRef}
-                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  sitekey="6LfJf_ssAAAAAFZBIbjq47Ylxu0cC27U92YhODtZ"
                   onChange={(token) => setCaptchaToken(token)}
                   onExpired={() => setCaptchaToken(null)}
                   theme="light"
