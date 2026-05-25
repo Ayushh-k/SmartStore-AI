@@ -1,19 +1,18 @@
 // frontend/src/pages/Login.jsx
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api from "../utils/api.js";
-import ReCAPTCHA from "react-google-recaptcha";
-import { useTheme } from "../context/ThemeContext.jsx";
+import { useRecaptcha } from "../hooks/useRecaptcha.js";
+
+const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const Login = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
-  const recaptchaRef = useRef(null);
+  const { containerRef, token: captchaToken, resetCaptcha } = useRecaptcha(SITE_KEY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [captchaToken, setCaptchaToken] = useState("");
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -41,11 +40,11 @@ const Login = () => {
         password: form.password,
         captchaToken,
       });
-      
+
       // Store token and user info
       localStorage.setItem("smartstoretoken", res.data.token);
       localStorage.setItem("smartstoreuser", JSON.stringify(res.data.user));
-      
+
       // Redirect based on role
       const role = res.data.role || (res.data.user && res.data.user.role);
       if (role === "superadmin") {
@@ -66,9 +65,8 @@ const Login = () => {
     } catch (err) {
       console.error("Auth error:", err);
       // Reset reCAPTCHA on failure
-      recaptchaRef.current?.reset();
-      setCaptchaToken("");
-      
+      resetCaptcha();
+
       if (err?.response?.status === 403) {
         if (err.response.data?.message === "Account Suspended") {
           navigate("/suspended", { state: { reason: err.response.data.banReason } });
@@ -87,9 +85,7 @@ const Login = () => {
             </span>
           );
         } else {
-          setError(
-            err.response.data?.message || "Access denied."
-          );
+          setError(err.response.data?.message || "Access denied.");
         }
       } else {
         setError(
@@ -105,12 +101,12 @@ const Login = () => {
     <div className="flex min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white transition-colors duration-300">
       {/* Editorial Split-Screen Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 w-full">
-        
+
         {/* Left Side: Striking Fashion Editorial Image */}
         <div className="relative hidden md:block h-full w-full overflow-hidden bg-neutral-900">
-          <img 
-            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80" 
-            alt="Editorial Fashion" 
+          <img
+            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80"
+            alt="Editorial Fashion"
             className="absolute inset-0 w-full h-full object-cover opacity-70"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-black/60" />
@@ -174,14 +170,9 @@ const Login = () => {
                 />
               </div>
 
+              {/* reCAPTCHA Widget — rendered via direct Google script injection */}
               <div className="flex justify-center md:justify-start py-2 select-none">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                  onChange={(val) => setCaptchaToken(val || "")}
-                  onExpired={() => setCaptchaToken("")}
-                  theme={theme === "dark" ? "dark" : "light"}
-                />
+                <div ref={containerRef} id="recaptcha-login-widget" />
               </div>
 
               <div className="pt-4">
