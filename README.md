@@ -70,6 +70,7 @@ The platform splits accounts into **three tiers**:
 | **Tailwind CSS v3** | Styling framework customized for a high-contrast theme |
 | **Vercel Web Analytics** | Serverless storefront traffic tracking |
 | **Chart.js + React-Chartjs-2** | Monochromatic interactive line charts |
+| **react-google-recaptcha** | Google reCAPTCHA v2 checkbox integration |
 | **Lucide React** | Editorial stroke-based icon library |
 
 ### Backend
@@ -93,6 +94,7 @@ The platform splits accounts into **three tiers**:
 | 🛍️ Storefront | Responsive grid catalog, horizonal categories, and dual keyword/vibe search |
 | 🇮🇳 Localization | Complete conversion to Indian Rupees (`₹`) via global `formatCurrency` utility |
 | 🛡️ OTP Registration | 2-step signup wizard requiring 6-digit OTP verification valid for 5 mins |
+| 🔒 reCAPTCHA v2 | Google reCAPTCHA v2 bot-attack defense integrated on user/admin sign-in |
 | 👤 Profile Deck | Base64 avatar uploads, editable phone/address metadata, and navbar previews |
 | 🤖 AI shopping | Product Q&A, Body-spec Size Predictor, Cart Stylist, and Price Insights |
 | 🏪 Vendor Portal | Inventory tables, product editing forms, sales charts, and recent activity logs |
@@ -315,11 +317,13 @@ OPENAI_API_KEY=sk-proj-...
 BREVO_API_KEY=xkeysib-...
 EMAIL_USER=your_configured_sender_email
 CLIENTURL=http://localhost:5173
+RECAPTCHA_SECRET_KEY=6LfJf_ssAAAAABqtxurfWurGkMjHDk147OVv1WBv
 ```
 
 ### Frontend (`frontend/.env`)
 ```env
 VITE_API_BASE_URL=http://localhost:5000
+VITE_RECAPTCHA_SITE_KEY=6LfJf_ssAAAAAFZBIbjq47Ylxu0cC27U92YhODtZ
 ```
 
 ---
