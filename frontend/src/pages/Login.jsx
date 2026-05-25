@@ -1,18 +1,17 @@
 // frontend/src/pages/Login.jsx
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import api from "../utils/api.js";
-import { useRecaptcha } from "../hooks/useRecaptcha.js";
-
-const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const Login = () => {
   const navigate = useNavigate();
-  const { containerRef, token: captchaToken, resetCaptcha } = useRecaptcha(SITE_KEY);
+  const recaptchaRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -65,7 +64,8 @@ const Login = () => {
     } catch (err) {
       console.error("Auth error:", err);
       // Reset reCAPTCHA on failure
-      resetCaptcha();
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
 
       if (err?.response?.status === 403) {
         if (err.response.data?.message === "Account Suspended") {
@@ -133,7 +133,7 @@ const Login = () => {
             </div>
 
             {error && (
-              <div className="border-l border-rose-500 bg-rose-950/10 px-4 py-3 text-xs text-rose-450 font-sans">
+              <div className="border-l border-rose-500 bg-rose-950/10 px-4 py-3 text-xs text-rose-400 font-sans">
                 {error}
               </div>
             )}
@@ -170,12 +170,18 @@ const Login = () => {
                 />
               </div>
 
-              {/* reCAPTCHA Widget — rendered via direct Google script injection */}
-              <div className="flex justify-center md:justify-start py-2 select-none">
-                <div ref={containerRef} id="recaptcha-login-widget" />
+              {/* reCAPTCHA Widget */}
+              <div className="flex justify-center w-full my-6">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                  onExpired={() => setCaptchaToken(null)}
+                  theme="light"
+                />
               </div>
 
-              <div className="pt-4">
+              <div>
                 <button
                   type="submit"
                   disabled={loading}
