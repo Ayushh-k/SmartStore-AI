@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, RefreshCw, ShoppingBag, Heart, MapPin, X, Package, Tag, Layers, Palette, Store, Users, ChevronRight, ArrowLeft } from "lucide-react";
 import api from "../../utils/api.js";
+import { formatCurrency } from "../../utils/formatCurrency.js";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -204,7 +205,7 @@ const UserManagement = () => {
               >
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 block">LIFETIME REVENUE</span>
                 <p className="text-3xl font-serif text-black dark:text-white mt-1">
-                  ₹{(activity.vendorStats?.lifetimeRevenue ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {formatCurrency(activity.vendorStats?.lifetimeRevenue ?? 0)}
                 </p>
                 <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-mono block mt-1">Total Revenue Generated &rarr;</span>
               </div>
@@ -274,7 +275,7 @@ const UserManagement = () => {
                                 </td>
                                 <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">{p.sku || "N/A"}</td>
                                 <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">{p.category}</td>
-                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">₹{Number(p.price).toFixed(2)}</td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">{formatCurrency(p.price)}</td>
                                 <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">{p.stock} units</td>
                                 <td className="px-6 py-4">
                                   {p.isActive ? (
@@ -321,7 +322,7 @@ const UserManagement = () => {
                                 <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400 font-mono text-[11px]">{new Date(sale.saleDate).toLocaleString()}</td>
                                 <td className="px-6 py-4 font-semibold text-black dark:text-white uppercase font-serif">{sale.product?.name || "Deleted Product"}</td>
                                 <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400">{sale.quantity}</td>
-                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400 font-bold">₹{Number(sale.totalAmount).toFixed(2)}</td>
+                                <td className="px-6 py-4 font-mono text-[11px] text-neutral-600 dark:text-neutral-400 font-bold">{formatCurrency(sale.totalAmount)}</td>
                                 <td className="px-6 py-4 text-neutral-500 uppercase tracking-wider text-[10px]">{sale.channel || "web"}</td>
                               </tr>
                             ))}
@@ -355,7 +356,7 @@ const UserManagement = () => {
                           <span className="font-semibold text-black dark:text-white">ID: {order._id}</span>
                           <div className="flex gap-4 text-neutral-500">
                             <span>Placed: {new Date(order.createdAt).toLocaleDateString()}</span>
-                            <span>Total: ₹{(order.totalAmount || 0).toFixed(2)}</span>
+                            <span>Total: {formatCurrency(order.totalAmount || 0)}</span>
                             <span className={order.paymentDetails?.status === "Completed" ? "text-emerald-500 font-bold" : "text-amber-500 font-bold"}>
                               {order.paymentDetails?.status === "Completed" ? "Paid" : "Pending Pay"}
                             </span>
@@ -369,7 +370,7 @@ const UserManagement = () => {
                                 {item.selectedSize && <span className="text-[10px] text-neutral-500 font-mono ml-2">Size: {item.selectedSize}</span>}
                                 {item.selectedColor && <span className="text-[10px] text-neutral-500 font-mono ml-2">Color: {item.selectedColor}</span>}
                               </div>
-                              <span className="font-mono text-neutral-500">{item.quantity} x ₹{item.product?.price || 0}</span>
+                              <span className="font-mono text-neutral-500">{item.quantity} x {formatCurrency(item.product?.price || 0)}</span>
                             </div>
                           ))}
                         </div>
@@ -403,7 +404,7 @@ const UserManagement = () => {
                             )}
                           </div>
                         </div>
-                        <span className="font-mono text-neutral-500">{item.quantity} units &bull; ₹{item.product?.price || 0}</span>
+                        <span className="font-mono text-neutral-500">{item.quantity} units &bull; {formatCurrency(item.product?.price || 0)}</span>
                       </div>
                     ))}
                   </div>
@@ -429,7 +430,7 @@ const UserManagement = () => {
                           <Heart className="h-4 w-4 text-rose-500 shrink-0 fill-rose-500" />
                           <span className="font-serif uppercase font-semibold text-black dark:text-white truncate">{item.name}</span>
                         </div>
-                        <span className="font-mono font-bold">₹{item.price}</span>
+                        <span className="font-mono font-bold">{formatCurrency(item.price)}</span>
                       </div>
                     ))}
                   </div>
@@ -546,7 +547,7 @@ const UserManagement = () => {
                       </div>
                       <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
                         <span className="text-neutral-500 uppercase">Unit Price:</span>
-                        <span className="font-bold">₹{selectedProduct.price}</span>
+                        <span className="font-bold">{formatCurrency(selectedProduct.price)}</span>
                       </div>
                       <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5 font-sans">
                         <span className="text-neutral-500 uppercase">Stock Level:</span>

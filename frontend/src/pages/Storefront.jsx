@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import api, { toggleWishlistAPI } from "../utils/api.js";
 import ProductDetails from "../components/ProductDetails.jsx";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const CATEGORIES = [
   { name: "Mobiles", icon: Smartphone, color: "text-indigo-400" },
@@ -179,7 +180,7 @@ const ProductCard = ({ product, handleAddToCart, setSelectedProduct, addingToCar
 
         <div className="flex justify-between items-baseline">
           <span className="font-sans text-xs tracking-wider text-neutral-400">
-            ₹{Number(product.price).toFixed(2)}
+            {formatCurrency(product.price)}
           </span>
           <button 
             onClick={() => setSelectedProduct(product)}

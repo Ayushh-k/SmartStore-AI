@@ -13,6 +13,7 @@ import {
   Filler
 } from "chart.js";
 import api from "../../utils/api.js";
+import { formatCurrency } from "../../utils/formatCurrency.js";
 import { useTheme } from "../../context/ThemeContext.jsx";
 
 // Register Chart.js modules
@@ -206,10 +207,7 @@ const PlatformOverview = () => {
                 )}
               </div>
               <div className="font-serif text-5xl sm:text-6xl font-light text-black dark:text-white my-6 tracking-wide">
-                ₹{Number(metrics.totalRevenue || 0).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                {formatCurrency(metrics.totalRevenue || 0)}
               </div>
               <span className="text-[8px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
                 All transactions across all stores

@@ -16,6 +16,7 @@ import {
   Sparkles
 } from "lucide-react";
 import api from "../utils/api.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -692,7 +693,7 @@ const Checkout = () => {
                       </div>
                     </div>
                     <span className="font-bold text-black dark:text-white shrink-0 font-mono">
-                      ₹{(product.price * item.quantity).toFixed(2)}
+                      {formatCurrency(product.price * item.quantity)}
                     </span>
                   </div>
                 );
@@ -703,7 +704,7 @@ const Checkout = () => {
             <div className="border-t border-gray-200 dark:border-white/10 pt-3.5 space-y-2.5 text-xs uppercase tracking-widest font-sans font-medium">
               <div className="flex justify-between text-black dark:text-white">
                 <span>Items Subtotal</span>
-                <span className="font-semibold font-mono">₹{subtotal.toFixed(2)}</span>
+                <span className="font-semibold font-mono">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-black dark:text-white">
                 <span>Shipping & Delivery</span>
@@ -711,7 +712,7 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between text-sm font-bold text-black dark:text-white border-t border-gray-200 dark:border-white/10 pt-3 font-serif">
                 <span>Total Amount Due</span>
-                <span className="font-mono">₹{subtotal.toFixed(2)}</span>
+                <span className="font-mono">{formatCurrency(subtotal)}</span>
               </div>
             </div>
           </div>

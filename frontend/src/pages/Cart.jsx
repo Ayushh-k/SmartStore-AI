@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Trash2, ShoppingCart, Loader2, ArrowRight, CheckCircle2, PackageMinus, Plus, Minus, Share2, Check, Sparkles } from "lucide-react";
 import api from "../utils/api.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
@@ -199,7 +200,7 @@ const Cart = () => {
             </div>
             <div className="flex justify-between text-sm border-t border-gray-200 dark:border-white/10 pt-2 font-bold text-gray-900 dark:text-white">
               <span>Total Paid:</span>
-              <span>₹{Number(orderReceipt.totalAmount).toFixed(2)}</span>
+              <span>{formatCurrency(orderReceipt.totalAmount)}</span>
             </div>
           </div>
 
@@ -304,8 +305,8 @@ const Cart = () => {
                       </div>
 
                       <div className="text-right min-w-[70px]">
-                        <span className="text-xs font-bold text-gray-900 dark:text-white">₹{(product.price * item.quantity).toFixed(2)}</span>
-                        <span className="text-[10px] text-gray-500 dark:text-gray-400 block">₹{Number(product.price).toFixed(2)} each</span>
+                        <span className="text-xs font-bold text-gray-900 dark:text-white">{formatCurrency(product.price * item.quantity)}</span>
+                        <span className="text-[10px] text-gray-500 dark:text-gray-400 block">{formatCurrency(product.price)} each</span>
                       </div>
 
                       <button
@@ -332,7 +333,7 @@ const Cart = () => {
               <div className="space-y-2.5 text-xs text-gray-600 dark:text-gray-400">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">₹{subtotal.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping:</span>
@@ -340,11 +341,11 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>Tax:</span>
-                  <span className="font-semibold text-gray-800 dark:text-slate-200">₹0.00</span>
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">{formatCurrency(0)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-white/10 pt-3">
                   <span>Estimated Total:</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>{formatCurrency(subtotal)}</span>
                 </div>
               </div>
 
@@ -420,7 +421,7 @@ const Cart = () => {
                           {prod.category || "General"}
                         </span>
                         <h4 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-neutral-600 dark:group-hover:text-neutral-350 transition-colors">{prod.name}</h4>
-                        <p className="text-[10px] text-gray-700 dark:text-gray-300 font-bold">₹{Number(prod.price).toFixed(2)}</p>
+                        <p className="text-[10px] text-gray-700 dark:text-gray-300 font-bold">{formatCurrency(prod.price)}</p>
                       </div>
                     </div>
 

@@ -17,6 +17,7 @@ import {
   Heart
 } from "lucide-react";
 import api from "../utils/api.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const ProductDetails = ({ 
   product, 
@@ -307,7 +308,7 @@ const ProductDetails = ({
             <div className="grid grid-cols-2 gap-3 p-4 bg-slate-950/60 rounded-lg border border-slate-900 h-fit">
               <div>
                 <span className="text-[9px] text-slate-500 uppercase block font-semibold">Store Price</span>
-                <p className="text-base font-bold text-slate-100">₹{Number(product.price).toFixed(2)}</p>
+                <p className="text-base font-bold text-slate-100">{formatCurrency(product.price)}</p>
               </div>
               <div>
                 <span className="text-[9px] text-slate-500 uppercase block font-semibold">Availability</span>

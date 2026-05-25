@@ -15,6 +15,7 @@ import {
 import api from "../utils/api.js";
 import { ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
 import { useTheme } from "../context/ThemeContext.jsx";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 ChartJS.register(
   LineElement,
@@ -166,7 +167,7 @@ const Dashboard = () => {
             </span>
           </div>
           <div className="mt-4 font-serif text-3xl font-light text-black dark:text-white">
-            ${(metrics.totalRevenue || 0).toLocaleString()}
+            {formatCurrency(metrics.totalRevenue || 0)}
           </div>
           <div className="mt-2 text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
             vs. last week
@@ -265,7 +266,7 @@ const Dashboard = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-bold text-black dark:text-white">
-                      ${sale.amount.toLocaleString()}
+                      {formatCurrency(sale.amount)}
                     </div>
                     <div className="text-[9px] uppercase tracking-widest text-neutral-600 dark:text-neutral-400 mt-0.5">
                       Paid

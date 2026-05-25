@@ -20,6 +20,7 @@ import {
   X
 } from "lucide-react";
 import api, { toggleWishlistAPI } from "../utils/api.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const COLOR_MAP = {
   black: "#000000",
@@ -559,10 +560,10 @@ const ProductPage = () => {
                 <span className="text-[9px] text-neutral-500 uppercase tracking-widest font-bold block">Price Value</span>
                 <div className="flex items-baseline gap-3">
                   <span className="text-3xl font-serif text-neutral-900 dark:text-white">
-                    ₹{product.price.toFixed(2)}
+                    {formatCurrency(product.price)}
                   </span>
-                  <span className="text-sm text-neutral-400 dark:text-neutral-550 line-through font-sans">
-                    ₹{originalPrice.toFixed(2)}
+                  <span className="text-sm text-neutral-400 dark:text-neutral-555 line-through font-sans">
+                    {formatCurrency(originalPrice)}
                   </span>
                   <span className="text-xs text-[#D4AF37] font-semibold tracking-wider font-sans uppercase">
                     ({discountPercent}% OFF)

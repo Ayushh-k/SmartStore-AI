@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, RefreshCw, X } from "lucide-react";
 import api from "../../utils/api.js";
+import { formatCurrency } from "../../utils/formatCurrency.js";
 
 const StoreManagement = () => {
   const [vendors, setVendors] = useState([]);
@@ -226,7 +227,7 @@ const StoreManagement = () => {
                         Category: {product.category || "General"}
                       </span>
                       <span className="font-mono text-xs font-bold text-black dark:text-white">
-                        ₹{product.price}
+                        {formatCurrency(product.price)}
                       </span>
                     </div>
                   </div>
@@ -315,7 +316,7 @@ const StoreManagement = () => {
                       </div>
                       <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5">
                         <span className="text-neutral-500 uppercase">Unit Price:</span>
-                        <span className="font-bold">₹{activeProductDetails.price}</span>
+                        <span className="font-bold">{formatCurrency(activeProductDetails.price)}</span>
                       </div>
                       <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5">
                         <span className="text-neutral-500 uppercase">Stock Level:</span>

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import api from "../utils/api.js";
 import AvatarUpload from "../components/AvatarUpload.jsx";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const UserProfile = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -388,7 +389,7 @@ const UserProfile = () => {
                         </div>
                         <div>
                           <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Total Paid</span>
-                          <span className="text-xs font-bold text-black dark:text-white block">₹{Number(order.totalAmount).toFixed(2)}</span>
+                          <span className="text-xs font-bold text-black dark:text-white block">{formatCurrency(order.totalAmount)}</span>
                         </div>
                         <div>
                           <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Status</span>
@@ -427,8 +428,8 @@ const UserProfile = () => {
                             </div>
                           </div>
                           <div className="text-right shrink-0 min-w-[70px]">
-                            <p className="font-bold text-black dark:text-white">₹{(item.priceAtPurchase * item.quantity).toFixed(2)}</p>
-                            <p className="text-[10px] text-neutral-500">{item.quantity} × ₹{Number(item.priceAtPurchase).toFixed(2)}</p>
+                            <p className="font-bold text-black dark:text-white">{formatCurrency(item.priceAtPurchase * item.quantity)}</p>
+                            <p className="text-[10px] text-neutral-500">{item.quantity} × {formatCurrency(item.priceAtPurchase)}</p>
                           </div>
                         </div>
                       ))}
@@ -503,7 +504,7 @@ const UserProfile = () => {
                             {product.name}
                           </h4>
                           <p className="text-xs font-montserrat text-black dark:text-white font-semibold pt-0.5">
-                            ₹{Number(product.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatCurrency(product.price)}
                           </p>
                         </div>
                       </div>
