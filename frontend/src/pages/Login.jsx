@@ -41,7 +41,7 @@ const Login = () => {
       } else if (role === "admin") {
         navigate("/dashboard");
       } else if (role === "user") {
-        navigate("/profile");
+        navigate("/");
       } else {
         const urlParams = new URLSearchParams(window.location.search);
         const importCart = urlParams.get("importCart");

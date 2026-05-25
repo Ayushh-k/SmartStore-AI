@@ -90,6 +90,18 @@ const Cart = () => {
     const newQty = currentQty + amount;
     if (newQty < 1) return;
 
+    // Optimistically update the state array for instant rendering of local totals
+    const originalCart = [...cart];
+    setCart(prevCart =>
+      prevCart.map(item =>
+        (item.product?._id === productId &&
+         (item.selectedSize || "") === size &&
+         (item.selectedColor || "") === color)
+          ? { ...item, quantity: newQty }
+          : item
+      )
+    );
+
     try {
       const res = await api.put(`/api/store/cart/${productId}`, {
         quantity: newQty,
@@ -101,6 +113,7 @@ const Cart = () => {
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
       console.error("Update quantity error:", err);
+      setCart(originalCart);
       setMessage(err?.response?.data?.message || "Failed to update quantity.");
       setMessageType("error");
     }

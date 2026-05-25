@@ -10,6 +10,7 @@ import {
   Menu,
   X
 } from "lucide-react";
+import ThemeToggle from "../../components/ThemeToggle.jsx";
 
 /**
   DeveloperLayout with minimalist luxury style for the developer dashboard.
@@ -174,6 +175,7 @@ const DeveloperLayout = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle className="text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white transition-colors duration-300 p-1 bg-transparent border-none flex items-center justify-center cursor-pointer focus:outline-none" />
               {/* Active Super Admin info displayed clearly on top header */}
               <div className="hidden sm:flex flex-col text-right">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white">

@@ -14,6 +14,7 @@ import {
   Settings
 } from "lucide-react";
 import api from "../utils/api.js";
+import ThemeToggle from "./ThemeToggle.jsx";
 
 /**
   AdminLayout with glassmorphic sidebar, header with notifications, and main content area.
@@ -287,6 +288,7 @@ const AdminLayout = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle className="text-neutral-500 hover:text-black dark:text-neutral-450 dark:hover:text-white transition-colors duration-300 p-1 bg-transparent border-none flex items-center justify-center cursor-pointer focus:outline-none" />
               {/* Notification Bell Dropdown */}
               <div className="relative" ref={notificationRef}>
                 <button

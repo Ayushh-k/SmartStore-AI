@@ -3,7 +3,7 @@
 import express from "express";
 import Product from "../models/Product.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
-import { getProductById, createProductReview } from "../controllers/productController.js";
+import { getProductById, createProductReview, updateVendorProduct } from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -57,20 +57,7 @@ router.get("/:id", protect, getProductById);
 router.post("/:id/reviews", protect, createProductReview);
 
 // Update product
-router.put("/:id", protect, admin, async (req, res) => {
-  try {
-    const prod = await Product.findById(req.params.id);
-    if (!prod) {
-      return res.status(404).json({ message: "Product not found." });
-    }
-    Object.assign(prod, req.body);
-    await prod.save();
-    res.json(prod);
-  } catch (error) {
-    console.error("Update product error:", error);
-    res.status(500).json({ message: "Failed to update product." });
-  }
-});
+router.put("/:id", protect, admin, updateVendorProduct);
 
 // Delete product
 router.delete("/:id", protect, admin, async (req, res) => {

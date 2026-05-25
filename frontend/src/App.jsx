@@ -7,6 +7,7 @@ import UserNavbar from "./components/UserNavbar.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Products from "./pages/Products.jsx";
 import AddProduct from "./pages/AddProduct.jsx";
+import EditProduct from "./pages/EditProduct.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Storefront from "./pages/Storefront.jsx";
@@ -159,6 +160,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/new" element={<AddProduct />} />
+        <Route path="/products/edit/:id" element={<EditProduct />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin/settings" element={<StoreSettings />} />
       </Route>

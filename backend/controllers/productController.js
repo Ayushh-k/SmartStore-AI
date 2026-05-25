@@ -68,3 +68,30 @@ export const createProductReview = async (req, res) => {
     res.status(500).json({ message: "Failed to submit review." });
   }
 };
+
+/**
+  Update a vendor product, verifying ownership.
+  Route: PUT /api/products/:id
+  Access: Protected (Vendor/Admin)
+ */
+export const updateVendorProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // STRICT OWNERSHIP CHECK: Verify if product.vendor matches the logged-in vendor's ID
+    if (product.vendor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to update this product." });
+    }
+
+    Object.assign(product, req.body);
+    await product.save();
+    
+    res.json(product);
+  } catch (error) {
+    console.error("Update vendor product error:", error);
+    res.status(500).json({ message: "Failed to update product." });
+  }
+};

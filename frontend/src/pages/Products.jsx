@@ -194,13 +194,21 @@ const Products = () => {
                       </button>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => handleDelete(product._id)}
-                        className="text-neutral-550 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-500 transition-colors cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
-                        title="Delete Product"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex items-center justify-end gap-4">
+                        <Link
+                          to={`/products/edit/${product._id}`}
+                          className="text-xs uppercase tracking-widest font-semibold text-black dark:text-white hover:underline transition-all"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(product._id)}
+                          className="text-neutral-550 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-500 transition-colors cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
+                          title="Delete Product"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

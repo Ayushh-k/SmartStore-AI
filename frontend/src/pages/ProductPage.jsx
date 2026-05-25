@@ -121,6 +121,7 @@ const ProductPage = () => {
 
   // Toast State
   const [toast, setToast] = useState({ show: false, message: "" });
+  const [addedNotification, setAddedNotification] = useState(false);
 
   const showToast = (message) => {
     setToast({ show: true, message });
@@ -242,12 +243,10 @@ const ProductPage = () => {
 
       // Dispatch event to update global cart counts
       window.dispatchEvent(new Event("cartUpdated"));
-      showToast("Added to Cart!");
-      
-      // Redirect to the checkout cart page
+      setAddedNotification(true);
       setTimeout(() => {
-        navigate("/cart");
-      }, 1000);
+        setAddedNotification(false);
+      }, 2500);
     } catch (err) {
       console.error("Add to cart API error:", err);
       showToast(err?.response?.data?.message || "Failed to add item to shopping cart.");
@@ -714,6 +713,11 @@ const ProductPage = () => {
                   </>
                 )}
               </button>
+              {addedNotification && (
+                <p className="mt-2.5 text-center text-[10px] tracking-[0.2em] uppercase font-semibold text-emerald-600 dark:text-emerald-450 animate-fadeIn">
+                  ADDED TO CART
+                </p>
+              )}
             </div>
 
             {/* Delivery Pincode Checker */}
