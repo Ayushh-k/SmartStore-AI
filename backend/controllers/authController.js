@@ -3,6 +3,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import axios from "axios";
 
 /**
   Generate JWT token for a user.
@@ -161,12 +162,23 @@ export const register = async (req, res) => {
  */
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, captchaToken } = req.body;
 
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: "Email and password are required." });
+    }
+
+    if (!captchaToken) {
+      return res.status(400).json({ message: "Please complete the human verification." });
+    }
+
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
+    const captchaVerify = await axios.post(verifyUrl);
+
+    if (!captchaVerify.data.success) {
+      return res.status(403).json({ message: "Bot behavior detected. CAPTCHA verification failed." });
     }
 
     const user = await User.findOne({ email });

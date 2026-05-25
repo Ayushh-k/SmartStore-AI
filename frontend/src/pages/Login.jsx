@@ -1,14 +1,19 @@
 // frontend/src/pages/Login.jsx
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api from "../utils/api.js";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useTheme } from "../context/ThemeContext.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const recaptchaRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -24,10 +29,17 @@ const Login = () => {
     setLoading(true);
     setError("");
 
+    if (!captchaToken) {
+      setError("Please complete the human verification.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await api.post("/api/auth/login", {
         email: form.email,
         password: form.password,
+        captchaToken,
       });
       
       // Store token and user info
@@ -53,6 +65,10 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Auth error:", err);
+      // Reset reCAPTCHA on failure
+      recaptchaRef.current?.reset();
+      setCaptchaToken("");
+      
       if (err?.response?.status === 403) {
         if (err.response.data?.message === "Account Suspended") {
           navigate("/suspended", { state: { reason: err.response.data.banReason } });
@@ -155,6 +171,16 @@ const Login = () => {
                   onChange={handleChange}
                   className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
                   placeholder="••••••••"
+                />
+              </div>
+
+              <div className="flex justify-center md:justify-start py-2 select-none">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  onChange={(val) => setCaptchaToken(val || "")}
+                  onExpired={() => setCaptchaToken("")}
+                  theme={theme === "dark" ? "dark" : "light"}
                 />
               </div>
 
