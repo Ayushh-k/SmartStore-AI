@@ -532,18 +532,23 @@ const Storefront = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
           
-          <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full z-10 text-center md:text-left flex flex-col items-center md:items-start space-y-6">
+          <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full z-10 text-center md:text-left flex flex-col items-center md:items-start space-y-5">
             <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-gold font-bold">
               Luxury Atelier
             </span>
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white tracking-widest leading-tight uppercase max-w-3xl">
-              THE WINTER COLLECTION
+            <h2 className="text-3xl xs:text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white tracking-wide sm:tracking-widest leading-tight uppercase max-w-3xl">
+              THE WINTER
+              <br />
+              COLLECTION
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-400 font-sans tracking-[0.2em] max-w-lg leading-relaxed uppercase">
+            <p className="text-[11px] sm:text-sm text-neutral-400 font-sans tracking-[0.15em] sm:tracking-[0.2em] max-w-lg leading-relaxed uppercase">
               EXQUISITE MINIMALISM / ARCHITECTURAL FORMS
             </p>
-            <div className="pt-4">
-              <Link to="/login" className="bg-white text-black px-12 py-4 text-xs font-semibold uppercase tracking-[0.2em] hover:bg-neutral-200 transition-colors duration-300">
+            <div className="pt-3">
+              <Link
+                to="/login"
+                className="inline-block bg-white text-black px-8 sm:px-12 py-3.5 sm:py-4 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] hover:bg-neutral-200 transition-colors duration-300 whitespace-nowrap"
+              >
                 Explore The Collection
               </Link>
             </div>
@@ -647,18 +652,23 @@ const Storefront = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
         
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full z-10 text-center md:text-left flex flex-col items-center md:items-start space-y-6">
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full z-10 text-center md:text-left flex flex-col items-center md:items-start space-y-5">
           <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-gold font-bold">
             Luxury Atelier
           </span>
-          <h2 className="text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white tracking-widest leading-tight uppercase max-w-3xl">
-            THE WINTER COLLECTION
+          <h2 className="text-3xl xs:text-4xl sm:text-6xl md:text-7xl font-serif font-light text-white tracking-wide sm:tracking-widest leading-tight uppercase max-w-3xl">
+            THE WINTER
+            <br />
+            COLLECTION
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-400 font-sans tracking-[0.2em] max-w-lg leading-relaxed uppercase">
+          <p className="text-[11px] sm:text-sm text-neutral-400 font-sans tracking-[0.15em] sm:tracking-[0.2em] max-w-lg leading-relaxed uppercase">
             EXQUISITE MINIMALISM / ARCHITECTURAL FORMS
           </p>
-          <div className="pt-4">
-            <a href="#catalog" className="bg-white text-black px-12 py-4 text-xs font-semibold uppercase tracking-[0.2em] hover:bg-neutral-200 transition-colors duration-300">
+          <div className="pt-3">
+            <a
+              href="#catalog"
+              className="inline-block bg-white text-black px-8 sm:px-12 py-3.5 sm:py-4 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] hover:bg-neutral-200 transition-colors duration-300 whitespace-nowrap"
+            >
               Browse Catalog
             </a>
           </div>
