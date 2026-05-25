@@ -141,7 +141,7 @@ const GlobalProducts = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right font-medium text-black dark:text-white">
-                      ${Number(product.price).toFixed(2)}
+                      ₹{Number(product.price).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-right space-x-3">
                       <button
@@ -237,7 +237,7 @@ const GlobalProducts = () => {
                     </div>
                     <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5">
                       <span className="text-neutral-500 uppercase">Unit Price:</span>
-                      <span className="font-bold">${activeProductDetails.price}</span>
+                      <span className="font-bold">₹{activeProductDetails.price}</span>
                     </div>
                     <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5">
                       <span className="text-neutral-500 uppercase">Stock Level:</span>

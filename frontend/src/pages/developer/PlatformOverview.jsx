@@ -206,7 +206,7 @@ const PlatformOverview = () => {
                 )}
               </div>
               <div className="font-serif text-5xl sm:text-6xl font-light text-black dark:text-white my-6 tracking-wide">
-                ${Number(metrics.totalRevenue || 0).toLocaleString(undefined, {
+                ₹{Number(metrics.totalRevenue || 0).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}

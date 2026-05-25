@@ -206,7 +206,7 @@ export const checkout = async (req, res) => {
     // Create admin notification
     await Notification.create({
       type: "purchase",
-      message: `New purchase by ${user.name}! Bought ${user.cart.reduce((sum, item) => sum + item.quantity, 0)} product(s) for a total of $${totalAmount.toFixed(2)}.`,
+      message: `New purchase by ${user.name}! Bought ${user.cart.reduce((sum, item) => sum + item.quantity, 0)} product(s) for a total of ₹${totalAmount.toFixed(2)}.`,
     });
 
     // Clear user's cart

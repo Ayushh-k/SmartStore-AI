@@ -226,7 +226,7 @@ const StoreManagement = () => {
                         Category: {product.category || "General"}
                       </span>
                       <span className="font-mono text-xs font-bold text-black dark:text-white">
-                        ${product.price}
+                        ₹{product.price}
                       </span>
                     </div>
                   </div>
@@ -315,7 +315,7 @@ const StoreManagement = () => {
                       </div>
                       <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5">
                         <span className="text-neutral-500 uppercase">Unit Price:</span>
-                        <span className="font-bold">${activeProductDetails.price}</span>
+                        <span className="font-bold">₹{activeProductDetails.price}</span>
                       </div>
                       <div className="flex justify-between border-b border-neutral-200/60 dark:border-neutral-900/60 pb-1.5">
                         <span className="text-neutral-500 uppercase">Stock Level:</span>

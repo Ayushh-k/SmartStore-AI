@@ -152,7 +152,7 @@ const simulateProductQA = (product, question) => {
   const q = question.toLowerCase();
 
   if (q.includes("price") || q.includes("cost") || q.includes("how much") || q.includes("rate") || q.includes("cheap")) {
-    return `The current price of the ${contextName} is $${product.price.toFixed(2)}.`;
+    return `The current price of the ${contextName} is ₹${product.price.toFixed(2)}.`;
   } else if (q.includes("stock") || q.includes("available") || q.includes("how many") || q.includes("left") || q.includes("buy")) {
     return `We currently have ${product.stock} units of ${contextName} available in our inventory.`;
   } else if (q.includes("tag") || q.includes("category") || q.includes("type") || q.includes("kind")) {
@@ -160,7 +160,7 @@ const simulateProductQA = (product, question) => {
   } else if (q.includes("feature") || q.includes("keyword") || q.includes("spec") || q.includes("description") || q.includes("detail") || q.includes("material") || q.includes("quality")) {
     return `Key specs and features for the ${contextName} include: ${contextKeywords || "Premium design and materials"}. Description: ${contextDesc || "No description available"}.`;
   } else {
-    return `Based on the product specs, the ${contextName} is a premium ${product.category || "product"} featuring "${contextKeywords || contextTags}". It offers great reliability and is currently priced at $${product.price.toFixed(2)}.`;
+    return `Based on the product specs, the ${contextName} is a premium ${product.category || "product"} featuring "${contextKeywords || contextTags}". It offers great reliability and is currently priced at ₹${product.price.toFixed(2)}.`;
   }
 };
 
@@ -202,7 +202,7 @@ Category: ${product.category || "N/A"}
 Description: ${contextDesc}
 Tags: ${contextTags}
 Keywords: ${contextKeywords}
-Price: $${product.price}
+Price: ₹${product.price}
 Stock: ${product.stock}
 
 Question: "${question}"
@@ -381,19 +381,19 @@ export const priceInsights = async (req, res) => {
     // Local calculation fallback
     let summary = "";
     if (history.length < 2) {
-      summary = `Price is stable at $${product.price.toFixed(2)}. Excellent baseline value for this tier.`;
+      summary = `Price is stable at ₹${product.price.toFixed(2)}. Excellent baseline value for this tier.`;
     } else {
       const oldest = history[0].price;
       const latest = product.price;
       const diff = oldest - latest;
       if (diff > 0) {
         const pct = Math.round((diff / oldest) * 100);
-        summary = `Price dropped by ${pct}% ($${diff.toFixed(2)}) since release. Outstanding time to buy!`;
+        summary = `Price dropped by ${pct}% (₹${diff.toFixed(2)}) since release. Outstanding time to buy!`;
       } else if (diff < 0) {
         const pct = Math.round((Math.abs(diff) / oldest) * 100);
-        summary = `Price rose ${pct}% ($${Math.abs(diff).toFixed(2)}) recently. Order soon before further updates.`;
+        summary = `Price rose ${pct}% (₹${Math.abs(diff).toFixed(2)}) recently. Order soon before further updates.`;
       } else {
-        summary = `Price has remained steady at $${product.price.toFixed(2)}. Consistently valued.`;
+        summary = `Price has remained steady at ₹${product.price.toFixed(2)}. Consistently valued.`;
       }
     }
 
@@ -407,7 +407,7 @@ export const priceInsights = async (req, res) => {
 You are a pricing analyst for an e-commerce platform.
 Analyze the price history of this product:
 Product Name: ${product.name}
-Current Price: $${product.price}
+Current Price: ₹${product.price}
 Price History: ${JSON.stringify(history)}
 
 Generate a punchy, one-liner buyer recommendation (maximum 15 words) based on the price trend. Examples:

@@ -560,10 +560,10 @@ const ProductPage = () => {
                 <span className="text-[9px] text-neutral-500 uppercase tracking-widest font-bold block">Price Value</span>
                 <div className="flex items-baseline gap-3">
                   <span className="text-3xl font-serif text-neutral-900 dark:text-white">
-                    ${product.price.toFixed(2)}
+                    ₹{product.price.toFixed(2)}
                   </span>
                   <span className="text-sm text-neutral-400 dark:text-neutral-550 line-through font-sans">
-                    ${originalPrice.toFixed(2)}
+                    ₹{originalPrice.toFixed(2)}
                   </span>
                   <span className="text-xs text-[#D4AF37] font-semibold tracking-wider font-sans uppercase">
                     ({discountPercent}% OFF)

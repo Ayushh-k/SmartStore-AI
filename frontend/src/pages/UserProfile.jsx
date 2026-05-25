@@ -44,7 +44,7 @@ const UserProfile = () => {
     city: "",
     state: "",
     zipCode: "",
-    country: "United States",
+    country: "India",
     isDefault: false
   });
   const [addressLoading, setAddressLoading] = useState(false);
@@ -219,7 +219,7 @@ const UserProfile = () => {
         city: "",
         state: "",
         zipCode: "",
-        country: "United States",
+        country: "India",
         isDefault: false
       });
       setShowAddressForm(false);
@@ -238,7 +238,7 @@ const UserProfile = () => {
       city: addr.city || "",
       state: addr.state || "",
       zipCode: addr.zipCode || "",
-      country: addr.country || "United States",
+      country: addr.country || "India",
       isDefault: addr.isDefault || false
     });
     setEditingAddressId(addr._id);
@@ -381,7 +381,7 @@ const UserProfile = () => {
                         </div>
                         <div>
                           <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Total Paid</span>
-                          <span className="text-xs font-bold text-black dark:text-white block">${Number(order.totalAmount).toFixed(2)}</span>
+                          <span className="text-xs font-bold text-black dark:text-white block">₹{Number(order.totalAmount).toFixed(2)}</span>
                         </div>
                         <div>
                           <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Status</span>
@@ -420,8 +420,8 @@ const UserProfile = () => {
                             </div>
                           </div>
                           <div className="text-right shrink-0 min-w-[70px]">
-                            <p className="font-bold text-black dark:text-white">${(item.priceAtPurchase * item.quantity).toFixed(2)}</p>
-                            <p className="text-[10px] text-neutral-500">{item.quantity} × ${Number(item.priceAtPurchase).toFixed(2)}</p>
+                            <p className="font-bold text-black dark:text-white">₹{(item.priceAtPurchase * item.quantity).toFixed(2)}</p>
+                            <p className="text-[10px] text-neutral-500">{item.quantity} × ₹{Number(item.priceAtPurchase).toFixed(2)}</p>
                           </div>
                         </div>
                       ))}
@@ -496,7 +496,7 @@ const UserProfile = () => {
                             {product.name}
                           </h4>
                           <p className="text-xs font-montserrat text-black dark:text-white font-semibold pt-0.5">
-                            ${Number(product.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            ₹{Number(product.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
@@ -546,7 +546,7 @@ const UserProfile = () => {
                        city: "",
                        state: "",
                        zipCode: "",
-                       country: "United States",
+                       country: "India",
                        isDefault: false
                      });
                      setShowAddressForm(true);

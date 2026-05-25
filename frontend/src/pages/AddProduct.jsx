@@ -415,7 +415,7 @@ const AddProduct = () => {
 
               <div>
                 <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Price (USD) *
+                  Price (₹ / INR) *
                 </label>
                 <input
                   type="number"

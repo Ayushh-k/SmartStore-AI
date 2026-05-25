@@ -178,7 +178,7 @@ const Products = () => {
                         {product.category || "General"}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-right font-medium text-black dark:text-white">${Number(product.price).toFixed(2)}</td>
+                    <td className="px-5 py-4 text-right font-medium text-black dark:text-white">₹{Number(product.price).toFixed(2)}</td>
                     <td className="px-5 py-4 text-right">
                       <span className={`font-semibold ${Number(product.stock) <= 5 ? "text-rose-600 dark:text-rose-500" : "text-black dark:text-white"}`}>
                         {product.stock}
@@ -276,7 +276,7 @@ const Products = () => {
                   </div>
                   <div>
                     <span className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-450 font-semibold">Price</span>
-                    <p className="text-black dark:text-white mt-0.5 font-medium text-[11px]">${Number(selectedProduct.price).toFixed(2)}</p>
+                    <p className="text-black dark:text-white mt-0.5 font-medium text-[11px]">₹{Number(selectedProduct.price).toFixed(2)}</p>
                   </div>
                   <div>
                     <span className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-450 font-semibold">Inventory</span>

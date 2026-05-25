@@ -36,7 +36,7 @@ const Checkout = () => {
     city: "",
     state: "",
     zipCode: "",
-    country: "United States",
+    country: "India",
     isDefault: false
   });
   const [addressFormLoading, setAddressFormLoading] = useState(false);
@@ -121,7 +121,7 @@ const Checkout = () => {
         city: "",
         state: "",
         zipCode: "",
-        country: "United States",
+        country: "India",
         isDefault: false
       });
       setShowAddressForm(false);
@@ -335,7 +335,7 @@ const Checkout = () => {
                     <label className="mb-1 block text-[10px] uppercase text-gray-500 dark:text-gray-400 font-bold tracking-widest">Street Address *</label>
                     <input 
                       type="text" 
-                      placeholder="123 Luxury Ave, Apt 4B" 
+                      placeholder="Flat No. 302, Royal Heights" 
                       className="w-full bg-transparent border-b border-gray-300 dark:border-white/20 px-0 py-2 text-xs text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-sans"
                       value={addressForm.street}
                       onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
@@ -348,7 +348,7 @@ const Checkout = () => {
                       <label className="mb-1 block text-[10px] uppercase text-gray-500 dark:text-gray-400 font-bold tracking-widest">City *</label>
                       <input 
                         type="text" 
-                        placeholder="Beverly Hills" 
+                        placeholder="Mumbai" 
                         className="w-full bg-transparent border-b border-gray-300 dark:border-white/20 px-0 py-2 text-xs text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-sans"
                         value={addressForm.city}
                         onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
@@ -359,7 +359,7 @@ const Checkout = () => {
                       <label className="mb-1 block text-[10px] uppercase text-gray-500 dark:text-gray-400 font-bold tracking-widest">State / Province *</label>
                       <input 
                         type="text" 
-                        placeholder="California" 
+                        placeholder="Maharashtra" 
                         className="w-full bg-transparent border-b border-gray-300 dark:border-white/20 px-0 py-2 text-xs text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-sans"
                         value={addressForm.state}
                         onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
@@ -373,7 +373,7 @@ const Checkout = () => {
                       <label className="mb-1 block text-[10px] uppercase text-gray-500 dark:text-gray-400 font-bold tracking-widest">Zip / Postal Code *</label>
                       <input 
                         type="text" 
-                        placeholder="90210" 
+                        placeholder="400001" 
                         className="w-full bg-transparent border-b border-gray-300 dark:border-white/20 px-0 py-2 text-xs text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-sans"
                         value={addressForm.zipCode}
                         onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
@@ -384,7 +384,7 @@ const Checkout = () => {
                       <label className="mb-1 block text-[10px] uppercase text-gray-500 dark:text-gray-400 font-bold tracking-widest">Country *</label>
                       <input 
                         type="text" 
-                        placeholder="United States" 
+                        placeholder="India" 
                         className="w-full bg-transparent border-b border-gray-300 dark:border-white/20 px-0 py-2 text-xs text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-sans"
                         value={addressForm.country}
                         onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
@@ -692,7 +692,7 @@ const Checkout = () => {
                       </div>
                     </div>
                     <span className="font-bold text-black dark:text-white shrink-0 font-mono">
-                      ${(product.price * item.quantity).toFixed(2)}
+                      ₹{(product.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 );
@@ -703,7 +703,7 @@ const Checkout = () => {
             <div className="border-t border-gray-200 dark:border-white/10 pt-3.5 space-y-2.5 text-xs uppercase tracking-widest font-sans font-medium">
               <div className="flex justify-between text-black dark:text-white">
                 <span>Items Subtotal</span>
-                <span className="font-semibold font-mono">${subtotal.toFixed(2)}</span>
+                <span className="font-semibold font-mono">₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-black dark:text-white">
                 <span>Shipping & Delivery</span>
@@ -711,7 +711,7 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between text-sm font-bold text-black dark:text-white border-t border-gray-200 dark:border-white/10 pt-3 font-serif">
                 <span>Total Amount Due</span>
-                <span className="font-mono">${subtotal.toFixed(2)}</span>
+                <span className="font-mono">₹{subtotal.toFixed(2)}</span>
               </div>
             </div>
           </div>

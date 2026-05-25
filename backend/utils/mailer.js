@@ -30,7 +30,7 @@ export const sendOrderConfirmationEmail = async (userEmail, userName, order) => 
           ${item.quantity}
         </td>
         <td style="padding: 16px 0; text-align: right; vertical-align: top; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; color: #000000;">
-          $${(item.priceAtPurchase * item.quantity).toFixed(2)}
+          ₹${(item.priceAtPurchase * item.quantity).toFixed(2)}
         </td>
       </tr>
     `;
@@ -136,7 +136,7 @@ export const sendOrderConfirmationEmail = async (userEmail, userName, order) => 
               <table width="50%" align="right" border="0" cellspacing="0" cellpadding="0" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #555555;">
                 <tr>
                   <td style="padding: 6px 0; text-align: left;">Subtotal</td>
-                  <td style="padding: 6px 0; text-align: right; color: #000000; font-weight: bold;">$${order.totalAmount.toFixed(2)}</td>
+                  <td style="padding: 6px 0; text-align: right; color: #000000; font-weight: bold;">₹${order.totalAmount.toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; text-align: left;">Shipping</td>
@@ -144,11 +144,11 @@ export const sendOrderConfirmationEmail = async (userEmail, userName, order) => 
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; text-align: left;">Tax</td>
-                  <td style="padding: 6px 0; text-align: right; color: #000000;">$0.00</td>
+                  <td style="padding: 6px 0; text-align: right; color: #000000;">₹0.00</td>
                 </tr>
                 <tr style="border-top: 1px solid #000000;">
                   <td style="padding: 12px 0 0 0; text-align: left; font-size: 13px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: 0.05em;">Total Due</td>
-                  <td style="padding: 12px 0 0 0; text-align: right; font-size: 14px; font-weight: bold; color: #000000;">$${order.totalAmount.toFixed(2)}</td>
+                  <td style="padding: 12px 0 0 0; text-align: right; font-size: 14px; font-weight: bold; color: #000000;">₹${order.totalAmount.toFixed(2)}</td>
                 </tr>
               </table>
             </td>
