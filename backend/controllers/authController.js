@@ -50,7 +50,7 @@ const getLuxuryOtpTemplate = (userName, otpCode) => `
                 Authorize Your Account, ${userName}
               </h2>
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 300; line-height: 1.6; color: #555555; margin: 0 0 32px 0;">
-                Thank you for registering with SmartStore. To finalize your customer account credentials, please utilize the authorization code below. This code will expire in 15 minutes.
+                Thank you for registering with SmartStore. To finalize your customer account credentials, please utilize the authorization code below. This code will expire in 5 minutes.
               </p>
             </td>
           </tr>
@@ -103,9 +103,9 @@ export const register = async (req, res) => {
       return res.status(409).json({ message: "User already exists." });
     }
 
-    // Generate 6-digit OTP code and set 15 minutes expiration
+    // Generate 6-digit OTP code and set 5 minutes expiration
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpire = new Date(Date.now() + 15 * 60 * 1000);
+    const otpExpire = new Date(Date.now() + 5 * 60 * 1000);
 
     const user = await User.create({
       name,
@@ -292,17 +292,17 @@ export const resendOtp = async (req, res) => {
       return res.status(400).json({ message: "Account is already verified." });
     }
 
-    // Generate new OTP and update expire (15 min)
+    // Generate new OTP and update expire (5 min)
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     user.verificationOtp = otpCode;
-    user.otpExpire = new Date(Date.now() + 15 * 60 * 1000);
+    user.otpExpire = new Date(Date.now() + 5 * 60 * 1000);
     await user.save();
 
     // Resend email
     const luxuryOtpTemplate = getLuxuryOtpTemplate(user.name, otpCode);
     await sendEmail({
       to: user.email,
-      subject: "AUTHORIZE YOUR ACCOUNT",
+      subject: "AUTHORIZE YOUR ACCOUNT - SMARTSTORE",
       htmlContent: luxuryOtpTemplate,
     });
 

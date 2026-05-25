@@ -1,6 +1,6 @@
 // frontend/src/pages/Signup.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api from "../utils/api.js";
@@ -15,12 +15,32 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [resendSuccess, setResendSuccess] = useState("");
   const [otpCode, setOtpCode] = useState("");
+  const [timer, setTimer] = useState(120); // 2-minute countdown timer
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     role: "user",
   });
+
+  // Ticks down the 2-minute resend countdown timer when step 2 is active
+  useEffect(() => {
+    let interval = null;
+    if (step === 2 && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +65,7 @@ const Signup = () => {
       // Navigate to OTP step
       setUnverifiedEmail(form.email);
       setStep(2);
+      setTimer(120); // Initialize timer to 120s
     } catch (err) {
       console.error("Auth registration error:", err);
       setError(
@@ -102,6 +123,7 @@ const Signup = () => {
         email: unverifiedEmail,
       });
       setResendSuccess(res.data.message || "A new code has been sent.");
+      setTimer(120); // Reset timer to 120s
     } catch (err) {
       console.error("Resend OTP error:", err);
       setError(
@@ -288,6 +310,16 @@ const Signup = () => {
                     />
                   </div>
 
+                  {/* Elegant Minimalist Advisory Note */}
+                  <div className="pt-2 pb-1 border-t border-black/5 dark:border-white/5 space-y-1">
+                    <p className="text-[10px] text-neutral-500 font-sans tracking-widest uppercase font-semibold">
+                      Advisory Notice
+                    </p>
+                    <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-serif italic leading-relaxed">
+                      If the email does not arrive in your primary inbox, please review your junk or spam folders. The verification token remains active for exactly 5 minutes from issuance.
+                    </p>
+                  </div>
+
                   <div className="pt-2">
                     <button
                       type="submit"
@@ -306,11 +338,11 @@ const Signup = () => {
                 <div className="border-t border-black/10 dark:border-white/5 pt-6 flex justify-between items-center text-xs font-sans tracking-wider">
                   <button
                     type="button"
-                    disabled={loading}
+                    disabled={loading || timer > 0}
                     onClick={handleResendOtp}
-                    className="text-black dark:text-white hover:text-gold transition-colors underline font-medium cursor-pointer disabled:opacity-50"
+                    className="text-black dark:text-white hover:text-gold transition-colors underline font-medium cursor-pointer disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
                   >
-                    Resend Code
+                    {timer > 0 ? `Resend Code (${formatTime(timer)})` : "Resend Code"}
                   </button>
                   <button
                     type="button"
