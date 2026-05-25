@@ -312,8 +312,8 @@ const UserNavbar = () => {
         </div>
       </div>
 
-      {/* ── Top Bar (3-column grid) ────────────────────────────────────── */}
-      <div className="grid grid-cols-3 w-full items-center">
+      {/* ── Top Bar — flex with absolutely centered logo ─────────────── */}
+      <div className="relative flex w-full items-center justify-between">
 
         {/* Left: Hamburger (mobile) | Nav links (desktop) */}
         <div className="flex items-center justify-start gap-6">
@@ -383,49 +383,49 @@ const UserNavbar = () => {
           </div>
         </div>
 
-        {/* Center: Logo */}
-        <div className="flex justify-center">
-          <Link to="/" className={logoClass}>
+        {/* Center: Logo — absolutely centered so it never shifts */}
+        <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
+          <Link to="/" className={`${logoClass} pointer-events-auto`}>
             SmartStore
           </Link>
         </div>
 
         {/* Right: Theme Toggle, Cart, Profile/Sign In */}
-        <div className="flex items-center gap-3 sm:gap-5 justify-end">
+        <div className="flex items-center gap-2 sm:gap-4 justify-end z-10">
           {/* Theme Toggle — hidden on mobile (moved to drawer footer) */}
           <div className="hidden md:block">
             <ThemeToggle className={themeToggleClass} />
           </div>
 
-          {/* Cart Icon — always visible */}
+          {/* Cart Icon — always visible, icon-only on mobile */}
           <NavLink
             to="/cart"
             className={({ isActive }) =>
-              `flex items-center gap-1.5 relative font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 pb-1 ${
+              `relative flex items-center gap-1.5 font-montserrat text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 ${
                 isStorefront
                   ? isActive
-                    ? "text-white border-b border-white"
-                    : "text-neutral-400 hover:text-white"
+                    ? "text-white"
+                    : "text-neutral-300 hover:text-white"
                   : isActive
-                  ? "text-black dark:text-white border-b border-black dark:border-white"
+                  ? "text-black dark:text-white"
                   : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
               }`
             }
             aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ""}`}
           >
             <div className="relative">
-              <ShoppingCart className="h-4 w-4 stroke-[1.5]" />
-              {/* Mobile cart badge */}
+              <ShoppingCart className="h-[18px] w-[18px] stroke-[1.5]" />
+              {/* Mobile cart badge — top-right of icon, won't overflow */}
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 md:hidden bg-black dark:bg-white text-white dark:text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center font-montserrat leading-none">
+                <span className="absolute -top-[6px] -right-[6px] md:hidden bg-black dark:bg-white text-white dark:text-black text-[8px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-[3px] font-montserrat leading-none">
                   {cartCount > 9 ? "9+" : cartCount}
                 </span>
               )}
             </div>
-            <span className="hidden sm:inline">Cart</span>
-            {/* Desktop count */}
+            {/* Desktop: text + count */}
+            <span className="hidden md:inline">Cart</span>
             {cartCount > 0 && (
-              <span className="hidden sm:inline text-[10px] font-montserrat font-medium text-amber-600 dark:text-amber-400">
+              <span className="hidden md:inline text-[10px] font-montserrat font-medium text-amber-600 dark:text-amber-400">
                 ({cartCount})
               </span>
             )}
@@ -459,11 +459,11 @@ const UserNavbar = () => {
             )}
           </div>
 
-          {/* Mobile: Profile icon (if logged in) */}
+          {/* Mobile: Profile icon-only (if logged in) */}
           {user && (
             <Link
               to="/profile"
-              className={`md:hidden p-1 transition-colors ${
+              className={`md:hidden transition-colors ${
                 isStorefront
                   ? "text-neutral-300 hover:text-white"
                   : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
@@ -474,25 +474,26 @@ const UserNavbar = () => {
                 <img
                   src={user.avatar}
                   alt="Profile"
-                  className="h-5 w-5 object-cover border border-black/10 dark:border-white/10"
+                  className="h-[18px] w-[18px] object-cover border border-black/10 dark:border-white/10"
                 />
               ) : (
-                <User className="h-4.5 w-4.5 stroke-[1.5]" />
+                <User className="h-[18px] w-[18px] stroke-[1.5]" />
               )}
             </Link>
           )}
 
-          {/* Mobile: Sign In button (if not logged in) */}
+          {/* Mobile: Sign In icon-only (if not logged in) */}
           {!user && (
             <Link
               to="/login"
-              className={`md:hidden font-montserrat text-[10px] tracking-[0.15em] uppercase px-3 py-1.5 font-semibold transition-colors ${
+              className={`md:hidden transition-colors ${
                 isStorefront
-                  ? "bg-white text-black hover:bg-neutral-200"
-                  : "bg-black text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200"
+                  ? "text-neutral-300 hover:text-white"
+                  : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
               }`}
+              aria-label="Sign In"
             >
-              Sign In
+              <User className="h-[18px] w-[18px] stroke-[1.5]" />
             </Link>
           )}
         </div>
