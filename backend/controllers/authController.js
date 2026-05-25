@@ -174,11 +174,21 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Please complete the human verification." });
     }
 
-    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
-    const captchaVerify = await axios.post(verifyUrl);
+    // Hardcoded secret to bypass potential .env loading issues on the host
+    const secretKey = "6LfJf_ssAAAAABqtxurfWurGkMjHDk147OVv1WBv";
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captchaToken}`;
 
-    if (!captchaVerify.data.success) {
-      return res.status(403).json({ message: "Bot behavior detected. CAPTCHA verification failed." });
+    try {
+      const captchaVerify = await axios.post(verifyUrl);
+      console.log("[reCAPTCHA] Google response:", JSON.stringify(captchaVerify.data));
+
+      if (!captchaVerify.data.success) {
+        console.error("[reCAPTCHA] Verification failed. Error codes:", captchaVerify.data["error-codes"]);
+        return res.status(403).json({ message: "Bot behavior detected. CAPTCHA verification failed." });
+      }
+    } catch (captchaError) {
+      console.error("[reCAPTCHA] Request to Google failed:", captchaError.message);
+      return res.status(500).json({ message: "Error verifying CAPTCHA. Please try again." });
     }
 
     const user = await User.findOne({ email });
