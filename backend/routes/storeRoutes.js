@@ -23,7 +23,7 @@ router.get("/products/:id", getPublicProduct);
 router.post("/cart", protect, addToCart);
 router.post("/cart/batch", protect, batchUpdateCart);
 router.get("/cart", protect, getCart);
-router.put("/cart/:productId", protect, updateCartQuantity);
+router.put("/cart/:cartItemId", protect, updateCartQuantity);
 router.delete("/cart/:productId", protect, removeFromCart);
 router.post("/checkout", protect, checkout);
 

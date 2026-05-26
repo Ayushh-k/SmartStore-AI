@@ -87,7 +87,7 @@ const Cart = () => {
     fetchCart();
   }, []);
 
-  const handleUpdateQuantity = async (productId, size = "", color = "", currentQty, amount) => {
+  const handleUpdateQuantity = async (cartItemId, currentQty, amount) => {
     const newQty = currentQty + amount;
     if (newQty < 1) return;
 
@@ -95,19 +95,15 @@ const Cart = () => {
     const originalCart = [...cart];
     setCart(prevCart =>
       prevCart.map(item =>
-        (item.product?._id === productId &&
-         (item.selectedSize || "") === size &&
-         (item.selectedColor || "") === color)
+        item._id === cartItemId
           ? { ...item, quantity: newQty }
           : item
       )
     );
 
     try {
-      const res = await api.put(`/api/store/cart/${productId}`, {
-        quantity: newQty,
-        size,
-        color
+      const res = await api.put(`/api/store/cart/${cartItemId}`, {
+        quantity: newQty
       });
       setCart(res.data || []);
       // Emit event so the Navbar updates the count instantly
@@ -289,7 +285,7 @@ const Cart = () => {
                     <div className="flex items-center justify-between sm:justify-end gap-6">
                       <div className="flex items-center gap-2.5">
                         <button
-                          onClick={() => handleUpdateQuantity(product._id, item.selectedSize, item.selectedColor, item.quantity, -1)}
+                          onClick={() => handleUpdateQuantity(item._id, item.quantity, -1)}
                           disabled={item.quantity <= 1}
                           className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
                         >
@@ -297,7 +293,7 @@ const Cart = () => {
                         </button>
                         <span className="text-xs font-semibold font-mono w-4 text-center">{item.quantity}</span>
                         <button
-                          onClick={() => handleUpdateQuantity(product._id, item.selectedSize, item.selectedColor, item.quantity, 1)}
+                          onClick={() => handleUpdateQuantity(item._id, item.quantity, 1)}
                           className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white cursor-pointer rounded-none animate-none"
                         >
                           <Plus className="h-3.5 w-3.5" />

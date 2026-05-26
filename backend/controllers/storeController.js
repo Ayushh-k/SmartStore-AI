@@ -267,9 +267,11 @@ export const removeFromCart = async (req, res) => {
  */
 export const updateCartQuantity = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const { quantity, size = "", color = "" } = req.body;
+    const { cartItemId } = req.params;
+    const { quantity } = req.body;
     const qty = Number(quantity);
+
+    console.log("Incoming Update Request - CartItemId:", cartItemId, "Quantity:", quantity);
 
     if (isNaN(qty) || qty < 1) {
       return res.status(400).json({ message: "Invalid quantity. Must be at least 1." });
@@ -280,25 +282,22 @@ export const updateCartQuantity = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const itemIndex = user.cart.findIndex(
-      (item) =>
-        item.product.toString() === productId.toString() &&
-        (item.selectedSize || "") === size &&
-        (item.selectedColor || "") === color
-    );
+    // Safely find the item using Mongoose subdocument id() method
+    const item = user.cart.id(cartItemId);
 
-    if (itemIndex === -1) {
+    if (!item) {
+      console.error("Item mismatch. Available IDs in user cart:", user.cart.map((i) => i._id.toString()));
       return res.status(404).json({ message: "Item not found in cart." });
     }
 
-    user.cart[itemIndex].quantity = qty;
+    item.quantity = qty;
     await user.save();
 
     const populatedUser = await User.findById(req.user._id).populate("cart.product");
     res.json(populatedUser.cart);
   } catch (error) {
     console.error("Update cart quantity error:", error);
-    res.status(500).json({ message: "Failed to update quantity in cart." });
+    res.status(500).json({ message: error.message || "Failed to update quantity in cart." });
   }
 };
 
