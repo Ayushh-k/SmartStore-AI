@@ -250,27 +250,16 @@ const AdminProfile = () => {
 
           {/* SECURITY & PASSWORD Form */}
           <form onSubmit={handleUpdatePassword} className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-6">
-            <div className="flex justify-between items-center border-b border-gray-200 dark:border-neutral-900 pb-3 mb-2">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">
-                Security & Password
+            <div className="border-b border-neutral-200 mb-6 mt-10 text-left">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-black dark:text-white font-mono">
+                SECURITY & PASSWORD
               </h3>
             </div>
 
-            {pwdSuccess && (
-              <div className="border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/15 text-emerald-800 dark:text-emerald-300 p-3 text-[9px] uppercase tracking-widest font-bold">
-                {pwdSuccess}
-              </div>
-            )}
-            {pwdError && (
-              <div className="border border-rose-500/30 bg-rose-50 dark:bg-rose-950/15 text-rose-800 dark:text-rose-300 p-3 text-[9px] uppercase tracking-widest font-bold">
-                {pwdError}
-              </div>
-            )}
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Current Password *
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs uppercase text-neutral-500 tracking-widest font-mono mb-1">
+                  CURRENT PASSWORD *
                 </label>
                 <input
                   type="password"
@@ -278,13 +267,13 @@ const AdminProfile = () => {
                   placeholder="CURRENT PASSWORD"
                   value={pwdForm.oldPassword}
                   onChange={(e) => setPwdForm(prev => ({ ...prev, oldPassword: e.target.value }))}
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-mono"
+                  className="w-full bg-transparent border border-neutral-300 text-xs p-2.5 focus:outline-none focus:border-black focus:ring-0 rounded-none font-mono text-black dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  New Password *
+                <label className="block text-xs uppercase text-neutral-500 tracking-widest font-mono mb-1">
+                  NEW PASSWORD *
                 </label>
                 <input
                   type="password"
@@ -292,13 +281,13 @@ const AdminProfile = () => {
                   placeholder="NEW PASSWORD"
                   value={pwdForm.newPassword}
                   onChange={(e) => setPwdForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-mono"
+                  className="w-full bg-transparent border border-neutral-300 text-xs p-2.5 focus:outline-none focus:border-black focus:ring-0 rounded-none font-mono text-black dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Confirm New Password *
+                <label className="block text-xs uppercase text-neutral-500 tracking-widest font-mono mb-1">
+                  CONFIRM NEW PASSWORD *
                 </label>
                 <input
                   type="password"
@@ -306,7 +295,7 @@ const AdminProfile = () => {
                   placeholder="CONFIRM NEW PASSWORD"
                   value={pwdForm.confirmPassword}
                   onChange={(e) => setPwdForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-mono"
+                  className="w-full bg-transparent border border-neutral-300 text-xs p-2.5 focus:outline-none focus:border-black focus:ring-0 rounded-none font-mono text-black dark:text-white"
                 />
               </div>
             </div>
@@ -315,12 +304,22 @@ const AdminProfile = () => {
               <button
                 type="submit"
                 disabled={pwdLoading}
-                className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="bg-black text-white hover:bg-neutral-900 py-3.5 text-xs font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none cursor-pointer"
               >
-                {pwdLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                Update Password
+                {pwdLoading ? "UPDATING..." : "UPDATE PASSWORD"}
               </button>
             </div>
+
+            {pwdSuccess && (
+              <p className="text-[10px] uppercase font-mono tracking-widest text-emerald-600 dark:text-emerald-400 mt-4 text-left">
+                {pwdSuccess}
+              </p>
+            )}
+            {pwdError && (
+              <p className="text-[10px] uppercase font-mono tracking-widest text-rose-600 dark:text-rose-400 mt-4 text-left">
+                {pwdError}
+              </p>
+            )}
           </form>
         </div>
       </div>
