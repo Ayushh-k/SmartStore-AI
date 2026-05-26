@@ -206,7 +206,7 @@ const PlatformOverview = () => {
                   <span className="h-1.5 w-1.5 bg-black dark:bg-white" />
                 )}
               </div>
-              <div className="font-serif text-4xl sm:text-5xl font-light text-black dark:text-white my-6 tracking-wide truncate whitespace-nowrap overflow-hidden w-full">
+              <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-black dark:text-white my-6 tracking-wide truncate whitespace-nowrap overflow-hidden w-full">
                 {formatCurrency(metrics.totalRevenue || 0)}
               </div>
               <span className="text-[8px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
@@ -231,7 +231,7 @@ const PlatformOverview = () => {
                   <span className="h-1.5 w-1.5 bg-black dark:bg-white" />
                 )}
               </div>
-              <div className="font-serif text-4xl sm:text-5xl font-light text-black dark:text-white my-6 tracking-wide truncate whitespace-nowrap overflow-hidden w-full">
+              <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-black dark:text-white my-6 tracking-wide truncate whitespace-nowrap overflow-hidden w-full">
                 {metrics.totalVendors || 0}
               </div>
               <span className="text-[8px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
@@ -256,7 +256,7 @@ const PlatformOverview = () => {
                   <span className="h-1.5 w-1.5 bg-black dark:bg-white" />
                 )}
               </div>
-              <div className="font-serif text-4xl sm:text-5xl font-light text-black dark:text-white my-6 tracking-wide truncate whitespace-nowrap overflow-hidden w-full">
+              <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-black dark:text-white my-6 tracking-wide truncate whitespace-nowrap overflow-hidden w-full">
                 {metrics.totalProducts || 0}
               </div>
               <span className="text-[8px] uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
