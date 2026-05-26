@@ -52,6 +52,7 @@ const ProductPage = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
+  const [reviewImages, setReviewImages] = useState([]);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState("");
 
@@ -315,6 +316,17 @@ const ProductPage = () => {
     }, 850);
   };
 
+  const handleReviewImagesUpload = (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReviewImages((prev) => [...prev, reader.result]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!reviewComment.trim()) return;
@@ -324,11 +336,13 @@ const ProductPage = () => {
     try {
       await api.post(`/api/products/${id}/reviews`, {
         rating: reviewRating,
-        comment: reviewComment
+        comment: reviewComment,
+        images: reviewImages
       });
       showToast("Review submitted successfully!");
       setReviewComment("");
       setReviewRating(5);
+      setReviewImages([]);
       setShowReviewForm(false);
       await fetchProductDetails();
     } catch (err) {
@@ -567,23 +581,52 @@ const ProductPage = () => {
                 </button>
               </div>
               <div className="grid grid-cols-5 gap-2">
-                {["XS", "S", "M", "L", "XL"].map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => {
-                      setSelectedSize(size);
-                      setSizeError(false);
-                    }}
-                    className={`h-11 text-xs font-sans tracking-wide border flex items-center justify-center cursor-pointer transition-all duration-200 uppercase rounded-none ${
-                      selectedSize === size
-                        ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-semibold"
-                        : "border-neutral-300 dark:border-neutral-700 bg-transparent text-black dark:text-white hover:border-black dark:hover:border-white"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {product.sizes && product.sizes.length > 0 ? (
+                  product.sizes.map((sizeObj) => {
+                    const isOutOfStock = sizeObj.stock <= 0;
+                    const isSelected = selectedSize === sizeObj.size;
+                    return (
+                      <button
+                        key={sizeObj.size}
+                        type="button"
+                        disabled={isOutOfStock}
+                        onClick={() => {
+                          if (!isOutOfStock) {
+                            setSelectedSize(sizeObj.size);
+                            setSizeError(false);
+                          }
+                        }}
+                        className={`h-11 text-xs font-sans tracking-wide border flex items-center justify-center cursor-pointer transition-all duration-200 uppercase rounded-none ${
+                          isOutOfStock
+                            ? "line-through opacity-40 text-neutral-450 cursor-not-allowed border-neutral-200 bg-transparent"
+                            : isSelected
+                            ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-semibold"
+                            : "border-neutral-350 dark:border-neutral-750 bg-transparent text-black dark:text-white hover:border-black dark:hover:border-white"
+                        }`}
+                      >
+                        {sizeObj.size}
+                      </button>
+                    );
+                  })
+                ) : (
+                  ["XS", "S", "M", "L", "XL"].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => {
+                        setSelectedSize(size);
+                        setSizeError(false);
+                      }}
+                      className={`h-11 text-xs font-sans tracking-wide border flex items-center justify-center cursor-pointer transition-all duration-200 uppercase rounded-none ${
+                        selectedSize === size
+                          ? "border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-semibold"
+                          : "border-neutral-350 dark:border-neutral-750 bg-transparent text-black dark:text-white hover:border-black dark:hover:border-white"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
 
@@ -711,30 +754,31 @@ const ProductPage = () => {
                   {accordions.details ? <ChevronUp className="h-4 w-4 stroke-[1.5]" /> : <ChevronDown className="h-4 w-4 stroke-[1.5]" />}
                 </button>
                 {accordions.details && (
-                  <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed space-y-1 font-light tracking-wide uppercase">
-                    <p>Composition: Premium Organic Materials</p>
-                    <p>Design: Modern Minimalist silhouette</p>
-                    <p>SKU: {product.sku || "N/A"}</p>
-                    <p>Category: {product.category || "Atelier Curated"}</p>
+                  <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-450 leading-relaxed space-y-1 font-light tracking-wide uppercase">
+                    {product.fabric && <p>Composition: {product.fabric}</p>}
+                    {product.fit && <p>Fit: {product.fit}</p>}
+                    {product.sku && <p>SKU: {product.sku}</p>}
+                    {product.category && <p>Category: {product.category}</p>}
                   </div>
                 )}
               </div>
 
-              <div className="border-b border-neutral-200 dark:border-neutral-800 py-4">
-                <button
-                  onClick={() => toggleAccordion("care")}
-                  className="w-full flex justify-between items-center text-left cursor-pointer"
-                >
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">Care Guide</span>
-                  {accordions.care ? <ChevronUp className="h-4 w-4 stroke-[1.5]" /> : <ChevronDown className="h-4 w-4 stroke-[1.5]" />}
-                </button>
-                {accordions.care && (
-                  <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-light tracking-wide uppercase">
-                    <p>Hand wash cold or professional dry clean only.</p>
-                    <p>Lay flat to dry. Do not tumble dry. Cool iron if needed.</p>
-                  </div>
-                )}
-              </div>
+              {product.careInstructions && (
+                <div className="border-b border-neutral-200 dark:border-neutral-800 py-4">
+                  <button
+                    onClick={() => toggleAccordion("care")}
+                    className="w-full flex justify-between items-center text-left cursor-pointer"
+                  >
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">Care Guide</span>
+                    {accordions.care ? <ChevronUp className="h-4 w-4 stroke-[1.5]" /> : <ChevronDown className="h-4 w-4 stroke-[1.5]" />}
+                  </button>
+                  {accordions.care && (
+                    <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-450 leading-relaxed font-light tracking-wide uppercase">
+                      <p>{product.careInstructions}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="border-b border-neutral-200 dark:border-neutral-800 py-4">
                 <button
@@ -745,7 +789,7 @@ const ProductPage = () => {
                   {accordions.shipping ? <ChevronUp className="h-4 w-4 stroke-[1.5]" /> : <ChevronDown className="h-4 w-4 stroke-[1.5]" />}
                 </button>
                 {accordions.shipping && (
-                  <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-light tracking-wide uppercase">
+                  <div className="mt-3 text-xs text-neutral-600 dark:text-neutral-450 leading-relaxed font-light tracking-wide uppercase">
                     <p>Complimentary signature packaging and express delivery.</p>
                     <p>Returns accepted within 10 days of delivery date.</p>
                   </div>
@@ -1036,9 +1080,7 @@ const ProductPage = () => {
                         </button>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Comment textarea */}
+                  </div>                  {/* Comment textarea */}
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-neutral-500 block">Comment</label>
                     <textarea
@@ -1049,6 +1091,34 @@ const ProductPage = () => {
                       className="w-full bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 focus:border-black dark:focus:border-white px-4 py-3 text-xs text-black dark:text-white placeholder-neutral-400 focus:outline-none rounded-none"
                       required
                     />
+                  </div>
+
+                  {/* Photo Upload */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-neutral-500 block">Upload Photos</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleReviewImagesUpload}
+                      className="w-full text-xs text-neutral-550 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-black dark:file:border-white file:text-xs file:font-semibold file:bg-transparent file:text-black dark:file:text-white hover:file:bg-black hover:file:text-white dark:hover:file:bg-white dark:hover:file:text-black cursor-pointer"
+                    />
+                    {reviewImages.length > 0 && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        {reviewImages.map((img, idx) => (
+                          <div key={idx} className="relative w-[50px] h-[50px] border border-neutral-300">
+                            <img src={img} alt="preview" className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => setReviewImages(reviewImages.filter((_, i) => i !== idx))}
+                              className="absolute top-0 right-0 bg-black/80 text-white text-[8px] px-1 font-bold"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-4 pt-2">
@@ -1065,8 +1135,11 @@ const ProductPage = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setShowReviewForm(false)}
-                      className="border border-neutral-300 dark:border-neutral-700 text-black dark:text-white px-6 py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer rounded-none bg-transparent"
+                      onClick={() => {
+                        setReviewImages([]);
+                        setShowReviewForm(false);
+                      }}
+                      className="border border-neutral-300 dark:border-neutral-700 text-black dark:text-white px-6 py-3.5 text-xs font-bold uppercase tracking-widest hover:bg-neutral-100 dark:hover:bg-neutral-850 transition-colors cursor-pointer rounded-none bg-transparent"
                     >
                       Cancel
                     </button>
@@ -1107,9 +1180,23 @@ const ProductPage = () => {
                             {new Date(r.createdAt || r.date).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-light uppercase tracking-wide">
+                        <p className="text-xs text-neutral-700 dark:text-neutral-350 leading-relaxed font-light uppercase tracking-wide">
                           {r.comment}
                         </p>
+                        
+                        {r.images && r.images.length > 0 && (
+                          <div className="flex gap-2 mt-3 flex-wrap">
+                            {r.images.map((img, imgIdx) => (
+                              <a key={imgIdx} href={img} target="_blank" rel="noopener noreferrer" className="cursor-zoom-in">
+                                <img
+                                  src={img}
+                                  alt={`Review upload ${imgIdx}`}
+                                  className="w-16 h-16 object-cover border border-neutral-200 hover:border-black transition-all rounded-none bg-neutral-50 dark:bg-neutral-955"
+                                />
+                              </a>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

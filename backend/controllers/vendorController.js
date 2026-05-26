@@ -139,6 +139,9 @@ export const getVendorProducts = async (req, res) => {
 export const createVendorProduct = async (req, res) => {
   try {
     req.body.vendor = req.user._id;
+    if (req.body.sizes && Array.isArray(req.body.sizes)) {
+      req.body.stock = req.body.sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
+    }
     const product = new Product(req.body);
     await product.save();
     res.status(201).json(product);
@@ -164,6 +167,9 @@ export const updateVendorProduct = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to update this product." });
     }
 
+    if (req.body.sizes && Array.isArray(req.body.sizes)) {
+      req.body.stock = req.body.sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
+    }
     Object.assign(product, req.body);
     await product.save();
     res.json(product);

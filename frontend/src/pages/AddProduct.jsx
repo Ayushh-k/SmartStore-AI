@@ -35,15 +35,18 @@ const AddProduct = () => {
     brand: "",
     description: "",
     tags: "",
+    colors: "",
+    fabric: "",
+    fit: "",
+    careInstructions: "",
     captionsInstagram: "",
     captionsFacebook: "",
     captionsTwitter: "",
   });
 
   const [sizes, setSizes] = useState([]);
-  const [sizeInput, setSizeInput] = useState("");
-  const [colors, setColors] = useState([]);
-  const [colorInput, setColorInput] = useState("");
+  const [tempSize, setTempSize] = useState("");
+  const [tempStock, setTempStock] = useState("");
   const [uploadedImages, setUploadedImages] = useState([]);
 
   const handleImageUpload = (e) => {
@@ -66,34 +69,22 @@ const AddProduct = () => {
     setUploadedImages((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  const handleSizeKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const val = sizeInput.trim();
-      if (val && !sizes.includes(val)) {
-        setSizes([...sizes, val]);
-      }
-      setSizeInput("");
+  const handleAddSizeStock = () => {
+    const size = tempSize.trim().toUpperCase();
+    const stock = Number(tempStock) || 0;
+    if (!size) return;
+
+    if (sizes.some((item) => item.size === size)) {
+      setSizes(sizes.map((item) => (item.size === size ? { ...item, stock } : item)));
+    } else {
+      setSizes([...sizes, { size, stock }]);
     }
+    setTempSize("");
+    setTempStock("");
   };
 
   const removeSize = (indexToRemove) => {
     setSizes(sizes.filter((_, idx) => idx !== indexToRemove));
-  };
-
-  const handleColorKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const val = colorInput.trim();
-      if (val && !colors.includes(val)) {
-        setColors([...colors, val]);
-      }
-      setColorInput("");
-    }
-  };
-
-  const removeColor = (indexToRemove) => {
-    setColors(colors.filter((_, idx) => idx !== indexToRemove));
   };
 
   const [aiContext, setAiContext] = useState({
@@ -222,15 +213,22 @@ const AddProduct = () => {
       const audienceVal = audienceSelection === "other" ? customAudience : audienceSelection;
       const keywordsVal = keywordSelection === "other" ? customKeywords : keywordSelection;
 
+      const parsedColors = form.colors
+        ? form.colors.split(",").map((c) => c.trim()).filter(Boolean)
+        : [];
+
       const payload = {
         name: form.name,
         sku: form.sku || undefined,
         price: Number(form.price) || 0,
-        stock: Number(form.stock) || 0,
+        stock: sizes.length > 0 ? sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) : (Number(form.stock) || 0),
         category: form.category || undefined,
         brand: form.brand || undefined,
         sizes,
-        colors,
+        colors: parsedColors,
+        fabric: form.fabric,
+        fit: form.fit,
+        careInstructions: form.careInstructions,
         audience: audienceVal,
         keywords: keywordsVal,
         images: uploadedImages,
@@ -269,12 +267,17 @@ const AddProduct = () => {
         brand: "",
         description: "",
         tags: "",
+        colors: "",
+        fabric: "",
+        fit: "",
+        careInstructions: "",
         captionsInstagram: "",
         captionsFacebook: "",
         captionsTwitter: "",
       });
       setSizes([]);
-      setColors([]);
+      setTempSize("");
+      setTempStock("");
       setUploadedImages([]);
       setAiContext({
         productType: "",
@@ -432,79 +435,125 @@ const AddProduct = () => {
 
               <div>
                 <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Initial Stock *
+                  Initial Stock (Calculated from Matrix)
                 </label>
                 <input
                   type="number"
                   name="stock"
                   min="0"
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                  placeholder="50"
-                  value={form.stock}
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-neutral-405 dark:text-neutral-500 focus:outline-none transition-colors duration-300 rounded-none cursor-not-allowed"
+                  placeholder="0"
+                  value={sizes.length > 0 ? sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) : form.stock}
                   onChange={handleChange}
-                  required
+                  disabled={sizes.length > 0}
+                  required={sizes.length === 0}
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-3">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider">
+                  Size & Stock Matrix
+                </label>
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="block text-[8px] uppercase text-neutral-450 mb-1">Size (e.g. XS, M)</label>
+                    <input
+                      type="text"
+                      placeholder="Size"
+                      value={tempSize}
+                      onChange={(e) => setTempSize(e.target.value)}
+                      className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-1.5 text-black dark:text-white focus:outline-none rounded-none"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-[8px] uppercase text-neutral-450 mb-1">Stock</label>
+                    <input
+                      type="number"
+                      placeholder="Qty"
+                      value={tempStock}
+                      onChange={(e) => setTempStock(e.target.value)}
+                      className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-1.5 text-black dark:text-white focus:outline-none rounded-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddSizeStock}
+                    className="border border-black dark:border-white text-black dark:text-white px-5 py-2 text-xs uppercase tracking-widest font-bold rounded-none transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
+                {sizes.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                    {sizes.map((item, idx) => (
+                      <div key={idx} className="border border-neutral-200 dark:border-neutral-800 p-2.5 flex justify-between items-center text-xs rounded-none bg-neutral-50 dark:bg-neutral-900/30">
+                        <span className="uppercase tracking-wider font-semibold">{item.size}: {item.stock}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSize(idx)}
+                          className="text-neutral-450 dark:text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none font-bold"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Colors (comma-separated list)
+                </label>
+                <input
+                  type="text"
+                  name="colors"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Black, White, Camel, Navy"
+                  value={form.colors}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Fabric Composition
+                </label>
+                <input
+                  type="text"
+                  name="fabric"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. 100% Organic Linen"
+                  value={form.fabric}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Fit Type
+                </label>
+                <input
+                  type="text"
+                  name="fit"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Loose/Relaxed Fit"
+                  value={form.fit}
+                  onChange={handleChange}
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Sizes (type and press Enter)
+                  Care Instructions
                 </label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {sizes.map((size, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-gray-200 dark:border-neutral-800 text-black dark:text-white text-[10px] uppercase tracking-wider bg-gray-50 dark:bg-transparent rounded-none"
-                    >
-                      {size}
-                      <button
-                        type="button"
-                        onClick={() => removeSize(idx)}
-                        className="text-neutral-450 dark:text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none font-bold"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
                 <input
                   type="text"
-                  value={sizeInput}
-                  onChange={(e) => setSizeInput(e.target.value)}
-                  onKeyDown={handleSizeKeyDown}
+                  name="careInstructions"
                   className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                  placeholder="E.g. S, M, L, XL"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Colors (type and press Enter)
-                </label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {colors.map((color, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-gray-200 dark:border-neutral-800 text-black dark:text-white text-[10px] uppercase tracking-wider bg-gray-50 dark:bg-transparent rounded-none"
-                    >
-                      {color}
-                      <button
-                        type="button"
-                        onClick={() => removeColor(idx)}
-                        className="text-neutral-450 dark:text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none font-bold"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={colorInput}
-                  onChange={(e) => setColorInput(e.target.value)}
-                  onKeyDown={handleColorKeyDown}
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                  placeholder="E.g. Black, White, Charcoal"
+                  placeholder="E.g. Dry clean recommended. Cold gentle cycle."
+                  value={form.careInstructions}
+                  onChange={handleChange}
                 />
               </div>
 

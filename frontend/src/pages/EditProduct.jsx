@@ -37,14 +37,20 @@ const EditProduct = () => {
     stock: "",
     category: "",
     brand: "",
-    sizes: "",
     colors: "",
+    fabric: "",
+    fit: "",
+    careInstructions: "",
     description: "",
     tags: "",
     captionsInstagram: "",
     captionsFacebook: "",
     captionsTwitter: "",
   });
+
+  const [sizes, setSizes] = useState([]);
+  const [tempSize, setTempSize] = useState("");
+  const [tempStock, setTempStock] = useState("");
 
   const [uploadedImages, setUploadedImages] = useState([]);
   const [aiContext, setAiContext] = useState({
@@ -105,8 +111,10 @@ const EditProduct = () => {
           stock: product.stock !== undefined ? String(product.stock) : "",
           category: product.category || "",
           brand: product.brand || "",
-          sizes: (product.sizes || []).join(", "),
           colors: (product.colors || []).join(", "),
+          fabric: product.fabric || "",
+          fit: product.fit || "",
+          careInstructions: product.careInstructions || "",
           description: product.description || "",
           tags: (product.tags || []).join(", "),
           captionsInstagram: captionsByPlatform.instagram,
@@ -114,6 +122,7 @@ const EditProduct = () => {
           captionsTwitter: captionsByPlatform.twitter,
         });
 
+        setSizes(product.sizes || []);
         setUploadedImages(product.images || []);
         
         // Setup AI context presets
@@ -184,6 +193,24 @@ const EditProduct = () => {
     setUploadedImages((prev) => prev.filter((_, idx) => idx !== index));
   };
 
+  const handleAddSizeStock = () => {
+    const size = tempSize.trim().toUpperCase();
+    const stock = Number(tempStock) || 0;
+    if (!size) return;
+
+    if (sizes.some((item) => item.size === size)) {
+      setSizes(sizes.map((item) => (item.size === size ? { ...item, stock } : item)));
+    } else {
+      setSizes([...sizes, { size, stock }]);
+    }
+    setTempSize("");
+    setTempStock("");
+  };
+
+  const removeSize = (indexToRemove) => {
+    setSizes(sizes.filter((_, idx) => idx !== indexToRemove));
+  };
+
   const handleGenerateWithAI = async () => {
     if (!form.name) {
       setMessage("Please enter a Product Name first to give the AI context.");
@@ -244,30 +271,26 @@ const EditProduct = () => {
       const audienceVal = audienceSelection === "other" ? customAudience : audienceSelection;
       const keywordsVal = keywordSelection === "other" ? customKeywords : keywordSelection;
 
-      const parsedSizes = form.sizes
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-
       const parsedColors = form.colors
-        .split(",")
-        .map((c) => c.trim())
-        .filter(Boolean);
+        ? form.colors.split(",").map((c) => c.trim()).filter(Boolean)
+        : [];
 
       const parsedTags = form.tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
+        ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
+        : [];
 
       const payload = {
         name: form.name,
         sku: form.sku || undefined,
         price: Number(form.price) || 0,
-        stock: Number(form.stock) || 0,
+        stock: sizes.length > 0 ? sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) : (Number(form.stock) || 0),
         category: form.category || undefined,
         brand: form.brand || undefined,
-        sizes: parsedSizes,
+        sizes,
         colors: parsedColors,
+        fabric: form.fabric,
+        fit: form.fit,
+        careInstructions: form.careInstructions,
         audience: audienceVal,
         keywords: keywordsVal,
         images: uploadedImages,
@@ -441,32 +464,70 @@ const EditProduct = () => {
 
               <div>
                 <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Inventory Stock *
+                  Inventory Stock (Calculated from Matrix)
                 </label>
                 <input
                   type="number"
                   name="stock"
                   min="0"
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                  placeholder="50"
-                  value={form.stock}
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-neutral-405 dark:text-neutral-500 focus:outline-none transition-colors duration-300 rounded-none cursor-not-allowed"
+                  placeholder="0"
+                  value={sizes.length > 0 ? sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0) : form.stock}
                   onChange={handleChange}
-                  required
+                  disabled={sizes.length > 0}
+                  required={sizes.length === 0}
                 />
               </div>
 
-              <div className="sm:col-span-2">
-                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Sizes (comma-separated list)
+              <div className="sm:col-span-2 space-y-3">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider">
+                  Size & Stock Matrix
                 </label>
-                <input
-                  type="text"
-                  name="sizes"
-                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                  placeholder="E.g. S, M, L, XL"
-                  value={form.sizes}
-                  onChange={handleChange}
-                />
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="block text-[8px] uppercase text-neutral-450 mb-1">Size (e.g. XS, M)</label>
+                    <input
+                      type="text"
+                      placeholder="Size"
+                      value={tempSize}
+                      onChange={(e) => setTempSize(e.target.value)}
+                      className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-1.5 text-black dark:text-white focus:outline-none rounded-none"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-[8px] uppercase text-neutral-450 mb-1">Stock</label>
+                    <input
+                      type="number"
+                      placeholder="Qty"
+                      value={tempStock}
+                      onChange={(e) => setTempStock(e.target.value)}
+                      className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-1.5 text-black dark:text-white focus:outline-none rounded-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddSizeStock}
+                    className="border border-black dark:border-white text-black dark:text-white px-5 py-2 text-xs uppercase tracking-widest font-bold rounded-none transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
+                {sizes.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                    {sizes.map((item, idx) => (
+                      <div key={idx} className="border border-neutral-200 dark:border-neutral-800 p-2.5 flex justify-between items-center text-xs rounded-none bg-neutral-50 dark:bg-neutral-900/30">
+                        <span className="uppercase tracking-wider font-semibold">{item.size}: {item.stock}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSize(idx)}
+                          className="text-neutral-450 dark:text-neutral-500 hover:text-black dark:hover:text-white focus:outline-none font-bold"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="sm:col-span-2">
@@ -479,6 +540,48 @@ const EditProduct = () => {
                   className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
                   placeholder="E.g. Black, White, Camel, Navy"
                   value={form.colors}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Fabric Composition
+                </label>
+                <input
+                  type="text"
+                  name="fabric"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. 100% Organic Linen"
+                  value={form.fabric}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Fit Type
+                </label>
+                <input
+                  type="text"
+                  name="fit"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Loose/Relaxed Fit"
+                  value={form.fit}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Care Instructions
+                </label>
+                <input
+                  type="text"
+                  name="careInstructions"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Dry clean recommended. Cold gentle cycle."
+                  value={form.careInstructions}
                   onChange={handleChange}
                 />
               </div>

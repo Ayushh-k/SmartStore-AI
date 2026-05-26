@@ -52,6 +52,7 @@ export const createProductReview = async (req, res) => {
       name: req.user.name,
       rating: Number(rating),
       comment,
+      images: req.body.images || [],
       user: req.user._id,
     };
 
@@ -86,6 +87,9 @@ export const updateVendorProduct = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to update this product." });
     }
 
+    if (req.body.sizes && Array.isArray(req.body.sizes)) {
+      req.body.stock = req.body.sizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
+    }
     Object.assign(product, req.body);
     await product.save();
     

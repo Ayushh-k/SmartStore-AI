@@ -63,16 +63,27 @@ const productSchema = new mongoose.Schema(
     ],
     sizes: [
       {
-        type: String,
-        trim: true,
-      },
+        size: { type: String, required: true },
+        stock: { type: Number, required: true, default: 0 }
+      }
     ],
     colors: [
       {
-        type: String,
-        trim: true,
-      },
+        type: String
+      }
     ],
+    fabric: {
+      type: String,
+      default: ""
+    },
+    careInstructions: {
+      type: String,
+      default: ""
+    },
+    fit: {
+      type: String,
+      default: ""
+    },
     captions: [
       {
         platform: {
@@ -129,6 +140,11 @@ const productSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        images: [
+          {
+            type: String
+          }
+        ],
         createdAt: {
           type: Date,
           default: Date.now,
