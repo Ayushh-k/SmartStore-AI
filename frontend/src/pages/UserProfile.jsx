@@ -62,6 +62,12 @@ const UserProfile = () => {
     avatar: ""
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
+  
+  // Password Form State
+  const [pwdForm, setPwdForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [pwdSuccess, setPwdSuccess] = useState("");
 
   // Synchronize active tab with query params
   useEffect(() => {
@@ -133,6 +139,30 @@ const UserProfile = () => {
       setError(err?.response?.data?.message || "Failed to update profile settings.");
     } finally {
       setSettingsLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setPwdLoading(true);
+    setPwdError("");
+    setPwdSuccess("");
+
+    if (pwdForm.newPassword !== pwdForm.confirmPassword) {
+      setPwdError("New passwords do not match.");
+      setPwdLoading(false);
+      return;
+    }
+
+    try {
+      const res = await api.put("/api/users/update-password", pwdForm);
+      setPwdSuccess(res.data.message || "Password updated successfully.");
+      setPwdForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      console.error("Password update error:", err);
+      setPwdError(err?.response?.data?.message || "Failed to update password.");
+    } finally {
+      setPwdLoading(false);
     }
   };
 
@@ -300,117 +330,183 @@ const UserProfile = () => {
         </h2>
       </div>
 
-      <div className="max-w-xl text-left">
-        <form onSubmit={handleUpdateSettings} className="border border-neutral-200 dark:border-neutral-800 p-6 space-y-6 bg-white dark:bg-[#0a0a0a] text-black dark:text-white rounded-none">
-          <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b border-neutral-100 dark:border-neutral-900 pb-3">
+      <div className="grid gap-8 lg:grid-cols-2 items-start">
+        {/* Column 1: Account Details */}
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800 p-6 space-y-6 text-left rounded-none">
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b border-neutral-100 dark:border-neutral-900 pb-3 font-montserrat">
             Account Details
           </h3>
-
-          <div className="flex flex-col items-center justify-center py-4 border-b border-neutral-100 dark:border-neutral-900">
-            <AvatarUpload
-              value={settingsForm.avatar}
-              onChange={(base64) => setSettingsForm(prev => ({ ...prev, avatar: base64 }))}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Display Name *
-              </label>
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
-                value={settingsForm.name}
-                onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
-                required
+          <form onSubmit={handleUpdateSettings} className="space-y-4">
+            <div className="flex flex-col items-center justify-center py-4 border-b border-neutral-100 dark:border-neutral-900 mb-2">
+              <AvatarUpload
+                value={settingsForm.avatar}
+                onChange={(base64) => setSettingsForm(prev => ({ ...prev, avatar: base64 }))}
               />
             </div>
 
-            <div>
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                placeholder="Email Address"
-                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
-                value={settingsForm.email}
-                onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                placeholder="E.g. +91 99999 88888"
-                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
-                value={settingsForm.phone}
-                onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Corporate Address
-              </label>
-              <input
-                type="text"
-                placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
-                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
-                value={settingsForm.address}
-                onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
-              />
-            </div>
-
-            <div className="grid gap-6 grid-cols-2">
+            <div className="space-y-4">
               <div>
                 <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                  Language
+                  Display Name *
                 </label>
-                <select
-                  className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-850 text-xs p-2.5 text-black dark:text-white focus:outline-none rounded-none cursor-pointer"
-                  value={settingsForm.language}
-                  onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
-                >
-                  <option value="en">English (US)</option>
-                  <option value="es">Español</option>
-                  <option value="fr">Français</option>
-                  <option value="de">Deutsch</option>
-                </select>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                  value={settingsForm.name}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
+                  required
+                />
               </div>
 
-              <div className="flex flex-col justify-end select-none pb-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="notifications-chk"
-                    className="cursor-pointer h-4 w-4 bg-transparent border border-neutral-300 dark:border-neutral-800 text-black dark:text-white focus:ring-0 focus:ring-offset-0 rounded-none checked:bg-black dark:checked:bg-white checked:border-black dark:checked:border-white appearance-none"
-                    checked={settingsForm.notifications}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, notifications: e.target.checked })}
-                  />
-                  <label htmlFor="notifications-chk" className="text-[10px] tracking-wider text-neutral-500 dark:text-neutral-400 uppercase cursor-pointer select-none">
-                    Email Updates
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                  value={settingsForm.email}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  placeholder="E.g. +91 99999 88888"
+                  className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                  value={settingsForm.phone}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Corporate Address
+                </label>
+                <input
+                  type="text"
+                  placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
+                  className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                  value={settingsForm.address}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
+                />
+              </div>
+
+              <div className="grid gap-6 grid-cols-2">
+                <div>
+                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                    Language
                   </label>
+                  <select
+                    className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-850 text-xs p-2.5 text-black dark:text-white focus:outline-none rounded-none cursor-pointer"
+                    value={settingsForm.language}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
+                  >
+                    <option value="en">English (US)</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col justify-end select-none pb-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="notifications-chk"
+                      className="cursor-pointer h-4 w-4 bg-transparent border border-neutral-300 dark:border-neutral-800 text-black dark:text-white focus:ring-0 focus:ring-offset-0 rounded-none checked:bg-black dark:checked:bg-white checked:border-black dark:checked:border-white appearance-none"
+                      checked={settingsForm.notifications}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, notifications: e.target.checked })}
+                    />
+                    <label htmlFor="notifications-chk" className="text-[10px] tracking-wider text-neutral-500 dark:text-neutral-400 uppercase cursor-pointer select-none">
+                      Email Updates
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={settingsLoading}
-            className="w-full bg-black hover:bg-neutral-850 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 inline-flex items-center justify-center gap-1.5 mt-2 cursor-pointer rounded-none"
-          >
-            {settingsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            <span>Save Changes</span>
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={settingsLoading}
+              className="w-full bg-black hover:bg-neutral-850 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 inline-flex items-center justify-center gap-1.5 mt-2 cursor-pointer rounded-none animate-none"
+            >
+              {settingsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              <span>Save Changes</span>
+            </button>
+          </form>
+        </div>
+
+        {/* Column 2: Security & Password */}
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800 p-6 space-y-6 text-left rounded-none">
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b border-neutral-100 dark:border-neutral-900 pb-3 font-montserrat">
+            SECURITY & PASSWORD
+          </h3>
+          <form onSubmit={handleUpdatePassword} className="space-y-4">
+            {pwdSuccess && (
+              <div className="border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/15 text-emerald-800 dark:text-emerald-300 p-3 text-[10px] uppercase tracking-widest font-bold">
+                {pwdSuccess}
+              </div>
+            )}
+            {pwdError && (
+              <div className="border border-rose-500/30 bg-rose-50 dark:bg-rose-950/15 text-rose-800 dark:text-rose-300 p-3 text-[10px] uppercase tracking-widest font-bold">
+                {pwdError}
+              </div>
+            )}
+            
+            <div className="space-y-1">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider">Current Password *</label>
+              <input
+                type="password"
+                required
+                placeholder="CURRENT PASSWORD"
+                value={pwdForm.oldPassword}
+                onChange={(e) => setPwdForm(prev => ({ ...prev, oldPassword: e.target.value }))}
+                className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider">New Password *</label>
+              <input
+                type="password"
+                required
+                placeholder="NEW PASSWORD"
+                value={pwdForm.newPassword}
+                onChange={(e) => setPwdForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider">Confirm New Password *</label>
+              <input
+                type="password"
+                required
+                placeholder="CONFIRM NEW PASSWORD"
+                value={pwdForm.confirmPassword}
+                onChange={(e) => setPwdForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={pwdLoading}
+              className="w-full bg-black hover:bg-neutral-850 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 inline-flex items-center justify-center gap-1.5 mt-4 cursor-pointer rounded-none animate-none"
+            >
+              {pwdLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              <span>Update Password</span>
+            </button>
+          </form>
+        </div>
       </div> 
     </div>
   );

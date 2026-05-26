@@ -3,6 +3,7 @@
 import User from "../models/User.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import bcrypt from "bcrypt";
 
 /**
   Get user profile along with order history, addresses, and wishlist.
@@ -241,5 +242,46 @@ export const deleteAddress = async (req, res) => {
   } catch (error) {
     console.error("Delete address error:", error);
     res.status(500).json({ message: "Server error deleting address." });
+  }
+};
+
+/**
+  Update user's own password from dashboard profile.
+  Body: { oldPassword, newPassword, confirmPassword }
+ */
+export const updatePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "All password fields are required." });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "New password and confirmation do not match." });
+    }
+
+    // Fetch the user including the hidden password field
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Verify the old password matches
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect." });
+    }
+
+    // Hash the new password and update
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+    await User.updateOne({ _id: user._id }, { password: hashedPassword });
+
+    res.status(200).json({ message: "Password updated successfully." });
+  } catch (error) {
+    console.error("Update password error:", error);
+    res.status(500).json({ message: "Server error updating password." });
   }
 };

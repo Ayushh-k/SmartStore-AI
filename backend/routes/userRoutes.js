@@ -8,6 +8,7 @@ import {
   addAddress,
   updateAddress,
   deleteAddress,
+  updatePassword,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -22,6 +23,7 @@ router.route("/profile")
 
 router.post("/wishlist/toggle", toggleWishlist);
 router.post("/wishlist", toggleWishlist);
+router.put("/update-password", updatePassword);
 
 router.post("/address", addAddress);
 router.route("/address/:addressId")
