@@ -292,560 +292,126 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
-      {/* Profile Header */}
-      <div className="border-b border-gray-200 dark:border-neutral-800 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 text-left">
-        <div>
-          <span className="text-[10px] tracking-[0.25em] uppercase text-neutral-500 font-medium block mb-1">Account</span>
-          <h1 className="text-3xl font-serif tracking-wide text-black dark:text-white uppercase">{user?.name}</h1>
-          <p className="text-xs tracking-[0.1em] text-neutral-600 dark:text-neutral-400 mt-1 font-sans">{user?.email}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-4 text-[10px] tracking-[0.25em] uppercase text-neutral-500 font-sans">
-          <div>
-            <span className="text-neutral-600 mr-2">Role //</span>
-            <span className="text-neutral-800 dark:text-neutral-300 font-medium">{user?.role || "user"}</span>
-          </div>
-          <div className="hidden md:block text-neutral-300 dark:text-neutral-700">|</div>
-          <div>
-            <span className="text-neutral-600 mr-2">Member Since //</span>
-            <span className="text-neutral-800 dark:text-neutral-300 font-medium">{new Date(user?.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</span>
-          </div>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="border-b border-neutral-200 dark:border-neutral-800 pb-3">
+        <h2 className="text-xs font-bold uppercase tracking-widest text-black dark:text-white font-montserrat">
+          Profile Information
+        </h2>
       </div>
 
-      {successMessage && (
-        <div className="rounded-none border border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/15 p-4 text-xs text-emerald-700 dark:text-emerald-300 text-left animate-fadeIn">
-          {successMessage}
-        </div>
-      )}
+      <div className="max-w-xl text-left">
+        <form onSubmit={handleUpdateSettings} className="border border-neutral-200 dark:border-neutral-800 p-6 space-y-6 bg-white dark:bg-[#0a0a0a] text-black dark:text-white rounded-none">
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b border-neutral-100 dark:border-neutral-900 pb-3">
+            Account Details
+          </h3>
 
-      {error && (
-        <div className="rounded-none border border-rose-500/40 bg-rose-50 dark:bg-rose-950/15 p-4 text-xs text-rose-700 dark:text-rose-300 text-left animate-fadeIn">
-          {error}
-        </div>
-      )}
-
-      {/* Tabs Switcher */}
-      <div className="flex gap-8 border-b border-gray-200 dark:border-neutral-800 overflow-x-auto no-scrollbar scroll-smooth justify-start md:justify-center py-2">
-        {[
-          { id: "orders", label: "Orders" },
-          { id: "wishlist", label: "Wishlist" },
-          { id: "addresses", label: "Addresses" },
-          { id: "settings", label: "Settings" }
-        ].map(tab => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              className={`pb-3 text-[11px] font-medium tracking-[0.25em] uppercase whitespace-nowrap transition-all cursor-pointer relative ${
-                isActive 
-                  ? "text-black dark:text-white font-semibold" 
-                  : "text-neutral-400 dark:text-neutral-500 hover:text-black dark:hover:text-neutral-300"
-              }`}
-            >
-              {tab.label}
-              {isActive && (
-                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black dark:bg-white animate-fadeIn" />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Tab Panels */}
-      <div className="min-h-[300px]">
-
-        {/* 1. ORDER HISTORY */}
-        {activeTab === "orders" && (
-          <div className="space-y-6 animate-fadeIn">
-            {orders.length === 0 ? (
-              <div className="border border-gray-200 dark:border-white/10 py-20 text-center text-neutral-500 space-y-4 bg-white dark:bg-[#0a0a0a]">
-                <ClipboardList className="h-8 w-8 text-neutral-400 dark:text-neutral-700 mx-auto stroke-[1]" />
-                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-300">No orders placed yet</h3>
-                <p className="text-[10px] tracking-wide text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto">
-                  Your order log is currently empty.
-                </p>
-                <Link to="/" className="bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white px-8 py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 inline-block">
-                  Explore Products
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {orders.map((order) => (
-                  <div key={order._id} className="border border-gray-200 dark:border-white/10 overflow-hidden text-left bg-white dark:bg-[#0a0a0a] text-black dark:text-white">
-                    {/* Order summary header */}
-                    <div className="p-5 bg-gray-50 dark:bg-neutral-950/40 border-b border-gray-200 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1 text-left">
-                        <div>
-                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Order ID</span>
-                          <span className="font-mono text-xs text-neutral-800 dark:text-neutral-300 font-semibold block truncate max-w-[150px]" title={order._id}>
-                            {order._id}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Placed On</span>
-                          <span className="text-xs text-neutral-800 dark:text-neutral-300 block">{new Date(order.createdAt).toLocaleDateString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Total Paid</span>
-                          <span className="text-xs font-bold text-black dark:text-white block">{formatCurrency(order.totalAmount)}</span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-neutral-500 uppercase tracking-widest block">Status</span>
-                          <span className="text-xs text-neutral-800 dark:text-neutral-300 block font-semibold capitalize">
-                            {order.paymentDetails?.status || "Completed"} ({order.paymentDetails?.method || "Card"})
-                          </span>
-                        </div>
-                      </div>
-                      <div className="self-end md:self-auto">
-                        <span className={`border px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${getOrderStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Order Items list */}
-                    <div className="p-5 divide-y divide-gray-200 dark:divide-white/10">
-                      {order.products?.map((item, idx) => (
-                        <div key={idx} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4 text-xs">
-                          <div className="space-y-1">
-                            <span className="font-serif tracking-wide text-black dark:text-white uppercase text-xs block">{item.product?.name || "Deleted Product"}</span>
-                            <div className="flex gap-2 flex-wrap text-[9px] pt-1 uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-semibold">
-                              <span>Qty: {item.quantity}</span>
-                              {item.selectedSize && (
-                                <>
-                                  <span className="text-gray-300 dark:text-neutral-700">|</span>
-                                  <span>Size: {item.selectedSize}</span>
-                                </>
-                              )}
-                              {item.selectedColor && (
-                                <>
-                                  <span className="text-gray-300 dark:text-neutral-700">|</span>
-                                  <span>Color: {item.selectedColor}</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0 min-w-[70px]">
-                            <p className="font-bold text-black dark:text-white">{formatCurrency(item.priceAtPurchase * item.quantity)}</p>
-                            <p className="text-[10px] text-neutral-500">{item.quantity} × {formatCurrency(item.priceAtPurchase)}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Shipping Address Footer */}
-                    {order.shippingAddress && (
-                      <div className="bg-gray-50 dark:bg-neutral-950/40 border-t border-gray-200 dark:border-white/10 px-5 py-3 text-[10px] text-neutral-500 flex flex-wrap gap-2 items-center uppercase tracking-widest">
-                        <MapPin className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-600" />
-                        <span className="font-semibold text-neutral-600 dark:text-neutral-400">Shipped To:</span>
-                        <span className="font-sans normal-case tracking-normal text-neutral-600 dark:text-neutral-400">{order.shippingAddress.street}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.zipCode}, {order.shippingAddress.country}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="flex flex-col items-center justify-center py-4 border-b border-neutral-100 dark:border-neutral-900">
+            <AvatarUpload
+              value={settingsForm.avatar}
+              onChange={(base64) => setSettingsForm(prev => ({ ...prev, avatar: base64 }))}
+            />
           </div>
-        )}
 
-        {/* 2. MY WISHLIST */}
-        {activeTab === "wishlist" && (
-          <div className="space-y-6 animate-fadeIn">            {!user?.wishlist || user.wishlist.length === 0 ? (
-              <div className="border border-gray-200 dark:border-white/10 py-20 text-center text-neutral-500 space-y-4 bg-white dark:bg-[#0a0a0a]">
-                <Heart className="h-8 w-8 text-neutral-400 dark:text-neutral-700 mx-auto stroke-[1]" />
-                <h3 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-300">Your wishlist is empty</h3>
-                <p className="text-[10px] tracking-wide text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto">
-                  Save items to your wishlist to view them later.
-                </p>
-                <Link to="/" className="bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white px-8 py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 inline-block">
-                  Explore Products
-                </Link>
-              </div>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-                {user.wishlist.map((product) => {
-                  const isActionLoading = wishlistActionId === product._id;
-                  return (
-                    <div key={product._id} className="group relative flex flex-col justify-between text-left bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 transition-all duration-300">
-                      <div>
-                        {/* Remove from wishlist top corner */}
-                        <button
-                          onClick={() => handleRemoveWishlist(product._id)}
-                          disabled={isActionLoading}
-                          className="absolute top-3 right-3 bg-white/80 dark:bg-[#0a0a0a]/80 p-2 text-black dark:text-white hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors z-10 border border-gray-200 dark:border-white/10"
-                          title="Remove from Wishlist"
-                        >
-                          <X className="h-4 w-4 stroke-[1.5]" />
-                        </button>
-
-                        {/* Image frame (3:4 aspect ratio) */}
-                        <div className="w-full aspect-[3/4] bg-gray-50 dark:bg-neutral-900 overflow-hidden relative border-b border-gray-200 dark:border-white/10">
-                          {product.images && product.images[0] ? (
-                            <img 
-                              src={product.images[0]} 
-                              alt={product.name} 
-                              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-                            />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-neutral-400 dark:text-neutral-800 bg-gray-50 dark:bg-neutral-900">
-                              <Heart className="h-8 w-8 stroke-[1]" />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Info details (left-aligned title/price) */}
-                        <div className="p-4 space-y-1">
-                          <span className="text-[9px] tracking-[0.2em] uppercase text-neutral-500 font-medium">
-                            {product.category || "General"}
-                          </span>
-                          <h4 className="text-xs font-serif tracking-wide text-black dark:text-white line-clamp-1 uppercase mt-1">
-                            {product.name}
-                          </h4>
-                          <p className="text-xs font-montserrat text-black dark:text-white font-semibold pt-0.5">
-                            {formatCurrency(product.price)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Action buttons (Solid white/black rectangles, high-contrast) */}
-                      <div className="p-4 pt-0 flex flex-col gap-2">
-                        <Link
-                          to={`/product/${product._id}`}
-                          className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[10px] font-bold tracking-[0.2em] uppercase text-center hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 border border-black dark:border-white"
-                        >
-                          View Details
-                        </Link>
-                        <button
-                          onClick={() => handleRemoveWishlist(product._id)}
-                          disabled={isActionLoading}
-                          className="w-full bg-transparent text-rose-600 dark:text-rose-500 py-2.5 text-[10px] font-bold tracking-[0.2em] uppercase border border-gray-200 dark:border-white/10 hover:border-rose-300 dark:hover:border-rose-900/55 hover:bg-rose-50 dark:hover:bg-rose-950/15 transition-all duration-300 inline-flex items-center justify-center gap-1.5"
-                        >
-                          {isActionLoading ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <>
-                              <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
-                              <span>Remove</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 3. ADDRESS BOOK */}
-        {activeTab === "addresses" && (
-          <div className="space-y-6 animate-fadeIn text-left">
-            <div className="flex justify-between items-center border-b border-gray-200 dark:border-neutral-900 pb-4">
-              <h3 className="text-sm font-serif tracking-wide uppercase text-black dark:text-white">Saved Addresses</h3>
-              {!showAddressForm && (
-                <button
-                  onClick={() => {
-                     setEditingAddressId(null);
-                     setAddressForm({
-                       street: "",
-                       city: "",
-                       state: "",
-                       zipCode: "",
-                       country: "India",
-                       isDefault: false
-                     });
-                     setShowAddressForm(true);
-                  }}
-                  className="bg-black dark:bg-white text-white dark:text-black px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 flex items-center gap-1.5"
-                >
-                  <Plus className="h-3 w-3" />
-                  <span>Add Address</span>
-                </button>
-              )}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                Display Name *
+              </label>
+              <input
+                type="text"
+                placeholder="Full Name"
+                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                value={settingsForm.name}
+                onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
+                required
+              />
             </div>
 
-            {showAddressForm && (
-              <form onSubmit={handleSaveAddress} className="border border-gray-200 dark:border-white/10 p-6 space-y-6 max-w-xl animate-fadeIn bg-white dark:bg-[#0a0a0a] text-black dark:text-white">
-                <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-white/10">
-                  <h4 className="text-[10px] font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-widest">
-                    {editingAddressId ? "Modify Address" : "New Address"}
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAddressForm(false);
-                      setEditingAddressId(null);
-                    }}
-                    className="text-[10px] text-neutral-500 hover:text-black dark:hover:text-white font-semibold cursor-pointer uppercase tracking-wider"
-                  >
-                    Cancel
-                  </button>
-                </div>
+            <div>
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                value={settingsForm.email}
+                onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
+                required
+              />
+            </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">Street Address *</label>
-                    <input
-                      type="text"
-                      placeholder="Street address, P.O. box, suite"
-                      className="input text-xs"
-                      value={addressForm.street}
-                      onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
-                      required
-                    />
-                  </div>
+            <div>
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                Phone Number
+              </label>
+              <input
+                type="text"
+                placeholder="E.g. +91 99999 88888"
+                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                value={settingsForm.phone}
+                onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
+              />
+            </div>
 
-                  <div className="grid gap-6 grid-cols-2">
-                    <div>
-                      <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">City *</label>
-                      <input
-                        type="text"
-                        placeholder="City"
-                        className="input text-xs"
-                        value={addressForm.city}
-                        onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">State / Province *</label>
-                      <input
-                        type="text"
-                        placeholder="State"
-                        className="input text-xs"
-                        value={addressForm.state}
-                        onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
+            <div>
+              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                Corporate Address
+              </label>
+              <input
+                type="text"
+                placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
+                className="w-full border border-neutral-200 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none rounded-none"
+                value={settingsForm.address}
+                onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
+              />
+            </div>
 
-                  <div className="grid gap-6 grid-cols-2">
-                    <div>
-                      <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">Zip / Postal Code *</label>
-                      <input
-                        type="text"
-                        placeholder="Zip code"
-                        className="input text-xs"
-                        value={addressForm.zipCode}
-                        onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">Country *</label>
-                      <input
-                        type="text"
-                        placeholder="Country"
-                        className="input text-xs"
-                        value={addressForm.country}
-                        onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
+            <div className="grid gap-6 grid-cols-2">
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Language
+                </label>
+                <select
+                  className="w-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-850 text-xs p-2.5 text-black dark:text-white focus:outline-none rounded-none cursor-pointer"
+                  value={settingsForm.language}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
+                >
+                  <option value="en">English (US)</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </div>
 
-                <div className="flex items-center gap-2 pt-1 select-none">
+              <div className="flex flex-col justify-end select-none pb-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    id="address-default-chk"
-                    className="cursor-pointer h-4 w-4 bg-transparent border-gray-300 dark:border-neutral-800 text-black dark:text-white focus:ring-0 focus:ring-offset-0 rounded-none"
-                    checked={addressForm.isDefault}
-                    onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                    id="notifications-chk"
+                    className="cursor-pointer h-4 w-4 bg-transparent border border-neutral-300 dark:border-neutral-800 text-black dark:text-white focus:ring-0 focus:ring-offset-0 rounded-none checked:bg-black dark:checked:bg-white checked:border-black dark:checked:border-white appearance-none"
+                    checked={settingsForm.notifications}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, notifications: e.target.checked })}
                   />
-                  <label htmlFor="address-default-chk" className="text-[10px] tracking-wider text-neutral-500 dark:text-neutral-400 uppercase cursor-pointer select-none">
-                    Set as default shipping address
+                  <label htmlFor="notifications-chk" className="text-[10px] tracking-wider text-neutral-500 dark:text-neutral-400 uppercase cursor-pointer select-none">
+                    Email Updates
                   </label>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={addressLoading}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 inline-flex items-center justify-center gap-1.5"
-                >
-                  {addressLoading && <Loader2 className="h-3 w-3 animate-spin" />}
-                  <span>{editingAddressId ? "Save Changes" : "Save Address"}</span>
-                </button>
-              </form>
-            )}
-
-            {!user?.addresses || user.addresses.length === 0 ? (
-              <div className="border border-gray-200 dark:border-white/10 py-16 text-center text-neutral-500 space-y-2 bg-white dark:bg-[#0a0a0a]">
-                <MapPin className="h-8 w-8 text-neutral-400 dark:text-neutral-700 mx-auto stroke-[1]" />
-                <h4 className="text-xs font-serif uppercase tracking-wider text-neutral-800 dark:text-neutral-300">No saved addresses</h4>
-                <p className="text-[10px] text-neutral-500 dark:text-neutral-400 tracking-wide max-w-xs mx-auto">
-                  Add shipping addresses for faster checkout experiences.
-                </p>
               </div>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2">
-                {user.addresses.map((addr) => (
-                  <div
-                    key={addr._id}
-                    className={`border p-6 text-xs flex flex-col justify-between transition-all bg-white dark:bg-[#0a0a0a] text-black dark:text-white ${
-                      addr.isDefault 
-                        ? "border-black dark:border-white" 
-                        : "border-gray-200 dark:border-white/10 hover:border-gray-400 dark:hover:border-white/20"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex justify-between items-start pb-2 border-b border-gray-200 dark:border-white/10">
-                        <span className="text-[10px] font-bold tracking-widest uppercase text-neutral-800 dark:text-neutral-200">
-                          {addr.isDefault ? "Primary Address" : "Address"}
-                        </span>
-                        {addr.isDefault && (
-                          <span className="h-1.5 w-1.5 bg-black dark:bg-white" />
-                        )}
-                      </div>
-                      <div className="mt-4 text-neutral-600 dark:text-neutral-400 space-y-1 font-sans text-xs tracking-wide leading-relaxed">
-                        <p className="text-black dark:text-white font-medium">{addr.street}</p>
-                        <p>{addr.city}, {addr.state} - {addr.zipCode}</p>
-                        <p className="text-neutral-500 dark:text-neutral-400 uppercase tracking-widest text-[9px] pt-1">{addr.country}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end gap-4 mt-6 pt-3 border-t border-gray-200 dark:border-white/10">
-                      <button
-                        onClick={() => handleEditAddressClick(addr)}
-                        className="text-neutral-500 hover:text-black dark:hover:text-white transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteAddress(addr._id)}
-                        className="text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all cursor-pointer text-[10px] tracking-wider uppercase font-semibold"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            </div>
           </div>
-        )}
 
-        {/* 4. PROFILE SETTINGS */}
-        {activeTab === "settings" && (
-          <div className="max-w-xl animate-fadeIn text-left">
-            <form onSubmit={handleUpdateSettings} className="border border-gray-200 dark:border-white/10 p-6 space-y-6 bg-white dark:bg-[#0a0a0a] text-black dark:text-white">
-              <h3 className="text-xs font-serif tracking-widest uppercase text-black dark:text-white border-b border-gray-200 dark:border-neutral-900 pb-3">
-                Account Details
-              </h3>
-
-              <div className="flex flex-col items-center justify-center py-4 border-b border-gray-200 dark:border-neutral-900">
-                <AvatarUpload
-                  value={settingsForm.avatar}
-                  onChange={(base64) => setSettingsForm(prev => ({ ...prev, avatar: base64 }))}
-                />
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                    Display Name *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    className="input text-xs"
-                    value={settingsForm.name}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    className="input text-xs"
-                    value={settingsForm.email}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                    Phone Number
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="E.g. +91 99999 88888"
-                    className="input text-xs"
-                    value={settingsForm.phone}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                    Corporate Address
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
-                    className="input text-xs"
-                    value={settingsForm.address}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
-                  />
-                </div>
-
-                <div className="grid gap-6 grid-cols-2">
-                  <div>
-                    <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                      Language
-                    </label>
-                    <select
-                      className="w-full bg-white dark:bg-black border-b border-gray-300 dark:border-neutral-800 text-xs py-2.5 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none cursor-pointer"
-                      value={settingsForm.language}
-                      onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
-                    >
-                      <option value="en">English (US)</option>
-                      <option value="es">Español</option>
-                      <option value="fr">Français</option>
-                      <option value="de">Deutsch</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col justify-end select-none pb-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="notifications-chk"
-                        className="cursor-pointer h-4 w-4 bg-transparent border-gray-300 dark:border-neutral-800 text-black dark:text-white focus:ring-0 focus:ring-offset-0 rounded-none"
-                        checked={settingsForm.notifications}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, notifications: e.target.checked })}
-                      />
-                      <label htmlFor="notifications-chk" className="text-[10px] tracking-wider text-neutral-500 dark:text-neutral-400 uppercase cursor-pointer select-none">
-                        Email Updates
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={settingsLoading}
-                className="w-full bg-black dark:bg-white text-white dark:text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-900 dark:hover:bg-neutral-200 transition-colors duration-300 inline-flex items-center justify-center gap-1.5 mt-2"
-              >
-                {settingsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                <span>Save Changes</span>
-              </button>
-            </form>
-          </div>
-        )}
-
-      </div>
+          <button
+            type="submit"
+            disabled={settingsLoading}
+            className="w-full bg-black hover:bg-neutral-850 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black py-3 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 inline-flex items-center justify-center gap-1.5 mt-2 cursor-pointer rounded-none"
+          >
+            {settingsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            <span>Save Changes</span>
+          </button>
+        </form>
+      </div> 
     </div>
   );
 };

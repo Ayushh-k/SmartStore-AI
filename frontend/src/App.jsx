@@ -18,6 +18,9 @@ import Checkout from "./pages/Checkout.jsx";
 import UserProfile from "./pages/UserProfile.jsx";
 import ProductPage from "./pages/ProductPage.jsx";
 import Orders from "./pages/Orders.jsx";
+import AccountLayout from "./layouts/AccountLayout.jsx";
+import Wishlist from "./pages/account/Wishlist.jsx";
+import Addresses from "./pages/account/Addresses.jsx";
 import AdminOrders from "./pages/AdminOrders.jsx";
 import Footer from "./components/Footer.jsx";
 import Terms from "./pages/Terms.jsx";
@@ -133,22 +136,19 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          {/* Nested Account Pages wrapped in AccountLayout */}
           <Route
-            path="/profile"
             element={
               <ProtectedRoute>
-                <UserProfile />
+                <AccountLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/orders"
-            element={
-              <ProtectedRoute>
-                <Orders />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/profile/wishlist" element={<Wishlist />} />
+            <Route path="/profile/addresses" element={<Addresses />} />
+          </Route>
           <Route
             path="/product/:id"
             element={

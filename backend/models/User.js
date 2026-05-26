@@ -76,11 +76,15 @@ const userSchema = new mongoose.Schema(
     ],
     addresses: [
       {
+        tag: { type: String, default: "" },
+        name: { type: String, default: "" },
+        phone: { type: String, default: "" },
+        pincode: { type: String, default: "" },
         street: { type: String, required: true },
         city: { type: String, required: true },
         state: { type: String, required: true },
         zipCode: { type: String, required: true },
-        country: { type: String, required: true },
+        country: { type: String, required: true, default: "India" },
         isDefault: { type: Boolean, default: false },
       },
     ],

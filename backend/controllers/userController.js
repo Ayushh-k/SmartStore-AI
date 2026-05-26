@@ -111,14 +111,17 @@ export const toggleWishlist = async (req, res) => {
 
 /**
   Add address to address book.
-  Body: { street, city, state, zipCode, country, isDefault }
+  Body: { tag, name, phone, street, city, state, pincode, zipCode, country, isDefault }
  */
 export const addAddress = async (req, res) => {
   try {
-    const { street, city, state, zipCode, country, isDefault = false } = req.body;
+    const { tag = "", name = "", phone = "", street, city, state, pincode, zipCode, country = "India", isDefault = false } = req.body;
 
-    if (!street || !city || !state || !zipCode || !country) {
-      return res.status(400).json({ message: "All address fields are required." });
+    const resolvedZip = zipCode || pincode;
+    const resolvedPin = pincode || zipCode;
+
+    if (!street || !city || !state || !resolvedZip) {
+      return res.status(400).json({ message: "Street, City, State, and Pincode are required." });
     }
 
     const user = await User.findById(req.user._id);
@@ -134,10 +137,14 @@ export const addAddress = async (req, res) => {
     }
 
     user.addresses.push({
+      tag,
+      name,
+      phone,
+      pincode: resolvedPin,
       street,
       city,
       state,
-      zipCode,
+      zipCode: resolvedZip,
       country,
       isDefault: user.addresses.length === 0 ? true : isDefault, // default if first
     });
@@ -153,12 +160,12 @@ export const addAddress = async (req, res) => {
 /**
   Update an existing address.
   Params: addressId
-  Body: { street, city, state, zipCode, country, isDefault }
+  Body: { tag, name, phone, street, city, state, pincode, zipCode, country, isDefault }
  */
 export const updateAddress = async (req, res) => {
   try {
     const { addressId } = req.params;
-    const { street, city, state, zipCode, country, isDefault } = req.body;
+    const { tag, name, phone, street, city, state, pincode, zipCode, country, isDefault } = req.body;
 
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -170,11 +177,20 @@ export const updateAddress = async (req, res) => {
       return res.status(404).json({ message: "Address not found." });
     }
 
-    if (street) address.street = street;
-    if (city) address.city = city;
-    if (state) address.state = state;
-    if (zipCode) address.zipCode = zipCode;
-    if (country) address.country = country;
+    if (tag !== undefined) address.tag = tag;
+    if (name !== undefined) address.name = name;
+    if (phone !== undefined) address.phone = phone;
+    if (street !== undefined) address.street = street;
+    if (city !== undefined) address.city = city;
+    if (state !== undefined) address.state = state;
+    if (country !== undefined) address.country = country;
+
+    if (zipCode !== undefined || pincode !== undefined) {
+      const resolvedZip = zipCode || pincode;
+      const resolvedPin = pincode || zipCode;
+      address.zipCode = resolvedZip;
+      address.pincode = resolvedPin;
+    }
     
     if (isDefault !== undefined) {
       address.isDefault = isDefault;
