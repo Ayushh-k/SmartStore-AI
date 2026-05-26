@@ -17,6 +17,92 @@ const Cart = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [recLoading, setRecLoading] = useState(false);
   const [isCartUpdating, setIsCartUpdating] = useState(false);
+  const [pincode, setPincode] = useState("");
+  const [pincodeChecked, setPincodeChecked] = useState(false);
+  const [deliveryMessage, setDeliveryMessage] = useState("");
+  const [savedItems, setSavedItems] = useState(() => {
+    try {
+      const val = localStorage.getItem("smartstoresaveditems");
+      return val ? JSON.parse(val) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("smartstoresaveditems", JSON.stringify(savedItems));
+  }, [savedItems]);
+
+  const handleSaveForLater = async (item) => {
+    const product = item.product;
+    if (!product) return;
+    
+    try {
+      const res = await api.delete(`/api/store/cart/${product._id}?size=${encodeURIComponent(item.selectedSize || "")}&color=${encodeURIComponent(item.selectedColor || "")}`);
+      setCart(res.data || []);
+      window.dispatchEvent(new Event("cartUpdated"));
+      
+      const newItem = {
+        _id: item._id,
+        product: {
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          description: product.description,
+          category: product.category,
+          images: product.images,
+          stock: product.stock,
+          sizes: product.sizes,
+        },
+        selectedSize: item.selectedSize || "",
+        selectedColor: item.selectedColor || "",
+        quantity: item.quantity || 1
+      };
+      
+      setSavedItems(prev => {
+        const exists = prev.some(x => x.product._id === product._id && x.selectedSize === newItem.selectedSize && x.selectedColor === newItem.selectedColor);
+        if (exists) return prev;
+        return [...prev, newItem];
+      });
+      
+      setMessage("Item saved for later.");
+      setMessageType("success");
+    } catch (err) {
+      console.error("Save for later error:", err);
+      setMessage("Failed to save item for later.");
+      setMessageType("error");
+    }
+  };
+
+  const handleMoveToCart = async (savedItem) => {
+    try {
+      await api.post("/api/store/cart", {
+        productId: savedItem.product._id,
+        quantity: savedItem.quantity || 1,
+        selectedSize: savedItem.selectedSize || "",
+        selectedColor: savedItem.selectedColor || ""
+      });
+      
+      const res = await api.get("/api/store/cart");
+      setCart(res.data || []);
+      window.dispatchEvent(new Event("cartUpdated"));
+      
+      setSavedItems(prev => prev.filter(x => !(x.product._id === savedItem.product._id && x.selectedSize === savedItem.selectedSize && x.selectedColor === savedItem.selectedColor)));
+      
+      setMessage("Item moved back to cart.");
+      setMessageType("success");
+    } catch (err) {
+      console.error("Move to cart error:", err);
+      setMessage(err?.response?.data?.message || "Failed to move item to cart.");
+      setMessageType("error");
+    }
+  };
+
+  const handleRemoveSavedItem = (savedItem) => {
+    setSavedItems(prev => prev.filter(x => !(x.product._id === savedItem.product._id && x.selectedSize === savedItem.selectedSize && x.selectedColor === savedItem.selectedColor)));
+    setMessage("Item removed from saved list.");
+    setMessageType("success");
+  };
 
   const cartIdsString = (cart || [])
     .map(item => item.product?._id)
@@ -224,7 +310,7 @@ const Cart = () => {
     <div className="space-y-6 max-w-5xl mx-auto px-4 py-6">
       <div>
         <h1 className="text-lg font-bold tracking-tight">Shopping Cart</h1>
-        <p className="text-xs text-gray-500 dark:text-slate-400">Review items in your cart and complete checkout.</p>
+        <p className="text-xs text-neutral-500 dark:text-neutral-405">Review items in your cart and complete checkout.</p>
       </div>
 
       {message && (
@@ -240,158 +326,365 @@ const Cart = () => {
       )}
 
       {cart.length === 0 ? (
-        <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 flex flex-col items-center justify-center py-20 text-center text-gray-500 dark:text-gray-400 rounded-none animate-fadeIn">
-          <ShoppingCart className="h-12 w-12 text-gray-300 dark:text-neutral-700 mb-3" />
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Your cart is empty</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-6 max-w-xs">
-            Add items from our catalog to get started.
-          </p>
-          <Link to="/" className="btn-primary inline-flex items-center gap-1.5 text-xs px-5 py-2">
-            Browse Storefront
-          </Link>
-        </div>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          {/* Cart list */}
-          <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 p-5 space-y-4 rounded-none text-black dark:text-white">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-white/10 pb-2">
-              Cart Items
-            </h3>
-            <div className="divide-y divide-gray-200 dark:divide-white/10">
-              {cart.map((item) => {
-                const product = item.product;
-                if (!product) return null;
-                
-                // Locate matching size stock
-                let sizeStock = product.stock;
-                if (product.sizes && product.sizes.length > 0) {
-                  const sizeObj = product.sizes.find(s => s.size === item.selectedSize);
-                  if (sizeObj) {
-                    sizeStock = sizeObj.stock;
-                  } else {
-                    sizeStock = 0;
-                  }
-                }
-                const isInsufficientStock = Number(sizeStock) < item.quantity;
-                
-                return (
-                  <div key={`${product._id}-${item.selectedSize}-${item.selectedColor}`} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-1">{product.name}</h4>
-                        <span className="rounded-none bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 px-1.5 py-0.5 text-[9px] text-gray-600 dark:text-gray-400">
-                          {product.category || "General"}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2">{product.description}</p>
-                      
-                      {/* Variation Info Display directly under product name/desc */}
-                      {(item.selectedSize || item.selectedColor) && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider font-semibold">
-                          Size: {item.selectedSize || "—"} {item.selectedColor && `| Color: ${item.selectedColor}`}
-                        </p>
-                      )}
-
-                      {isInsufficientStock && (
-                        <p className="text-[10px] text-rose-600 dark:text-rose-450 font-medium">
-                          Insufficient stock. Only {sizeStock} left in stock.
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between sm:justify-end gap-6">
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          onClick={() => handleUpdateQuantity(item._id, item.quantity, -1)}
-                          disabled={isCartUpdating || item.quantity <= 1}
-                          className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="text-xs font-semibold font-mono w-4 text-center">{item.quantity}</span>
-                        <button
-                          onClick={() => handleUpdateQuantity(item._id, item.quantity, 1)}
-                          disabled={isCartUpdating || item.quantity >= sizeStock}
-                          className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-
-                      <div className="text-right min-w-[70px]">
-                        <span className="text-xs font-bold text-gray-900 dark:text-white">{formatCurrency(product.price * item.quantity)}</span>
-                        <span className="text-[10px] text-gray-500 dark:text-gray-400 block">{formatCurrency(product.price)} each</span>
-                      </div>
-
-                      <button
-                        onClick={() => handleRemoveItem(product._id, item.selectedSize, item.selectedColor)}
-                        className="p-1.5 text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 transition-all cursor-pointer rounded-none"
-                        title="Remove Item"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-850 flex flex-col items-center justify-center py-20 text-center text-neutral-500 dark:text-neutral-400 rounded-none">
+            <ShoppingCart className="h-12 w-12 text-neutral-300 dark:text-neutral-700 mb-3" />
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Your cart is empty</h3>
+            <p className="text-xs text-neutral-500 mt-1 mb-6 max-w-xs">
+              Add items from our catalog to get started.
+            </p>
+            <Link to="/" className="bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black py-2.5 px-6 text-xs font-semibold uppercase tracking-widest transition-all">
+              Browse Catalog
+            </Link>
           </div>
 
-          {/* Checkout summary */}
-          <div className="space-y-4">
-            <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 p-5 space-y-4 rounded-none text-black dark:text-white">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-white/10 pb-2">
-                Order Summary
+          {/* Saved for Later (visible when cart is empty) */}
+          {savedItems.length > 0 && (
+            <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-850 p-6 space-y-4 rounded-none">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-black dark:text-white border-b border-neutral-200 dark:border-neutral-850 pb-2">
+                Saved For Later ({savedItems.length})
               </h3>
+              <div className="divide-y divide-neutral-200 dark:divide-neutral-850">
+                {savedItems.map((sItem) => {
+                  const prod = sItem.product;
+                  return (
+                    <div key={sItem._id} className="py-4 first:pt-0 last:pb-0 flex gap-4">
+                      <div className="w-16 h-20 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-850 shrink-0">
+                        {prod.images && prod.images[0] ? (
+                          <img src={prod.images[0]} alt={prod.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                            <ShoppingCart className="h-4 w-4 stroke-[1.2]" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div className="flex justify-between items-start gap-2">
+                          <div>
+                            <h4 className="text-xs font-bold text-black dark:text-white line-clamp-1">{prod.name}</h4>
+                            <p className="text-[9px] tracking-wider uppercase font-semibold text-neutral-450 mt-0.5">
+                              Size: {sItem.selectedSize || "—"} {sItem.selectedColor && `| Color: ${sItem.selectedColor}`}
+                            </p>
+                          </div>
+                          <span className="text-xs font-bold text-black dark:text-white">{formatCurrency(prod.price)}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[9px] tracking-widest font-bold uppercase font-montserrat mt-2">
+                          <button
+                            onClick={() => handleMoveToCart(sItem)}
+                            className="text-black dark:text-white hover:underline transition-colors cursor-pointer bg-transparent border-none p-0"
+                          >
+                            Move To Bag
+                          </button>
+                          <span className="text-neutral-300 dark:text-neutral-700">|</span>
+                          <button
+                            onClick={() => handleRemoveSavedItem(sItem)}
+                            className="text-neutral-450 hover:text-rose-600 dark:hover:text-rose-450 transition-colors cursor-pointer bg-transparent border-none p-0"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_320px] items-start">
+          {/* Left Column: Cart items & delivery check */}
+          <div className="space-y-6">
+            {/* Delivery Header */}
+            <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-850 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-none">
+              <div className="space-y-0.5">
+                <p className="text-[10px] tracking-[0.15em] uppercase text-neutral-400 font-semibold font-montserrat">Delivery Check</p>
+                <p className="text-xs font-bold text-black dark:text-white">
+                  {pincodeChecked && deliveryMessage ? deliveryMessage : "Enter pincode to check delivery availability"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                  placeholder="6-digit pincode"
+                  className="border border-neutral-200 dark:border-neutral-800 bg-transparent text-xs px-3 py-1.5 focus:outline-none w-36 tracking-wider font-mono text-center"
+                />
+                <button
+                  onClick={() => {
+                    if (pincode.length === 6) {
+                      setPincodeChecked(true);
+                      setDeliveryMessage(`Delivered to ${pincode} in 2-3 business days.`);
+                    } else {
+                      setPincodeChecked(true);
+                      setDeliveryMessage("Please enter a valid 6-digit Pincode.");
+                    }
+                  }}
+                  className="bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-[10px] font-semibold uppercase tracking-widest px-4 py-1.5 transition-all duration-300 cursor-pointer"
+                >
+                  Check
+                </button>
+              </div>
+            </div>
 
-              <div className="space-y-2.5 text-xs text-gray-600 dark:text-gray-400">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(subtotal)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping:</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold uppercase">Free</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax:</span>
-                  <span className="font-semibold text-gray-800 dark:text-slate-200">{formatCurrency(0)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-white/10 pt-3">
-                  <span>Estimated Total:</span>
-                  <span>{formatCurrency(subtotal)}</span>
-                </div>
+            {/* Cart Items List */}
+            <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-850 p-6 space-y-6 rounded-none">
+              <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-800 pb-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-black dark:text-white">
+                  Shopping Bag ({cart.reduce((acc, c) => acc + c.quantity, 0)})
+                </h3>
+                <button
+                  onClick={handleShareCart}
+                  className="text-[9px] uppercase tracking-widest font-semibold text-neutral-500 hover:text-black dark:hover:text-white transition-colors"
+                >
+                  {copiedCartLink ? "Link Copied" : "Share Bag"}
+                </button>
               </div>
 
-              <Link
-                to="/checkout"
-                className={`btn-primary w-full py-2.5 text-xs font-semibold tracking-wide inline-flex items-center justify-center gap-1.5 cursor-pointer text-center ${
-                  cart.some(item => Number(item.product?.stock) < item.quantity)
-                    ? "opacity-50 pointer-events-none"
-                    : ""
-                }`}
-              >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div className="divide-y divide-neutral-200 dark:divide-neutral-850 space-y-6">
+                {cart.map((item) => {
+                  const product = item.product;
+                  if (!product) return null;
 
-              <button
-                onClick={handleShareCart}
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-none border border-gray-200 dark:border-white/20 text-black dark:text-white bg-transparent hover:bg-neutral-900 hover:text-white dark:hover:bg-white dark:hover:text-black text-xs font-semibold uppercase tracking-widest transition-all duration-300 w-full mt-2"
-                title="Share your cart with a friend"
-              >
-                {copiedCartLink ? (
-                  <>
-                    <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                    <span className="text-emerald-600 dark:text-emerald-400">Cart Link Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="h-3.5 w-3.5 text-gray-500 dark:text-slate-300" />
-                    <span>Share Cart</span>
-                  </>
-                )}
-              </button>
+                  // stock check
+                  let sizeStock = product.stock;
+                  if (product.sizes && product.sizes.length > 0) {
+                    const sizeObj = product.sizes.find(s => s.size === item.selectedSize);
+                    sizeStock = sizeObj ? sizeObj.stock : 0;
+                  }
+                  const isInsufficientStock = Number(sizeStock) < item.quantity;
+                  const isOutOfStock = sizeStock <= 0;
+
+                  return (
+                    <div
+                      key={item._id}
+                      className="relative pt-6 first:pt-0 flex flex-col sm:flex-row gap-5"
+                    >
+                      {/* Image block on left */}
+                      <div className="relative w-24 h-32 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-850 shrink-0">
+                        {product.images && product.images[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                            <ShoppingCart className="h-6 w-6 stroke-[1.2]" />
+                          </div>
+                        )}
+                        {/* Out of Stock visual label overlay */}
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 bg-white/95 dark:bg-black/95 flex flex-col items-center justify-center p-2 text-center z-10 border border-red-500/10">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-450 leading-tight">
+                              Out of Stock
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Info & details on right */}
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-start gap-4">
+                            <div>
+                              <span className="text-[9px] tracking-widest uppercase text-neutral-400 font-semibold font-montserrat">
+                                {product.category || "General"}
+                              </span>
+                              <h4 className="text-sm font-bold text-black dark:text-white line-clamp-1 leading-snug">
+                                {product.name}
+                              </h4>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-sm font-bold text-black dark:text-white">
+                                {formatCurrency(product.price * item.quantity)}
+                              </span>
+                              {item.quantity > 1 && (
+                                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 block">
+                                  {formatCurrency(product.price)} each
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Selected Variant Info */}
+                          {(item.selectedSize || item.selectedColor) && (
+                            <p className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-neutral-400 mt-1">
+                              Size: {item.selectedSize || "—"} {item.selectedColor && `| Color: ${item.selectedColor}`}
+                            </p>
+                          )}
+
+                          {isOutOfStock ? (
+                            <p className="text-[10px] text-rose-650 dark:text-rose-450 font-bold uppercase tracking-wider">
+                              Currently out of stock for your location
+                            </p>
+                          ) : isInsufficientStock ? (
+                            <p className="text-[10px] text-rose-600 dark:text-rose-450 font-medium">
+                              Insufficient stock. Only {sizeStock} left.
+                            </p>
+                          ) : null}
+                        </div>
+
+                        {/* Actions & quantity selector below */}
+                        <div className="flex flex-wrap items-center justify-between gap-4 mt-4 pt-2">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleUpdateQuantity(item._id, item.quantity, -1)}
+                              disabled={isCartUpdating || item.quantity <= 1 || isOutOfStock}
+                              className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-1 text-neutral-500 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="text-xs font-semibold font-mono w-6 text-center">
+                              {isOutOfStock ? 0 : item.quantity}
+                            </span>
+                            <button
+                              onClick={() => handleUpdateQuantity(item._id, item.quantity, 1)}
+                              disabled={isCartUpdating || item.quantity >= sizeStock || isOutOfStock}
+                              className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-1 text-neutral-500 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-4 text-[10px] tracking-widest font-bold uppercase font-montserrat">
+                            <button
+                              onClick={() => handleSaveForLater(item)}
+                              className="text-neutral-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0"
+                            >
+                              Save For Later
+                            </button>
+                            <span className="text-neutral-300 dark:text-neutral-700">|</span>
+                            <button
+                              onClick={() => handleRemoveItem(product._id, item.selectedSize, item.selectedColor)}
+                              className="text-neutral-500 hover:text-rose-600 dark:hover:text-rose-450 transition-colors cursor-pointer bg-transparent border-none p-0"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Saved for Later Section (visible when cart has items) */}
+            {savedItems.length > 0 && (
+              <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-850 p-6 space-y-4 rounded-none">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-black dark:text-white border-b border-neutral-200 dark:border-neutral-850 pb-2">
+                  Saved For Later ({savedItems.length})
+                </h3>
+                <div className="divide-y divide-neutral-200 dark:divide-neutral-850">
+                  {savedItems.map((sItem) => {
+                    const prod = sItem.product;
+                    return (
+                      <div key={sItem._id} className="py-4 first:pt-0 last:pb-0 flex gap-4">
+                        <div className="w-16 h-20 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-850 shrink-0">
+                          {prod.images && prod.images[0] ? (
+                            <img src={prod.images[0]} alt={prod.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                              <ShoppingCart className="h-4 w-4 stroke-[1.2]" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 flex flex-col justify-between">
+                          <div className="flex justify-between items-start gap-2">
+                            <div>
+                              <h4 className="text-xs font-bold text-black dark:text-white line-clamp-1">{prod.name}</h4>
+                              <p className="text-[9px] tracking-wider uppercase font-semibold text-neutral-450 mt-0.5">
+                                Size: {sItem.selectedSize || "—"} {sItem.selectedColor && `| Color: ${sItem.selectedColor}`}
+                              </p>
+                            </div>
+                            <span className="text-xs font-bold text-black dark:text-white">{formatCurrency(prod.price)}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-[9px] tracking-widest font-bold uppercase font-montserrat mt-2">
+                            <button
+                              onClick={() => handleMoveToCart(sItem)}
+                              className="text-black dark:text-white hover:underline transition-colors cursor-pointer bg-transparent border-none p-0"
+                            >
+                              Move To Bag
+                            </button>
+                            <span className="text-neutral-300 dark:text-neutral-700">|</span>
+                            <button
+                              onClick={() => handleRemoveSavedItem(sItem)}
+                              className="text-neutral-450 hover:text-rose-600 dark:hover:text-rose-450 transition-colors cursor-pointer bg-transparent border-none p-0"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Sticky Summary */}
+          <div className="lg:sticky lg:top-28 space-y-4">
+            <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-850 p-6 space-y-4 rounded-none">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 border-b border-neutral-200 dark:border-neutral-805 pb-3">
+                PRICE DETAILS
+              </h3>
+
+              {/* Price Calculations */}
+              {(() => {
+                const totalMrp = Math.round(subtotal * 1.15);
+                const discount = totalMrp - subtotal;
+                const hasOutOfStockItems = cart.some(item => {
+                  let sizeStock = item.product?.stock || 0;
+                  if (item.product?.sizes && item.product.sizes.length > 0) {
+                    const sizeObj = item.product.sizes.find(s => s.size === item.selectedSize);
+                    sizeStock = sizeObj ? sizeObj.stock : 0;
+                  }
+                  return sizeStock <= 0 || sizeStock < item.quantity;
+                });
+
+                return (
+                  <div className="space-y-4 text-xs">
+                    <div className="space-y-2.5 text-neutral-600 dark:text-neutral-400">
+                      <div className="flex justify-between">
+                        <span>MRP (Total price of items)</span>
+                        <span className="font-semibold text-black dark:text-white">{formatCurrency(totalMrp)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Discount on MRP</span>
+                        <span className="font-semibold text-neutral-550">-{formatCurrency(discount)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Delivery Charges</span>
+                        <span className="font-semibold text-black dark:text-white uppercase tracking-wider">Free</span>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-neutral-200 dark:border-neutral-800 pt-3.5 flex justify-between font-bold text-black dark:text-white text-sm">
+                      <span>Total Amount</span>
+                      <span>{formatCurrency(subtotal)}</span>
+                    </div>
+
+                    <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-850 px-3 py-2 text-[10px] font-semibold text-neutral-500 uppercase tracking-widest text-center">
+                      You will save <span className="text-black dark:text-white font-bold">{formatCurrency(discount)}</span> on this order
+                    </div>
+
+                    <Link
+                      to="/checkout"
+                      className={`block text-center bg-black hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black py-3.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${
+                        hasOutOfStockItems
+                          ? "opacity-40 cursor-not-allowed pointer-events-none"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      Proceed to Checkout
+                    </Link>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

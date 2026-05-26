@@ -1,6 +1,6 @@
 // frontend/src/components/UserNavbar.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   ShoppingCart,
@@ -22,6 +22,19 @@ const UserNavbar = () => {
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Close drawer on route change
   useEffect(() => {
@@ -431,11 +444,15 @@ const UserNavbar = () => {
             )}
           </NavLink>
 
-          {/* Desktop: Profile + Logout / Sign In */}
-          <div className="hidden md:flex items-center gap-5">
+          {/* Desktop: Profile + Logout / Dropdown */}
+          <div className="hidden md:flex items-center gap-5" ref={dropdownRef}>
             {user ? (
-              <>
-                <Link to="/profile" className={actionClass}>
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  onMouseEnter={() => setIsDropdownOpen(true)}
+                  className={`${actionClass} cursor-pointer border-none bg-transparent focus:outline-none`}
+                >
                   {user.avatar ? (
                     <img
                       src={user.avatar}
@@ -446,12 +463,54 @@ const UserNavbar = () => {
                     <User className="h-3.5 w-3.5 stroke-[1.5]" />
                   )}
                   <span>{user.name.split(" ")[0]}</span>
-                </Link>
-                <button onClick={handleLogout} className={logoutClass}>
-                  <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
-                  <span>Logout</span>
                 </button>
-              </>
+
+                {isDropdownOpen && (
+                  <div
+                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800 shadow-lg z-50 py-1"
+                    onMouseLeave={() => setIsDropdownOpen(false)}
+                  >
+                    <Link
+                      to="/profile?tab=settings"
+                      className="block px-4 py-2 text-[10px] tracking-[0.15em] uppercase text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-black dark:hover:text-white transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="block px-4 py-2 text-[10px] tracking-[0.15em] uppercase text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-black dark:hover:text-white transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Orders
+                    </Link>
+                    <Link
+                      to="/profile?tab=wishlist"
+                      className="block px-4 py-2 text-[10px] tracking-[0.15em] uppercase text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-black dark:hover:text-white transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Wishlist
+                    </Link>
+                    <Link
+                      to="/profile?tab=addresses"
+                      className="block px-4 py-2 text-[10px] tracking-[0.15em] uppercase text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-black dark:hover:text-white transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Saved Addresses
+                    </Link>
+                    <hr className="border-neutral-100 dark:border-neutral-900 my-1" />
+                    <button
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-left block px-4 py-2 text-[10px] tracking-[0.15em] uppercase text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-black dark:hover:text-white transition-colors bg-transparent border-none cursor-pointer"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link to="/login" className={signInClass}>
                 Sign In
