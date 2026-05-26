@@ -290,6 +290,27 @@ export const updateCartQuantity = async (req, res) => {
       return res.status(404).json({ message: "Item not found in cart." });
     }
 
+    // Fetch the actual product document to verify stock limits
+    const product = await Product.findById(item.product);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Check size-specific stock limit
+    let availableStock = product.stock;
+    if (product.sizes && product.sizes.length > 0) {
+      const sizeObj = product.sizes.find((s) => s.size === item.selectedSize);
+      if (sizeObj) {
+        availableStock = sizeObj.stock;
+      } else {
+        availableStock = 0;
+      }
+    }
+
+    if (qty > availableStock) {
+      return res.status(400).json({ message: `Only ${availableStock} units available in this size.` });
+    }
+
     item.quantity = qty;
     await user.save();
 

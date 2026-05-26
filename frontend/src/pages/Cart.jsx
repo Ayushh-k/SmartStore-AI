@@ -16,6 +16,7 @@ const Cart = () => {
   const [copiedCartLink, setCopiedCartLink] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [recLoading, setRecLoading] = useState(false);
+  const [isCartUpdating, setIsCartUpdating] = useState(false);
 
   const cartIdsString = (cart || [])
     .map(item => item.product?._id)
@@ -89,7 +90,9 @@ const Cart = () => {
 
   const handleUpdateQuantity = async (cartItemId, currentQty, amount) => {
     const newQty = currentQty + amount;
-    if (newQty < 1) return;
+    if (newQty < 1 || isCartUpdating) return;
+
+    setIsCartUpdating(true);
 
     // Optimistically update the state array for instant rendering of local totals
     const originalCart = [...cart];
@@ -113,6 +116,8 @@ const Cart = () => {
       setCart(originalCart);
       setMessage(err?.response?.data?.message || "Failed to update quantity.");
       setMessageType("error");
+    } finally {
+      setIsCartUpdating(false);
     }
   };
 
@@ -256,7 +261,19 @@ const Cart = () => {
               {cart.map((item) => {
                 const product = item.product;
                 if (!product) return null;
-                const isInsufficientStock = Number(product.stock) < item.quantity;
+                
+                // Locate matching size stock
+                let sizeStock = product.stock;
+                if (product.sizes && product.sizes.length > 0) {
+                  const sizeObj = product.sizes.find(s => s.size === item.selectedSize);
+                  if (sizeObj) {
+                    sizeStock = sizeObj.stock;
+                  } else {
+                    sizeStock = 0;
+                  }
+                }
+                const isInsufficientStock = Number(sizeStock) < item.quantity;
+                
                 return (
                   <div key={`${product._id}-${item.selectedSize}-${item.selectedColor}`} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-1 flex-1">
@@ -277,7 +294,7 @@ const Cart = () => {
 
                       {isInsufficientStock && (
                         <p className="text-[10px] text-rose-600 dark:text-rose-450 font-medium">
-                          Insufficient stock. Only {product.stock} left in stock.
+                          Insufficient stock. Only {sizeStock} left in stock.
                         </p>
                       )}
                     </div>
@@ -286,7 +303,7 @@ const Cart = () => {
                       <div className="flex items-center gap-2.5">
                         <button
                           onClick={() => handleUpdateQuantity(item._id, item.quantity, -1)}
-                          disabled={item.quantity <= 1}
+                          disabled={isCartUpdating || item.quantity <= 1}
                           className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
                         >
                           <Minus className="h-3.5 w-3.5" />
@@ -294,7 +311,8 @@ const Cart = () => {
                         <span className="text-xs font-semibold font-mono w-4 text-center">{item.quantity}</span>
                         <button
                           onClick={() => handleUpdateQuantity(item._id, item.quantity, 1)}
-                          className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white cursor-pointer rounded-none animate-none"
+                          disabled={isCartUpdating || item.quantity >= sizeStock}
+                          className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-white/10 p-1 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded-none animate-none"
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </button>
