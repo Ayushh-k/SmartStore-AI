@@ -19,6 +19,36 @@ const AdminProfile = () => {
     avatar: "",
   });
 
+  // Password Form State
+  const [pwdForm, setPwdForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [pwdSuccess, setPwdSuccess] = useState("");
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setPwdLoading(true);
+    setPwdError("");
+    setPwdSuccess("");
+
+    if (pwdForm.newPassword !== pwdForm.confirmPassword) {
+      setPwdError("New passwords do not match.");
+      setPwdLoading(false);
+      return;
+    }
+
+    try {
+      const res = await api.put("/api/users/update-password", pwdForm);
+      setPwdSuccess(res.data.message || "Password updated successfully.");
+      setPwdForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      console.error("Password update error:", err);
+      setPwdError(err?.response?.data?.message || "Failed to update password.");
+    } finally {
+      setPwdLoading(false);
+    }
+  };
+
   const fetchProfile = async () => {
     setLoading(true);
     try {
@@ -121,7 +151,7 @@ const AdminProfile = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="grid gap-8 md:grid-cols-[180px_1fr]">
+      <div className="grid gap-8 md:grid-cols-[180px_1fr]">
         {/* Left Column: Avatar Upload */}
         <div className="flex flex-col items-center pt-2">
           <AvatarUpload value={form.avatar} onChange={handleAvatarChange} />
@@ -133,90 +163,167 @@ const AdminProfile = () => {
         </div>
 
         {/* Right Column: Profile Data Sheet */}
-        <div className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-6">
-          <div className="flex justify-between items-center border-b border-gray-200 dark:border-neutral-900 pb-3 mb-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">
-              Personal Data Sheets
-            </h3>
-            <div className="flex items-center gap-1.5 border border-black dark:border-white px-2 py-0.5 text-[8px] uppercase tracking-widest font-mono text-black dark:text-white font-bold">
-              <Shield className="h-3 w-3" />
-              <span>{user?.role === "superadmin" ? "SUPER ADMIN" : "ADMIN"}</span>
-            </div>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Full Identity Name *
-              </label>
-              <input
-                type="text"
-                name="name"
-                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                placeholder="E.g. Alexander McQueen"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
+        <div className="space-y-8">
+          <form onSubmit={handleSubmit} className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-6">
+            <div className="flex justify-between items-center border-b border-gray-200 dark:border-neutral-900 pb-3 mb-2">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">
+                Personal Data Sheets
+              </h3>
+              <div className="flex items-center gap-1.5 border border-black dark:border-white px-2 py-0.5 text-[8px] uppercase tracking-widest font-mono text-black dark:text-white font-bold">
+                <Shield className="h-3 w-3" />
+                <span>{user?.role === "superadmin" ? "SUPER ADMIN" : "ADMIN"}</span>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Registered Platform Email
-              </label>
-              <input
-                type="email"
-                disabled
-                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-neutral-450 dark:text-neutral-600 rounded-none cursor-not-allowed"
-                value={user?.email || ""}
-              />
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Full Identity Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. Alexander McQueen"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Registered Platform Email
+                </label>
+                <input
+                  type="email"
+                  disabled
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-neutral-450 dark:text-neutral-600 rounded-none cursor-not-allowed"
+                  value={user?.email || ""}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Contact Line / Phone Number
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. +91 99999 88888"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Corporate Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
+                  placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
+                  value={form.address}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Contact Line / Phone Number
-              </label>
-              <input
-                type="text"
-                name="phone"
-                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                placeholder="E.g. +91 99999 88888"
-                value={form.phone}
-                onChange={handleChange}
-              />
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save Changes
+              </button>
+            </div>
+          </form>
+
+          {/* SECURITY & PASSWORD Form */}
+          <form onSubmit={handleUpdatePassword} className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-6">
+            <div className="flex justify-between items-center border-b border-gray-200 dark:border-neutral-900 pb-3 mb-2">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">
+                Security & Password
+              </h3>
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
-                Corporate Address
-              </label>
-              <input
-                type="text"
-                name="address"
-                className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none"
-                placeholder="E.g. 12, Fashion Enclave, New Delhi, India"
-                value={form.address}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+            {pwdSuccess && (
+              <div className="border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/15 text-emerald-800 dark:text-emerald-300 p-3 text-[9px] uppercase tracking-widest font-bold">
+                {pwdSuccess}
+              </div>
+            )}
+            {pwdError && (
+              <div className="border border-rose-500/30 bg-rose-50 dark:bg-rose-950/15 text-rose-800 dark:text-rose-300 p-3 text-[9px] uppercase tracking-widest font-bold">
+                {pwdError}
+              </div>
+            )}
 
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              Save Changes
-            </button>
-          </div>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Current Password *
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="CURRENT PASSWORD"
+                  value={pwdForm.oldPassword}
+                  onChange={(e) => setPwdForm(prev => ({ ...prev, oldPassword: e.target.value }))}
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  New Password *
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="NEW PASSWORD"
+                  value={pwdForm.newPassword}
+                  onChange={(e) => setPwdForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[9px] uppercase text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider mb-1">
+                  Confirm New Password *
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="CONFIRM NEW PASSWORD"
+                  value={pwdForm.confirmPassword}
+                  onChange={(e) => setPwdForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="w-full bg-transparent border-b border-gray-200 dark:border-neutral-800 text-xs py-2 px-0 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors duration-300 rounded-none font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={pwdLoading}
+                className="bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-900 dark:hover:bg-neutral-200 py-3.5 text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none inline-flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {pwdLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                Update Password
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
