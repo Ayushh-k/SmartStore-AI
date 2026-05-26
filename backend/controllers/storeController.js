@@ -282,7 +282,7 @@ export const updateCartQuantity = async (req, res) => {
 
     const itemIndex = user.cart.findIndex(
       (item) =>
-        item.product.toString() === productId &&
+        item.product.toString() === productId.toString() &&
         (item.selectedSize || "") === size &&
         (item.selectedColor || "") === color
     );

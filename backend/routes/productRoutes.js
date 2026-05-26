@@ -3,7 +3,7 @@
 import express from "express";
 import Product from "../models/Product.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
-import { getProductById, createProductReview, updateVendorProduct } from "../controllers/productController.js";
+import { getProductById, createProductReview, updateVendorProduct, getSimilarProducts } from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -49,6 +49,9 @@ router.get("/meta/values", protect, admin, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch distinct meta values." });
   }
 });
+
+// Get similar products (Public route)
+router.get("/:id/similar", getSimilarProducts);
 
 // Get single product (Accessible by logged-in users for PDP)
 router.get("/:id", protect, getProductById);
