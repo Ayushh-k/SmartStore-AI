@@ -159,9 +159,21 @@ export const checkout = async (req, res) => {
         return res.status(400).json({ message: "Product in cart no longer exists." });
       }
 
-      if (product.stock < item.quantity) {
+      // Check size-specific stock limit first
+      let availableStock = product.stock;
+      if (product.sizes && product.sizes.length > 0) {
+        const sizeObj = product.sizes.find((s) => s.size === item.selectedSize);
+        if (sizeObj) {
+          availableStock = sizeObj.stock;
+        } else {
+          availableStock = 0;
+        }
+      }
+
+      if (availableStock < item.quantity) {
+        const sizeMsg = item.selectedSize ? `size '${item.selectedSize}' for ` : "";
         return res.status(400).json({
-          message: `Insufficient stock for product: ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`,
+          message: `Sorry, the ${sizeMsg}Product "${product.name}" has insufficient stock. Available: ${availableStock}, Requested: ${item.quantity}`,
         });
       }
 
@@ -190,9 +202,20 @@ export const checkout = async (req, res) => {
 
     // Update product stocks & Create Sale documents
     for (const item of user.cart) {
-      await Product.findByIdAndUpdate(item.product._id, {
-        $inc: { stock: -item.quantity },
-      });
+      const product = await Product.findById(item.product._id);
+      if (product) {
+        // Deduct global stock
+        product.stock = Math.max(0, product.stock - item.quantity);
+
+        // Deduct size-specific stock if sizes exist
+        if (product.sizes && product.sizes.length > 0) {
+          const sizeIndex = product.sizes.findIndex((s) => s.size === item.selectedSize);
+          if (sizeIndex !== -1) {
+            product.sizes[sizeIndex].stock = Math.max(0, product.sizes[sizeIndex].stock - item.quantity);
+          }
+        }
+        await product.save();
+      }
 
       await Sale.create({
         product: item.product._id,
