@@ -11,6 +11,42 @@ const AdminOrders = () => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [error, setError] = useState("");
 
+  const [updateStatus, setUpdateStatus] = useState("Processing");
+  const [updateMessage, setUpdateMessage] = useState("");
+  const [updateLocation, setUpdateLocation] = useState("");
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+
+  useEffect(() => {
+    if (expandedOrderId) {
+      const order = orders.find(o => o._id === expandedOrderId);
+      if (order) {
+        setUpdateStatus(order.status || "Processing");
+        setUpdateMessage("");
+        setUpdateLocation("");
+      }
+    }
+  }, [expandedOrderId, orders]);
+
+  const handleUpdateStatus = async (e, orderId) => {
+    e.preventDefault();
+    setUpdatingOrderId(orderId);
+    try {
+      const res = await api.put(`/api/vendor/orders/${orderId}/status`, {
+        status: updateStatus,
+        message: updateMessage,
+        location: updateLocation
+      });
+      setOrders(prev => prev.map(o => o._id === orderId ? res.data.order : o));
+      setUpdateMessage("");
+      setUpdateLocation("");
+    } catch (err) {
+      console.error("Error updating order status:", err);
+      setError(err?.response?.data?.message || "Failed to update order status.");
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
   const fetchOrders = async () => {
     setLoading(true);
     setError("");
@@ -44,8 +80,11 @@ const AdminOrders = () => {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
+      case "delivered":
       case "completed":
         return "border-black dark:border-white text-black dark:text-white bg-gray-100 dark:bg-neutral-900";
+      case "shipped":
+      case "out for delivery":
       case "processing":
         return "border-neutral-400 dark:border-neutral-600 text-neutral-700 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-950";
       case "cancelled":
@@ -178,7 +217,7 @@ const AdminOrders = () => {
                 {/* Expanded Details section */}
                 {isExpanded && (
                   <div className="border-t border-gray-200 dark:border-neutral-900 bg-gray-50 dark:bg-[#050505] p-5 space-y-6 text-left">
-                    <div className="grid gap-6 md:grid-cols-2">
+                    <div className="grid gap-6 md:grid-cols-3">
                       {/* Products Ordered */}
                       <div className="space-y-3">
                         <h4 className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest border-b border-gray-200 dark:border-neutral-900 pb-2 flex items-center gap-2">
@@ -261,6 +300,82 @@ const AdminOrders = () => {
                             <p className="text-xs text-neutral-500 italic pl-1">No payment transaction records.</p>
                           )}
                         </div>
+                      </div>
+
+                      {/* Shipment Tracking Control */}
+                      <div className="space-y-4">
+                        <h4 className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest border-b border-gray-200 dark:border-neutral-900 pb-2">
+                          Shipment Tracking Control
+                        </h4>
+                        <form onSubmit={(e) => handleUpdateStatus(e, order._id)} className="space-y-3">
+                          <div className="space-y-1">
+                            <label className="block text-[8px] uppercase tracking-wider text-neutral-400">Shipment Status</label>
+                            <select
+                              value={updateStatus}
+                              onChange={(e) => setUpdateStatus(e.target.value)}
+                              className="w-full bg-transparent border border-gray-200 dark:border-neutral-800 text-xs py-2 px-2 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white rounded-none"
+                            >
+                              <option value="Processing" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Processing</option>
+                              <option value="Shipped" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Shipped</option>
+                              <option value="Out for Delivery" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Out for Delivery</option>
+                              <option value="Delivered" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Delivered</option>
+                              <option value="Cancelled" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Cancelled</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="block text-[8px] uppercase tracking-wider text-neutral-400">Tracking Message</label>
+                            <input
+                              type="text"
+                              placeholder="E.g. Left New Delhi Hub"
+                              value={updateMessage}
+                              onChange={(e) => setUpdateMessage(e.target.value)}
+                              className="w-full bg-transparent border border-gray-200 dark:border-neutral-800 text-xs py-2 px-2 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white rounded-none"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="block text-[8px] uppercase tracking-wider text-neutral-400">Current Location</label>
+                            <input
+                              type="text"
+                              placeholder="E.g. New Delhi, IN"
+                              value={updateLocation}
+                              onChange={(e) => setUpdateLocation(e.target.value)}
+                              className="w-full bg-transparent border border-gray-200 dark:border-neutral-800 text-xs py-2 px-2 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white rounded-none"
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={updatingOrderId === order._id}
+                            className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5"
+                          >
+                            {updatingOrderId === order._id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              "Update Dispatch Status"
+                            )}
+                          </button>
+                        </form>
+
+                        {/* Display active tracking log */}
+                        {order.trackingHistory && order.trackingHistory.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-900 space-y-2">
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-neutral-450 block">Shipment Updates Log</span>
+                            <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                              {order.trackingHistory.slice().reverse().map((log, idx) => (
+                                <div key={idx} className="text-[9px] border-l-2 border-black dark:border-white pl-2 py-0.5 space-y-0.5 text-left bg-white dark:bg-neutral-900/50 p-1.5 border border-neutral-200 dark:border-neutral-800">
+                                  <div className="flex justify-between font-bold">
+                                    <span className="text-black dark:text-white uppercase font-mono">{log.status}</span>
+                                    <span className="text-neutral-450 font-mono">{new Date(log.timestamp).toLocaleDateString()}</span>
+                                  </div>
+                                  <p className="text-neutral-600 dark:text-neutral-350">{log.message}</p>
+                                  {log.location && <p className="text-neutral-450 italic">Location: {log.location}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -197,7 +197,15 @@ export const checkout = async (req, res) => {
         status: "Completed",
       },
       totalAmount,
-      status: "completed", // Completes instantly as a mock checkout flow
+      status: "Processing",
+      trackingHistory: [
+        {
+          status: "Processing",
+          message: "Order placed and being processed.",
+          location: shippingAddress.city || "Main Facility",
+          timestamp: new Date(),
+        },
+      ],
     });
 
     // Update product stocks & Create Sale documents

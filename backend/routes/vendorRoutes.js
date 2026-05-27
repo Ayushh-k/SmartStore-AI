@@ -9,6 +9,7 @@ import {
   deleteVendorProduct,
   getVendorOrders,
   updateStoreSettings,
+  updateVendorOrderStatus,
 } from "../controllers/vendorController.js";
 
 const router = express.Router();
@@ -24,6 +25,7 @@ router.delete("/products/:id", protect, admin, deleteVendorProduct);
 
 // Orders
 router.get("/orders", protect, admin, getVendorOrders);
+router.put("/orders/:id/status", protect, admin, updateVendorOrderStatus);
 
 // Store settings
 router.put("/settings", protect, admin, updateStoreSettings);

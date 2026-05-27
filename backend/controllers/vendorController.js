@@ -258,3 +258,49 @@ export const updateStoreSettings = async (req, res) => {
     res.status(500).json({ message: "Failed to update store settings." });
   }
 };
+
+/**
+  PUT /api/vendor/orders/:id/status
+  Updates the status of an order and appends to the tracking history.
+ */
+export const updateVendorOrderStatus = async (req, res) => {
+  try {
+    const { status, message, location } = req.body;
+    const orderId = req.params.id;
+
+    const validStatuses = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: `Invalid status. Must be one of: ${validStatuses.join(", ")}` });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Update status
+    order.status = status;
+
+    // Add tracking history entry
+    order.trackingHistory.push({
+      status,
+      message: message || `Order status updated to ${status}.`,
+      location: location || "Logistics Hub",
+      timestamp: new Date(),
+    });
+
+    await order.save();
+
+    const populatedOrder = await Order.findById(orderId)
+      .populate("user", "name email")
+      .populate("products.product");
+
+    res.json({
+      message: "Order tracking status updated successfully.",
+      order: populatedOrder,
+    });
+  } catch (error) {
+    console.error("Update vendor order status error:", error);
+    res.status(500).json({ message: "Failed to update order status." });
+  }
+};

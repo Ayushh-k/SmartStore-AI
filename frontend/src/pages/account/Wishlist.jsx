@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Trash2, ShoppingCart, Loader2, PackageMinus } from "lucide-react";
+import { Heart, Trash2, ShoppingCart, Loader2, PackageMinus } from "lucide-react";
 import api from "../../utils/api.js";
 import { formatCurrency } from "../../utils/formatCurrency.js";
 

@@ -10,6 +10,11 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
+
+  const toggleTrackingExpand = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
 
   // Filters State
   const [statusFilters, setStatusFilters] = useState({
@@ -318,6 +323,87 @@ const Orders = () => {
                         );
                       })}
                     </div>
+
+                    {/* Card Actions (Track Order Toggle) */}
+                    <div className="px-5 py-3 bg-neutral-50/50 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-850 flex justify-between items-center text-xs">
+                      <button
+                        onClick={() => toggleTrackingExpand(order._id)}
+                        className="text-[9px] tracking-widest font-bold uppercase font-montserrat text-black dark:text-white border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors cursor-pointer rounded-none"
+                      >
+                        {expandedOrderId === order._id ? "Close Tracking Details" : "Track Order / Shipment"}
+                      </button>
+                      <span className="text-[9px] text-neutral-450 uppercase font-mono">
+                        Status: <strong className="text-black dark:text-white font-medium">{order.status}</strong>
+                      </span>
+                    </div>
+
+                    {/* Expandable Tracking Timeline */}
+                    {expandedOrderId === order._id && (
+                      <div className="px-6 py-6 border-t border-neutral-100 dark:border-neutral-850 bg-neutral-50/50 dark:bg-[#050505] space-y-4">
+                        <h4 className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest font-montserrat">
+                          Shipment Tracking Timeline
+                        </h4>
+                        
+                        {/* Vertical Timeline Markup */}
+                        <div className="relative border-l border-neutral-300 dark:border-neutral-850 ml-3 pl-6 space-y-6 text-left py-2">
+                          {order.trackingHistory && order.trackingHistory.length > 0 ? (
+                            order.trackingHistory.map((history, idx) => {
+                              const isLatest = idx === order.trackingHistory.length - 1;
+                              return (
+                                <div key={idx} className="relative">
+                                  {/* Timeline Circle Node */}
+                                  <span className={`absolute -left-[30px] top-1 flex h-3 w-3 items-center justify-center rounded-full ${
+                                    isLatest ? "bg-black dark:bg-white ring-4 ring-neutral-200 dark:ring-neutral-800" : "bg-neutral-400"
+                                  }`} />
+                                  
+                                  <div className="space-y-1">
+                                    <div className="flex flex-wrap items-baseline gap-2">
+                                      <span className={`text-[10px] font-bold uppercase tracking-wider ${isLatest ? "text-black dark:text-white" : "text-neutral-500"}`}>
+                                        {history.status}
+                                      </span>
+                                      {history.location && (
+                                        <span className="text-[9px] text-neutral-450 uppercase font-semibold font-mono">
+                                          ({history.location})
+                                        </span>
+                                      )}
+                                    </div>
+                                    {history.message && (
+                                      <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                                        {history.message}
+                                      </p>
+                                    )}
+                                    <span className="text-[8px] font-mono text-neutral-400 uppercase tracking-widest mt-1 block">
+                                      {new Date(history.timestamp).toLocaleString(undefined, {
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            // Fallback simulation for older orders without full trackingHistory
+                            <div className="relative">
+                              <span className="absolute -left-[30px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-black dark:bg-white" />
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white">
+                                  {order.status}
+                                </span>
+                                <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                                  Order is currently {order.status.toLowerCase()}. Shipment tracking details are being updated.
+                                </p>
+                                <span className="text-[8px] font-mono text-neutral-400 uppercase tracking-widest mt-1 block">
+                                  {new Date(order.updatedAt).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })
