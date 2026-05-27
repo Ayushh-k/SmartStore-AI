@@ -18,7 +18,9 @@ import {
   Mail,
   Globe,
   Bell,
-  X
+  X,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import api from "../utils/api.js";
 import AvatarUpload from "../components/AvatarUpload.jsx";
@@ -68,6 +70,7 @@ const UserProfile = () => {
   const [pwdLoading, setPwdLoading] = useState(false);
   const [pwdError, setPwdError] = useState("");
   const [pwdSuccess, setPwdSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Synchronize active tab with query params
   useEffect(() => {
@@ -471,38 +474,53 @@ const UserProfile = () => {
             
             <div className="space-y-1">
               <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider">Current Password *</label>
-              <input
-                type="password"
-                required
-                placeholder="CURRENT PASSWORD"
-                value={pwdForm.oldPassword}
-                onChange={(e) => setPwdForm(prev => ({ ...prev, oldPassword: e.target.value }))}
-                className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="CURRENT PASSWORD"
+                  value={pwdForm.oldPassword}
+                  onChange={(e) => setPwdForm(prev => ({ ...prev, oldPassword: e.target.value }))}
+                  className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 pr-10 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono text-black dark:text-white"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-450 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1">
               <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider">New Password *</label>
-              <input
-                type="password"
-                required
-                placeholder="NEW PASSWORD"
-                value={pwdForm.newPassword}
-                onChange={(e) => setPwdForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="NEW PASSWORD"
+                  value={pwdForm.newPassword}
+                  onChange={(e) => setPwdForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                  className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 pr-10 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono text-black dark:text-white"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-450 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1">
               <label className="block text-[9px] uppercase text-neutral-500 font-semibold tracking-wider">Confirm New Password *</label>
-              <input
-                type="password"
-                required
-                placeholder="CONFIRM NEW PASSWORD"
-                value={pwdForm.confirmPassword}
-                onChange={(e) => setPwdForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="CONFIRM NEW PASSWORD"
+                  value={pwdForm.confirmPassword}
+                  onChange={(e) => setPwdForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent text-xs p-2.5 pr-10 focus:outline-none focus:border-black dark:focus:border-white focus:ring-0 rounded-none font-mono text-black dark:text-white"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-450 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             <button

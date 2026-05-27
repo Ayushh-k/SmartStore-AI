@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import api from "../utils/api.js";
 
@@ -12,6 +12,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [captchaToken, setCaptchaToken] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -158,16 +159,25 @@ const Login = () => {
                 <label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-sans font-medium">
                   Password
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  minLength={6}
-                  value={form.password}
-                  onChange={handleChange}
-                  className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white"
-                  placeholder="••••••••"
-                />
+                <div className="relative w-full">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    required
+                    minLength={6}
+                    value={form.password}
+                    onChange={handleChange}
+                    className="input border-b border-black/15 dark:border-white/20 text-black dark:text-white w-full pr-10"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 bottom-2.5 text-neutral-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               {/* reCAPTCHA Widget */}

@@ -1,7 +1,7 @@
 // frontend/src/pages/AdminProfile.jsx
 
 import React, { useState, useEffect } from "react";
-import { Loader2, Save, Shield } from "lucide-react";
+import { Loader2, Save, Shield, Eye, EyeOff } from "lucide-react";
 import api from "../utils/api.js";
 import AvatarUpload from "../components/AvatarUpload.jsx";
 
@@ -26,6 +26,7 @@ const AdminProfile = () => {
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [pwdLoading, setPwdLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
@@ -269,24 +270,57 @@ const AdminProfile = () => {
           </form>
 
           {/* SECURITY & PASSWORD Form */}
-          <div className="mt-12 border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-8 rounded-none">
+          <div className="mt-12 border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-8 max-w-2xl rounded-none">
             <h3 className="text-sm font-semibold uppercase tracking-widest border-b border-neutral-200 dark:border-neutral-900 pb-4 mb-6 text-black dark:text-white">Security & Password</h3>
-            <form onSubmit={handlePasswordUpdate} className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2 text-left">
-                <label className="text-xs uppercase tracking-widest text-gray-500">Current Password</label>
-                <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="border border-neutral-300 dark:border-neutral-850 bg-transparent p-3 text-sm focus:border-black focus:ring-0 outline-none text-black dark:text-white rounded-none" required />
+            <form onSubmit={handlePasswordUpdate} className="flex flex-col gap-5 max-w-md">
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-[10px] uppercase tracking-widest text-gray-500">Current Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={oldPassword} 
+                    onChange={(e) => setOldPassword(e.target.value)} 
+                    className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent p-2.5 text-sm focus:border-black focus:ring-0 outline-none pr-10 text-black dark:text-white rounded-none transition-colors" 
+                    required 
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-450 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-col gap-2 text-left">
-                <label className="text-xs uppercase tracking-widest text-gray-500">New Password</label>
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="border border-neutral-300 dark:border-neutral-850 bg-transparent p-3 text-sm focus:border-black focus:ring-0 outline-none text-black dark:text-white rounded-none" required />
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-[10px] uppercase tracking-widest text-gray-500">New Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent p-2.5 text-sm focus:border-black focus:ring-0 outline-none pr-10 text-black dark:text-white rounded-none transition-colors" 
+                    required 
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-450 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-col gap-2 text-left">
-                <label className="text-xs uppercase tracking-widest text-gray-500">Confirm New Password</label>
-                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="border border-neutral-300 dark:border-neutral-850 bg-transparent p-3 text-sm focus:border-black focus:ring-0 outline-none text-black dark:text-white rounded-none" required />
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-[10px] uppercase tracking-widest text-gray-500">Confirm New Password</label>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    className="w-full border border-neutral-300 dark:border-neutral-850 bg-transparent p-2.5 text-sm focus:border-black focus:ring-0 outline-none pr-10 text-black dark:text-white rounded-none transition-colors" 
+                    required 
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-450 hover:text-black dark:hover:text-white transition-colors cursor-pointer">
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
-              {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
-              {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
-              <button type="submit" disabled={pwdLoading} className="mt-4 w-full bg-black text-white p-4 uppercase tracking-widest text-sm font-semibold hover:bg-neutral-800 transition-colors cursor-pointer rounded-none">
+              {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
+              {passwordSuccess && <p className="text-xs text-green-600 mt-1">{passwordSuccess}</p>}
+              <button type="submit" disabled={pwdLoading} className="mt-2 w-full bg-black text-white p-3.5 uppercase tracking-widest text-xs font-semibold hover:bg-neutral-800 transition-colors cursor-pointer rounded-none">
                 {pwdLoading ? "Updating..." : "Update Password"}
               </button>
             </form>
