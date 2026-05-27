@@ -20,30 +20,38 @@ const AdminProfile = () => {
   });
 
   // Password Form State
-  const [pwdForm, setPwdForm] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
   const [pwdLoading, setPwdLoading] = useState(false);
-  const [pwdError, setPwdError] = useState("");
-  const [pwdSuccess, setPwdSuccess] = useState("");
 
-  const handleUpdatePassword = async (e) => {
+  const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     setPwdLoading(true);
-    setPwdError("");
-    setPwdSuccess("");
+    setPasswordError("");
+    setPasswordSuccess("");
 
-    if (pwdForm.newPassword !== pwdForm.confirmPassword) {
-      setPwdError("New passwords do not match.");
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.");
       setPwdLoading(false);
       return;
     }
 
     try {
-      const res = await api.put("/api/users/update-password", pwdForm);
-      setPwdSuccess(res.data.message || "Password updated successfully.");
-      setPwdForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      const res = await api.put("/api/users/update-password", {
+        oldPassword,
+        newPassword,
+        confirmPassword,
+      });
+      setPasswordSuccess(res.data.message || "Password updated successfully.");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
       console.error("Password update error:", err);
-      setPwdError(err?.response?.data?.message || "Failed to update password.");
+      setPasswordError(err?.response?.data?.message || "Failed to update password.");
     } finally {
       setPwdLoading(false);
     }
@@ -249,78 +257,28 @@ const AdminProfile = () => {
           </form>
 
           {/* SECURITY & PASSWORD Form */}
-          <form onSubmit={handleUpdatePassword} className="border border-gray-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-6 rounded-none space-y-6">
-            <div className="border-b border-neutral-200 mb-6 mt-10 text-left">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-black dark:text-white font-mono">
-                SECURITY & PASSWORD
-              </h3>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-xs uppercase text-neutral-500 tracking-widest font-mono mb-1">
-                  CURRENT PASSWORD *
-                </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="CURRENT PASSWORD"
-                  value={pwdForm.oldPassword}
-                  onChange={(e) => setPwdForm(prev => ({ ...prev, oldPassword: e.target.value }))}
-                  className="w-full bg-transparent border border-neutral-300 text-xs p-2.5 focus:outline-none focus:border-black focus:ring-0 rounded-none font-mono text-black dark:text-white"
-                />
+          <div className="mt-12 border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-[#0a0a0a] p-8 rounded-none">
+            <h3 className="text-sm font-semibold uppercase tracking-widest border-b border-neutral-200 dark:border-neutral-900 pb-4 mb-6 text-black dark:text-white">Security & Password</h3>
+            <form onSubmit={handlePasswordUpdate} className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2 text-left">
+                <label className="text-xs uppercase tracking-widest text-gray-500">Current Password</label>
+                <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className="border border-neutral-300 dark:border-neutral-850 bg-transparent p-3 text-sm focus:border-black focus:ring-0 outline-none text-black dark:text-white rounded-none" required />
               </div>
-
-              <div>
-                <label className="block text-xs uppercase text-neutral-500 tracking-widest font-mono mb-1">
-                  NEW PASSWORD *
-                </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="NEW PASSWORD"
-                  value={pwdForm.newPassword}
-                  onChange={(e) => setPwdForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                  className="w-full bg-transparent border border-neutral-300 text-xs p-2.5 focus:outline-none focus:border-black focus:ring-0 rounded-none font-mono text-black dark:text-white"
-                />
+              <div className="flex flex-col gap-2 text-left">
+                <label className="text-xs uppercase tracking-widest text-gray-500">New Password</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="border border-neutral-300 dark:border-neutral-850 bg-transparent p-3 text-sm focus:border-black focus:ring-0 outline-none text-black dark:text-white rounded-none" required />
               </div>
-
-              <div>
-                <label className="block text-xs uppercase text-neutral-500 tracking-widest font-mono mb-1">
-                  CONFIRM NEW PASSWORD *
-                </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="CONFIRM NEW PASSWORD"
-                  value={pwdForm.confirmPassword}
-                  onChange={(e) => setPwdForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full bg-transparent border border-neutral-300 text-xs p-2.5 focus:outline-none focus:border-black focus:ring-0 rounded-none font-mono text-black dark:text-white"
-                />
+              <div className="flex flex-col gap-2 text-left">
+                <label className="text-xs uppercase tracking-widest text-gray-500">Confirm New Password</label>
+                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="border border-neutral-300 dark:border-neutral-850 bg-transparent p-3 text-sm focus:border-black focus:ring-0 outline-none text-black dark:text-white rounded-none" required />
               </div>
-            </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={pwdLoading}
-                className="bg-black text-white hover:bg-neutral-900 py-3.5 text-xs font-bold tracking-[0.2em] uppercase transition-colors duration-300 w-full rounded-none cursor-pointer"
-              >
-                {pwdLoading ? "UPDATING..." : "UPDATE PASSWORD"}
+              {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
+              {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
+              <button type="submit" disabled={pwdLoading} className="mt-4 w-full bg-black text-white p-4 uppercase tracking-widest text-sm font-semibold hover:bg-neutral-800 transition-colors cursor-pointer rounded-none">
+                {pwdLoading ? "Updating..." : "Update Password"}
               </button>
-            </div>
-
-            {pwdSuccess && (
-              <p className="text-[10px] uppercase font-mono tracking-widest text-emerald-600 dark:text-emerald-400 mt-4 text-left">
-                {pwdSuccess}
-              </p>
-            )}
-            {pwdError && (
-              <p className="text-[10px] uppercase font-mono tracking-widest text-rose-600 dark:text-rose-400 mt-4 text-left">
-                {pwdError}
-              </p>
-            )}
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>
