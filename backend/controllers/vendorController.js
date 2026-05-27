@@ -278,6 +278,22 @@ export const updateVendorOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found." });
     }
 
+    // If requesting cancellation/return, enforce the 10-day return window limit if already delivered
+    if (status === "Cancelled") {
+      const deliveryDateEntry = order.trackingHistory.find(
+        (h) => h.status === "Delivered"
+      );
+      if (deliveryDateEntry) {
+        const deliveryDate = new Date(deliveryDateEntry.timestamp);
+        const tenDaysInMillis = 10 * 24 * 60 * 60 * 1000;
+        if (Date.now() - deliveryDate.getTime() > tenDaysInMillis) {
+          return res.status(400).json({
+            message: "The 10-day return window for this order has expired."
+          });
+        }
+      }
+    }
+
     // Update status
     order.status = status;
 

@@ -326,12 +326,20 @@ const Orders = () => {
 
                     {/* Card Actions (Track Order Toggle) */}
                     <div className="px-5 py-3 bg-neutral-50/50 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-850 flex justify-between items-center text-xs">
-                      <button
-                        onClick={() => toggleTrackingExpand(order._id)}
-                        className="text-[9px] tracking-widest font-bold uppercase font-montserrat text-black dark:text-white border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors cursor-pointer rounded-none"
-                      >
-                        {expandedOrderId === order._id ? "Close Tracking Details" : "Track Order / Shipment"}
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => toggleTrackingExpand(order._id)}
+                          className="text-[9px] tracking-widest font-bold uppercase font-montserrat text-black dark:text-white border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors cursor-pointer rounded-none"
+                        >
+                          {expandedOrderId === order._id ? "Close Tracking Details" : "Track Shipment"}
+                        </button>
+                        <Link
+                          to={`/orders/${order._id}`}
+                          className="text-[9px] tracking-widest font-bold uppercase font-montserrat text-black dark:text-white border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors cursor-pointer rounded-none flex items-center justify-center"
+                        >
+                          Order Details
+                        </Link>
+                      </div>
                       <span className="text-[9px] text-neutral-450 uppercase font-mono">
                         Status: <strong className="text-black dark:text-white font-medium">{order.status}</strong>
                       </span>

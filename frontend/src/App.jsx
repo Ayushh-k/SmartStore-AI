@@ -22,6 +22,7 @@ import Orders from "./pages/Orders.jsx";
 import AccountLayout from "./layouts/AccountLayout.jsx";
 import Wishlist from "./pages/account/Wishlist.jsx";
 import Addresses from "./pages/account/Addresses.jsx";
+import OrderDetails from "./pages/account/OrderDetails.jsx";
 import AdminOrders from "./pages/AdminOrders.jsx";
 import Footer from "./components/Footer.jsx";
 import Terms from "./pages/Terms.jsx";
@@ -147,6 +148,7 @@ const App = () => {
           >
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:id" element={<OrderDetails />} />
             <Route path="/profile/wishlist" element={<Wishlist />} />
             <Route path="/profile/addresses" element={<Addresses />} />
           </Route>
