@@ -53,6 +53,14 @@ const AdminLayout = () => {
     navigate("/login");
   };
 
+  const playNotificationSound = () => {
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
+    audio.volume = 0.6; // Muted to a premium comfortable level
+    audio.play().catch((error) => {
+      console.log("Audio playback prevented by browser autoplay policy until user interaction:", error);
+    });
+  };
+
   const fetchNotifications = async (isInitial = false) => {
     try {
       const res = await api.get("/api/dashboard/notifications");
@@ -68,6 +76,7 @@ const AdminLayout = () => {
         // Trigger toast on new unread notifications if not initial load
         if (!isInitial && latestNotificationIdRef.current && latest._id !== latestNotificationIdRef.current && !latest.read) {
           setToast({ show: true, message: latest.message });
+          playNotificationSound();
           
           setTimeout(() => {
             setToast((prev) => ({ ...prev, show: false }));
