@@ -41,7 +41,7 @@ const Footer = () => {
           {/* Column 1: Brand */}
           <div className="space-y-4">
             <Link to="/" className="block hover:opacity-80 transition-opacity">
-              <SmartStoreLogo className="w-44 h-auto text-[#0a0a0a] dark:text-white" />
+              <SmartStoreLogo className="w-56 h-auto text-[#0a0a0a] dark:text-white" />
             </Link>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-sans tracking-wide leading-relaxed max-w-xs uppercase">
               Elevating everyday essentials through curated design, minimalist architectural forms, and intelligent engineering.
