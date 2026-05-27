@@ -177,7 +177,7 @@ const UserNavbar = () => {
             className="block hover:opacity-80 transition-opacity"
             onClick={() => setIsMenuOpen(false)}
           >
-            <SmartStoreLogo className="w-28 h-auto text-[#0a0a0a] dark:text-white" />
+            <SmartStoreLogo className="w-36 h-auto text-[#0a0a0a] dark:text-white" />
           </Link>
           <button
             onClick={() => setIsMenuOpen(false)}
@@ -400,7 +400,7 @@ const UserNavbar = () => {
         {/* Center: Logo — absolutely centered so it never shifts */}
         <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
           <Link to="/" className="pointer-events-auto block hover:opacity-80 transition-opacity">
-            <SmartStoreLogo className={`w-32 sm:w-40 h-auto ${isStorefront ? "text-white" : "text-[#0a0a0a] dark:text-white"}`} />
+            <SmartStoreLogo className={`w-40 sm:w-52 h-auto ${isStorefront ? "text-white" : "text-[#0a0a0a] dark:text-white"}`} />
           </Link>
         </div>
 

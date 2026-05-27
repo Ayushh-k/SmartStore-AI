@@ -256,7 +256,7 @@ const AdminLayout = () => {
           <div className="mb-8 flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 pb-5">
             <div className="flex flex-col gap-1 text-left">
               <Link to="/" className="block hover:opacity-80 transition-opacity">
-                <SmartStoreLogo className="w-28 h-auto text-[#0a0a0a] dark:text-white" />
+                <SmartStoreLogo className="w-36 h-auto text-[#0a0a0a] dark:text-white" />
               </Link>
               <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5 pl-0.5">
                 {user.storeName || "Admin Console"}
