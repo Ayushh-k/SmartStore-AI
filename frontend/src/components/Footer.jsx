@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Send, Check } from "lucide-react";
 import api from "../utils/api.js";
+import SmartStoreLogo from "./SmartStoreLogo.jsx";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -39,9 +40,9 @@ const Footer = () => {
           
           {/* Column 1: Brand */}
           <div className="space-y-4">
-            <h3 className="font-serif text-xl tracking-[0.25em] uppercase font-semibold">
-              SMARTSTORE
-            </h3>
+            <Link to="/" className="block hover:opacity-80 transition-opacity">
+              <SmartStoreLogo className="w-36 h-auto text-[#0a0a0a] dark:text-white" />
+            </Link>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-sans tracking-wide leading-relaxed max-w-xs uppercase">
               Elevating everyday essentials through curated design, minimalist architectural forms, and intelligent engineering.
             </p>

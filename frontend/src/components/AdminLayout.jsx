@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import api from "../utils/api.js";
 import ThemeToggle from "./ThemeToggle.jsx";
+import SmartStoreLogo from "./SmartStoreLogo.jsx";
 
 /**
   AdminLayout with glassmorphic sidebar, header with notifications, and main content area.
@@ -253,17 +254,12 @@ const AdminLayout = () => {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}>
           <div className="mb-8 flex items-center justify-between border-b border-gray-200 dark:border-neutral-900 pb-5">
-            <div className="flex items-center gap-3">
-              <div className="text-black dark:text-white shrink-0">
-                <ShoppingBag className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <div className="font-serif text-sm font-semibold tracking-widest uppercase text-black dark:text-white">
-                  SmartStore
-                </div>
-                <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5">
-                  {user.storeName || "Admin Console"}
-                </div>
+            <div className="flex flex-col gap-1 text-left">
+              <Link to="/" className="block hover:opacity-80 transition-opacity">
+                <SmartStoreLogo className="w-28 h-auto text-[#0a0a0a] dark:text-white" />
+              </Link>
+              <div className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mt-0.5 pl-0.5">
+                {user.storeName || "Admin Console"}
               </div>
             </div>
             

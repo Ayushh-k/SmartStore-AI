@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import api from "../utils/api.js";
 import ThemeToggle from "./ThemeToggle.jsx";
+import SmartStoreLogo from "./SmartStoreLogo.jsx";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -173,10 +174,10 @@ const UserNavbar = () => {
         <div className="flex justify-between items-center px-6 py-5 border-b border-black/8 dark:border-white/8">
           <Link
             to="/"
-            className="font-serif text-base tracking-[0.3em] uppercase font-semibold text-black dark:text-white"
+            className="block hover:opacity-80 transition-opacity"
             onClick={() => setIsMenuOpen(false)}
           >
-            SmartStore
+            <SmartStoreLogo className="w-28 h-auto text-[#0a0a0a] dark:text-white" />
           </Link>
           <button
             onClick={() => setIsMenuOpen(false)}
@@ -398,8 +399,8 @@ const UserNavbar = () => {
 
         {/* Center: Logo — absolutely centered so it never shifts */}
         <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
-          <Link to="/" className={`${logoClass} pointer-events-auto`}>
-            SmartStore
+          <Link to="/" className="pointer-events-auto block hover:opacity-80 transition-opacity">
+            <SmartStoreLogo className={`w-32 sm:w-40 h-auto ${isStorefront ? "text-white" : "text-[#0a0a0a] dark:text-white"}`} />
           </Link>
         </div>
 
