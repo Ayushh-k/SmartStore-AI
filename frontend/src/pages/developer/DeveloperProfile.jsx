@@ -39,11 +39,23 @@ const DeveloperProfile = () => {
     }
 
     try {
-      const res = await api.put("/api/users/update-password", {
-        oldPassword,
-        newPassword,
-        confirmPassword,
-      });
+      const token = localStorage.getItem("smartstoretoken");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const res = await api.put(
+        "/api/users/update-password",
+        {
+          oldPassword,
+          newPassword,
+          confirmPassword,
+        },
+        config
+      );
       setPasswordSuccess(res.data.message || "Password updated successfully.");
       setOldPassword("");
       setNewPassword("");

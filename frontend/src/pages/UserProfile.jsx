@@ -155,7 +155,15 @@ const UserProfile = () => {
     }
 
     try {
-      const res = await api.put("/api/users/update-password", pwdForm);
+      const token = localStorage.getItem("smartstoretoken");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const res = await api.put("/api/users/update-password", pwdForm, config);
       setPwdSuccess(res.data.message || "Password updated successfully.");
       setPwdForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
