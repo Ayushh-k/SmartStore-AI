@@ -13,6 +13,7 @@ const OrderDetails = () => {
   const [error, setError] = useState("");
   const [returnMessage, setReturnMessage] = useState("");
   const [returning, setReturning] = useState(false);
+  const [returnReasonInput, setReturnReasonInput] = useState("");
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -38,16 +39,19 @@ const OrderDetails = () => {
   }, [id]);
 
   const handleReturnRequest = async () => {
+    if (!returnReasonInput.trim()) {
+      setReturnMessage("Please specify a reason for returning.");
+      return;
+    }
     setReturning(true);
     setReturnMessage("");
     try {
-      await api.put(`/api/vendor/orders/${order._id}/status`, {
-        status: "Cancelled",
-        message: "Customer requested a return and refund.",
-        location: order.shippingAddress?.city || "Customer Residence"
+      await api.put(`/api/users/orders/${order._id}/return`, {
+        reason: returnReasonInput
       });
       
-      setReturnMessage("Return request initiated successfully. Refund is being processed.");
+      setReturnMessage("Return request initiated successfully. Awaiting vendor review.");
+      setReturnReasonInput("");
       const res = await api.get("/api/users/profile");
       const foundOrder = res.data.orders?.find((o) => o._id === id);
       if (foundOrder) {
@@ -55,7 +59,7 @@ const OrderDetails = () => {
       }
     } catch (err) {
       console.error("Error initiating return:", err);
-      setReturnMessage("Failed to submit return request. Please contact support.");
+      setReturnMessage(err?.response?.data?.message || "Failed to submit return request. Please contact support.");
     } finally {
       setReturning(false);
     }
@@ -174,14 +178,24 @@ const OrderDetails = () => {
               <span className="font-semibold uppercase tracking-wider text-[9px]">10-Day Return Framework</span>
             </div>
             
-            {order.status === "Delivered" && isWithinReturnWindow && (
-              <div className="space-y-2">
+            {order.status === "Delivered" && isWithinReturnWindow && (order.returnStatus === "None" || !order.returnStatus) && (
+              <div className="space-y-3">
+                <div className="space-y-1 text-left">
+                  <label className="block text-[8px] uppercase tracking-wider text-neutral-400 font-bold">Reason for Return</label>
+                  <textarea
+                    placeholder="Please specify why you are returning this order..."
+                    value={returnReasonInput}
+                    onChange={(e) => setReturnReasonInput(e.target.value)}
+                    rows={3}
+                    className="w-full bg-white dark:bg-black border border-neutral-350 dark:border-neutral-700 px-3 py-2 text-xs text-black dark:text-white placeholder-neutral-450 focus:outline-none rounded-none focus:border-black dark:focus:border-white resize-none"
+                  />
+                </div>
                 <button
                   onClick={handleReturnRequest}
-                  disabled={returning}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5"
+                  disabled={returning || !returnReasonInput.trim()}
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-850 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  {returning ? <Loader2 className="h-3 w-3 animate-spin" /> : "Request Return / Refund"}
+                  {returning ? <Loader2 className="h-3 w-3 animate-spin" /> : "Submit Return Request"}
                 </button>
                 {returnMessage && (
                   <p className="text-[9px] uppercase tracking-wider font-bold text-black dark:text-white text-center">
@@ -191,13 +205,36 @@ const OrderDetails = () => {
               </div>
             )}
 
-            {order.status === "Delivered" && !isWithinReturnWindow && (
-              <p className="text-[9px] uppercase tracking-wider font-semibold text-neutral-450 pl-0.5 leading-relaxed">
+            {order.returnStatus && order.returnStatus !== "None" && (
+              <div className="p-3 border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 text-left space-y-2">
+                <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider">
+                  <span className="text-neutral-500 font-mono">Return Status</span>
+                  <span className={
+                    order.returnStatus === "Return Approved" 
+                      ? "text-emerald-600 dark:text-emerald-450 font-mono" 
+                      : order.returnStatus === "Return Rejected" 
+                        ? "text-rose-600 dark:text-rose-450 font-mono" 
+                        : "text-amber-600 dark:text-amber-450 font-mono"
+                  }>
+                    {order.returnStatus}
+                  </span>
+                </div>
+                {order.returnReason && (
+                  <div className="text-[9px] uppercase tracking-wider text-neutral-500 leading-relaxed">
+                    <span className="font-bold block text-neutral-400 mb-0.5 font-mono">Return Reason</span>
+                    <p className="text-black dark:text-white font-medium italic">"{order.returnReason}"</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {order.status === "Delivered" && !isWithinReturnWindow && (order.returnStatus === "None" || !order.returnStatus) && (
+              <p className="text-[9px] uppercase tracking-wider font-semibold text-neutral-455 pl-0.5 leading-relaxed">
                 The 10-day return window for this order has expired.
               </p>
             )}
 
-            {order.status !== "Delivered" && (
+            {order.status !== "Delivered" && (!order.returnStatus || order.returnStatus === "None") && (
               <p className="text-[9px] uppercase tracking-wider font-semibold text-neutral-455 pl-0.5 leading-relaxed">
                 Returns will be available once the shipment is marked as delivered.
               </p>

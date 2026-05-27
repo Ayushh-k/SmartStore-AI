@@ -268,7 +268,7 @@ export const updateVendorOrderStatus = async (req, res) => {
     const { status, message, location } = req.body;
     const orderId = req.params.id;
 
-    const validStatuses = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+    const validStatuses = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return Pending', 'Return Approved', 'Return Rejected'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: `Invalid status. Must be one of: ${validStatuses.join(", ")}` });
     }
@@ -296,6 +296,9 @@ export const updateVendorOrderStatus = async (req, res) => {
 
     // Update status
     order.status = status;
+    if (['Return Pending', 'Return Approved', 'Return Rejected'].includes(status)) {
+      order.returnStatus = status;
+    }
 
     // Add tracking history entry
     order.trackingHistory.push({

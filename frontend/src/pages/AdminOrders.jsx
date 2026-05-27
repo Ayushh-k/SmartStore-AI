@@ -47,6 +47,26 @@ const AdminOrders = () => {
     }
   };
 
+  const handleReturnApproval = async (orderId, newStatus) => {
+    setUpdatingOrderId(orderId);
+    setError("");
+    try {
+      const res = await api.put(`/api/vendor/orders/${orderId}/status`, {
+        status: newStatus,
+        message: newStatus === "Return Approved" 
+          ? "Vendor approved the return request and initiated a refund." 
+          : "Vendor rejected the return request.",
+        location: "Vendor Store / Returns Hub"
+      });
+      setOrders(prev => prev.map(o => o._id === orderId ? res.data.order : o));
+    } catch (err) {
+      console.error("Error processing return approval:", err);
+      setError(err?.response?.data?.message || "Failed to process return request.");
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
   const fetchOrders = async () => {
     setLoading(true);
     setError("");
@@ -88,7 +108,12 @@ const AdminOrders = () => {
       case "processing":
         return "border-neutral-400 dark:border-neutral-600 text-neutral-700 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-950";
       case "cancelled":
+      case "return rejected":
         return "border-rose-200 dark:border-rose-950 text-rose-650 dark:text-rose-500 bg-rose-50 dark:bg-[#14080b]";
+      case "return pending":
+        return "border-amber-200 dark:border-amber-950 text-amber-650 dark:text-amber-500 bg-amber-50 dark:bg-[#1f1609]";
+      case "return approved":
+        return "border-emerald-200 dark:border-emerald-950 text-emerald-650 dark:text-emerald-500 bg-emerald-50 dark:bg-[#07170e]";
       default:
         return "border-gray-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-500 bg-gray-50 dark:bg-black";
     }
@@ -302,6 +327,54 @@ const AdminOrders = () => {
                         </div>
                       </div>
 
+                      {/* Return Control Portal */}
+                      {order.returnStatus && order.returnStatus !== "None" && (
+                        <div className="space-y-4 p-4 border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black rounded-none">
+                          <h4 className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest border-b border-neutral-250 dark:border-neutral-850 pb-2">
+                            Return Policy Control
+                          </h4>
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between text-[9px] uppercase tracking-widest font-bold">
+                              <span className="text-neutral-500">Return Status</span>
+                              <span className={
+                                order.returnStatus === "Return Approved" 
+                                  ? "text-emerald-600 dark:text-emerald-450 font-mono" 
+                                  : order.returnStatus === "Return Rejected" 
+                                    ? "text-rose-600 dark:text-rose-450 font-mono" 
+                                    : "text-amber-600 dark:text-amber-450 font-mono animate-pulse"
+                              }>
+                                {order.returnStatus}
+                              </span>
+                            </div>
+                            {order.returnReason && (
+                              <div className="bg-neutral-50 dark:bg-neutral-900/50 p-3 border border-neutral-200 dark:border-neutral-800 text-left">
+                                <span className="block text-[8px] font-bold text-neutral-450 uppercase tracking-widest mb-1">Customer Reason</span>
+                                <p className="text-neutral-700 dark:text-neutral-300 italic font-mono">"{order.returnReason}"</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {order.returnStatus === "Return Pending" && (
+                            <div className="flex gap-2 pt-1">
+                              <button
+                                onClick={() => handleReturnApproval(order._id, "Return Approved")}
+                                disabled={updatingOrderId === order._id}
+                                className="flex-1 bg-black dark:bg-white text-white dark:text-black py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5"
+                              >
+                                Approve Return
+                              </button>
+                              <button
+                                onClick={() => handleReturnApproval(order._id, "Return Rejected")}
+                                disabled={updatingOrderId === order._id}
+                                className="flex-1 border border-neutral-350 dark:border-neutral-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-650 dark:text-rose-500 py-2 text-[9px] uppercase tracking-widest font-bold transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5"
+                              >
+                                Reject Return
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Shipment Tracking Control */}
                       <div className="space-y-4">
                         <h4 className="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest border-b border-gray-200 dark:border-neutral-900 pb-2">
@@ -320,6 +393,9 @@ const AdminOrders = () => {
                               <option value="Out for Delivery" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Out for Delivery</option>
                               <option value="Delivered" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Delivered</option>
                               <option value="Cancelled" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Cancelled</option>
+                              <option value="Return Pending" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Return Pending</option>
+                              <option value="Return Approved" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Return Approved</option>
+                              <option value="Return Rejected" className="bg-white dark:bg-[#1a1a1a] text-black dark:text-white">Return Rejected</option>
                             </select>
                           </div>
 

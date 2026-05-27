@@ -9,6 +9,7 @@ import {
   updateAddress,
   deleteAddress,
   updatePassword,
+  requestOrderReturn,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -29,5 +30,7 @@ router.post("/address", addAddress);
 router.route("/address/:addressId")
   .put(updateAddress)
   .delete(deleteAddress);
+
+router.put("/orders/:id/return", requestOrderReturn);
 
 export default router;

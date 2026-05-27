@@ -285,3 +285,60 @@ export const updatePassword = async (req, res) => {
     res.status(500).json({ message: "Server error updating password." });
   }
 };
+
+/**
+  Submit a return request for an order.
+  Params: id (orderId)
+  Body: { reason }
+ */
+export const requestOrderReturn = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    if (!reason || reason.trim() === "") {
+      return res.status(400).json({ message: "Return reason is required." });
+    }
+
+    const order = await Order.findOne({ _id: id, user: req.user._id });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    if (order.status !== "Delivered") {
+      return res.status(400).json({ message: "Only delivered orders can be returned." });
+    }
+
+    const deliveryEntry = order.trackingHistory.find((h) => h.status === "Delivered");
+    if (!deliveryEntry) {
+      return res.status(400).json({ message: "Delivery tracking timestamp not found." });
+    }
+
+    const deliveryDate = new Date(deliveryEntry.timestamp);
+    const tenDaysInMillis = 10 * 24 * 60 * 60 * 1000;
+    if (Date.now() - deliveryDate.getTime() > tenDaysInMillis) {
+      return res.status(400).json({ message: "The 10-day return policy window has expired for this order." });
+    }
+
+    order.status = "Return Pending";
+    order.returnStatus = "Return Pending";
+    order.returnReason = reason;
+
+    order.trackingHistory.push({
+      status: "Return Pending",
+      message: `Return request submitted by customer. Reason: ${reason}`,
+      location: order.shippingAddress?.city || "Customer Residence",
+      timestamp: new Date(),
+    });
+
+    await order.save();
+
+    res.status(200).json({
+      message: "Return request submitted successfully. Awaiting vendor review.",
+      order,
+    });
+  } catch (error) {
+    console.error("Request order return error:", error);
+    res.status(500).json({ message: "Failed to submit return request." });
+  }
+};

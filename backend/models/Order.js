@@ -54,7 +54,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+      enum: ['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return Pending', 'Return Approved', 'Return Rejected'],
       default: 'Processing',
     },
     trackingHistory: [
@@ -65,6 +65,15 @@ const orderSchema = new mongoose.Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
+    returnStatus: {
+      type: String,
+      enum: ['None', 'Return Pending', 'Return Approved', 'Return Rejected'],
+      default: 'None',
+    },
+    returnReason: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 );
