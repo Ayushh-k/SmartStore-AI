@@ -14,6 +14,8 @@ const OrderDetails = () => {
   const [returnMessage, setReturnMessage] = useState("");
   const [returning, setReturning] = useState(false);
   const [returnReasonInput, setReturnReasonInput] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState("");
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -62,6 +64,28 @@ const OrderDetails = () => {
       setReturnMessage(err?.response?.data?.message || "Failed to submit return request. Please contact support.");
     } finally {
       setReturning(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) {
+      return;
+    }
+    setCancelling(true);
+    setCancelMessage("");
+    try {
+      await api.put(`/api/users/orders/${order._id}/cancel`);
+      setCancelMessage("Order cancelled successfully.");
+      const res = await api.get("/api/users/profile");
+      const foundOrder = res.data.orders?.find((o) => o._id === id);
+      if (foundOrder) {
+        setOrder(foundOrder);
+      }
+    } catch (err) {
+      console.error("Error cancelling order:", err);
+      setCancelMessage(err?.response?.data?.message || "Failed to cancel order.");
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -173,11 +197,27 @@ const OrderDetails = () => {
           </div>
 
           <div className="space-y-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
-            <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
-              <RotateCcw className="h-4 w-4" />
-              <span className="font-semibold uppercase tracking-wider text-[9px]">10-Day Return Framework</span>
-            </div>
-            
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-455 border-b border-neutral-200 dark:border-neutral-800 pb-2 font-mono">
+              Order Actions
+            </h4>
+
+            {order.status === "Processing" && (
+              <div className="space-y-2">
+                <button
+                  onClick={handleCancelOrder}
+                  disabled={cancelling}
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-850 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5"
+                >
+                  {cancelling ? <Loader2 className="h-3 w-3 animate-spin" /> : "Cancel Order"}
+                </button>
+                {cancelMessage && (
+                  <p className="text-[9px] uppercase tracking-wider font-bold text-black dark:text-white text-center">
+                    {cancelMessage}
+                  </p>
+                )}
+              </div>
+            )}
+
             {order.status === "Delivered" && isWithinReturnWindow && (order.returnStatus === "None" || !order.returnStatus) && (
               <div className="space-y-3">
                 <div className="space-y-1 text-left">
@@ -193,7 +233,7 @@ const OrderDetails = () => {
                 <button
                   onClick={handleReturnRequest}
                   disabled={returning || !returnReasonInput.trim()}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-850 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-2.5 text-[9px] uppercase tracking-widest font-bold hover:bg-neutral-855 dark:hover:bg-neutral-200 transition-colors cursor-pointer rounded-none flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
                   {returning ? <Loader2 className="h-3 w-3 animate-spin" /> : "Submit Return Request"}
                 </button>
@@ -234,9 +274,9 @@ const OrderDetails = () => {
               </p>
             )}
 
-            {order.status !== "Delivered" && (!order.returnStatus || order.returnStatus === "None") && (
+            {(order.status === "Shipped" || order.status === "Out for Delivery") && (
               <p className="text-[9px] uppercase tracking-wider font-semibold text-neutral-455 pl-0.5 leading-relaxed">
-                Returns will be available once the shipment is marked as delivered.
+                Returns & Cancellations will be available once delivered.
               </p>
             )}
           </div>

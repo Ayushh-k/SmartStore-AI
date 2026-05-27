@@ -10,6 +10,7 @@ import {
   deleteAddress,
   updatePassword,
   requestOrderReturn,
+  cancelOrder,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -32,5 +33,6 @@ router.route("/address/:addressId")
   .delete(deleteAddress);
 
 router.put("/orders/:id/return", requestOrderReturn);
+router.put("/orders/:id/cancel", cancelOrder);
 
 export default router;

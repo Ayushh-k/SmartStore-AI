@@ -342,3 +342,39 @@ export const requestOrderReturn = async (req, res) => {
     res.status(500).json({ message: "Failed to submit return request." });
   }
 };
+
+/**
+  Cancel an order that is in 'Processing' status.
+  Params: id (orderId)
+ */
+export const cancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findOne({ _id: id, user: req.user._id });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    if (order.status !== "Processing") {
+      return res.status(400).json({ message: "Only orders in 'Processing' status can be cancelled." });
+    }
+
+    order.status = "Cancelled";
+    order.trackingHistory.push({
+      status: "Cancelled",
+      message: "Order cancelled by customer.",
+      location: order.shippingAddress?.city || "Customer Residence",
+      timestamp: new Date(),
+    });
+
+    await order.save();
+
+    res.status(200).json({
+      message: "Order cancelled successfully.",
+      order,
+    });
+  } catch (error) {
+    console.error("Cancel order error:", error);
+    res.status(500).json({ message: "Failed to cancel order." });
+  }
+};
