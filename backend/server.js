@@ -15,6 +15,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import developerRoutes from "./routes/developerRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
@@ -69,6 +70,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/developer", developerRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Global error handler (fallback)
 app.use((err, req, res, next) => {

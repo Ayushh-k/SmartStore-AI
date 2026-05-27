@@ -67,14 +67,14 @@ const AdminLayout = () => {
       const fetchedList = res.data || [];
       setNotifications(fetchedList);
       
-      const unreads = fetchedList.filter((n) => !n.read).length;
+      const unreads = fetchedList.filter((n) => !n.read && !n.isRead).length;
       setUnreadCount(unreads);
 
       if (fetchedList.length > 0) {
         const latest = fetchedList[0];
         
         // Trigger toast on new unread notifications if not initial load
-        if (!isInitial && latestNotificationIdRef.current && latest._id !== latestNotificationIdRef.current && !latest.read) {
+        if (!isInitial && latestNotificationIdRef.current && latest._id !== latestNotificationIdRef.current && !latest.read && !latest.isRead) {
           setToast({ show: true, message: latest.message });
           playNotificationSound();
           
@@ -117,10 +117,49 @@ const AdminLayout = () => {
   const handleMarkAllRead = async () => {
     try {
       await api.put("/api/dashboard/notifications/read");
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true, isRead: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error("Mark notifications read error:", err);
+    }
+  };
+
+  const handleNotificationClick = async (notification) => {
+    setShowDropdown(false);
+    
+    const isAlreadyRead = notification.isRead || notification.read;
+    if (isAlreadyRead) {
+      if (notification.link) navigate(notification.link);
+      return;
+    }
+
+    // 1. Optimistic UI Update: Instantly mark as read in local state to reduce the count badge immediately
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === notification._id ? { ...n, isRead: true, read: true } : n))
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+
+    try {
+      // 2. Background API Call to persist read state in DB
+      const token = localStorage.getItem("smartstoretoken");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      await api.put(`/api/notifications/${notification._id}/read`, {}, config);
+
+      // 3. Dynamic Redirection based on notification metadata
+      if (notification.link) {
+        navigate(notification.link);
+      } else if (notification.type === "ORDER") {
+        navigate("/admin/orders");
+      } else {
+        navigate("/admin/profile"); // Fallback
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
     }
   };
 
@@ -343,8 +382,9 @@ const AdminLayout = () => {
                         notifications.map((n) => (
                           <div
                             key={n._id}
-                            className={`px-4 py-3.5 hover:bg-gray-100 dark:hover:bg-neutral-900 transition-colors flex gap-3 items-start ${
-                              !n.read ? "bg-gray-50 dark:bg-neutral-900/40" : ""
+                            onClick={() => handleNotificationClick(n)}
+                            className={`px-4 py-3.5 hover:bg-gray-100 dark:hover:bg-neutral-900 transition-colors flex gap-3 items-start cursor-pointer ${
+                              (!n.read && !n.isRead) ? "bg-gray-50 dark:bg-neutral-900/40" : ""
                             }`}
                           >
                             <div className="mt-0.5 text-neutral-500 dark:text-neutral-400 shrink-0">
@@ -358,7 +398,7 @@ const AdminLayout = () => {
                                 {formatTime(n.createdAt)}
                               </span>
                             </div>
-                            {!n.read && (
+                            {(!n.read && !n.isRead) && (
                               <span className="h-1.5 w-1.5 bg-black dark:bg-white shrink-0 mt-1.5" />
                             )}
                           </div>

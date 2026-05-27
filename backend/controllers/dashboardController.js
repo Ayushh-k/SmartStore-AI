@@ -130,7 +130,7 @@ export const getNotifications = async (req, res) => {
  */
 export const markNotificationsRead = async (req, res) => {
   try {
-    await Notification.updateMany({ read: false }, { $set: { read: true } });
+    await Notification.updateMany({ $or: [{ read: false }, { isRead: false }] }, { $set: { read: true, isRead: true } });
     res.json({ message: "All notifications marked as read." });
   } catch (error) {
     console.error("Mark notifications read error:", error);
