@@ -1,17 +1,17 @@
 // backend/controllers/userAiController.js
 
-import OpenAI from "openai";
 import Product from "../models/Product.js";
+import { generateContent } from "../utils/aiClient.js";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAIAPIKEY || "dummy-key",
-  timeout: 4000, // 4 seconds timeout
-});
-
-// Helper to check if OpenAI key is missing or is the default dummy/placeholder
-const isApiKeyPlaceholder = () => {
-  const key = process.env.OPENAIAPIKEY || "";
-  return !key || key === "youropenaiapikeyhere" || key.startsWith("youropen") || key === "dummy-key";
+// Helper to check if any valid AI API is available
+const isAiProviderAvailable = () => {
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.GEMINIAPIKEY;
+  const isGeminiAvailable = geminiKey && geminiKey !== "yourgeminiapikeyhere" && geminiKey !== "dummy-key" && !global.isGeminiQuotaExceeded;
+  
+  const openaiKey = process.env.OPENAIAPIKEY || "";
+  const isOpenAiAvailable = openaiKey && openaiKey !== "youropenaiapikeyhere" && !openaiKey.startsWith("youropen") && openaiKey !== "dummy-key" && !global.isOpenAiQuotaExceeded;
+  
+  return isGeminiAvailable || isOpenAiAvailable;
 };
 
 /**
@@ -31,7 +31,7 @@ export const semanticSearch = async (req, res) => {
       return res.json([]);
     }
 
-    if (isApiKeyPlaceholder()) {
+    if (!isAiProviderAvailable()) {
       console.log("Using local semantic search simulation.");
       const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
       const scored = allProducts.map((p) => {
@@ -87,21 +87,15 @@ Do not return markdown code blocks, explanation, or notes.
 `;
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a precise JSON classifier. Output only a raw JSON array of IDs." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.2,
+      const raw = await generateContent({
+        prompt,
+        systemInstruction: "You are a precise JSON classifier. Output only a raw JSON array of IDs.",
+        isJson: true,
       });
-
-      const raw = (completion.choices?.[0]?.message?.content || "[]").trim();
       const cleanRaw = raw.replace(/```json/g, "").replace(/```/g, "").trim();
       const productIds = JSON.parse(cleanRaw);
 
       if (Array.isArray(productIds)) {
-        // Fetch and sort according to OpenAI's returned IDs
         const matched = await Product.find({ _id: { $in: productIds }, isActive: true });
         const sorted = productIds
           .map((id) => matched.find((p) => p._id.toString() === id))
@@ -109,8 +103,8 @@ Do not return markdown code blocks, explanation, or notes.
         return res.json(sorted);
       }
       return res.json([]);
-    } catch (openaiErr) {
-      console.warn("OpenAI semantic search error, falling back to local:", openaiErr.message);
+    } catch (aiErr) {
+      console.warn("AI semantic search error, falling back to local:", aiErr.message);
       // Fallback search logic
       const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
       const scored = allProducts.map((p) => {
@@ -186,7 +180,7 @@ export const productQA = async (req, res) => {
     const contextName = product.name;
     const contextKeywords = product.keywords || "";
 
-    if (isApiKeyPlaceholder()) {
+    if (!isAiProviderAvailable()) {
       console.log("Using local product QA simulation.");
       const answer = simulateProductQA(product, question);
       return res.json({ answer });
@@ -211,20 +205,13 @@ Provide a concise, accurate, and direct response (maximum 3 sentences). If the i
 `;
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a helpful e-commerce store shopping assistant." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.5,
-        max_tokens: 150,
+      const answer = await generateContent({
+        prompt,
+        systemInstruction: "You are a helpful e-commerce store shopping assistant.",
       });
-
-      const answer = completion.choices?.[0]?.message?.content?.trim() || "";
-      return res.json({ answer });
-    } catch (openaiErr) {
-      console.warn("OpenAI QA error, using local fallback:", openaiErr.message);
+      return res.json({ answer: answer.trim() });
+    } catch (aiErr) {
+      console.warn("AI QA error, using local fallback:", aiErr.message);
       const answer = simulateProductQA(product, question);
       return res.json({ answer });
     }
@@ -306,7 +293,7 @@ export const sizePredictor = async (req, res) => {
       if (idx < sizes.length - 1) finalSize = sizes[idx + 1];
     }
 
-    if (isApiKeyPlaceholder()) {
+    if (!isAiProviderAvailable()) {
       console.log("Using local size predictor simulation.");
       const category = (product.category || "apparel").toLowerCase();
       const rec = `Based on your height of ${height} and weight of ${weight} for this ${category} product, we recommend size **${finalSize}** for a ${fit} fit.`;
@@ -330,20 +317,13 @@ Based on typical sizing matrices, suggest the best size (XS, S, M, L, XL, XXL) a
 `;
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a professional retail sizing assistant." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.3,
-        max_tokens: 100,
+      const recommendation = await generateContent({
+        prompt,
+        systemInstruction: "You are a professional retail sizing assistant.",
       });
-
-      const recommendation = completion.choices?.[0]?.message?.content?.trim() || "";
-      return res.json({ recommendation });
-    } catch (openaiErr) {
-      console.warn("OpenAI size predictor error, using local fallback:", openaiErr.message);
+      return res.json({ recommendation: recommendation.trim() });
+    } catch (aiErr) {
+      console.warn("AI size predictor error, using local fallback:", aiErr.message);
       return res.json({
         recommendation: `Based on your height of ${height} and weight of ${weight} for this ${product.category || "apparel"} product, we recommend size **${finalSize}** for a ${fit} fit.`,
       });
@@ -397,7 +377,7 @@ export const priceInsights = async (req, res) => {
       }
     }
 
-    if (isApiKeyPlaceholder()) {
+    if (!isAiProviderAvailable()) {
       console.log("Using local price insights simulation.");
       return res.json({ summary });
     }
@@ -416,20 +396,13 @@ Generate a punchy, one-liner buyer recommendation (maximum 15 words) based on th
 `;
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a smart shopping price analyst." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.5,
-        max_tokens: 60,
+      const aiSummary = await generateContent({
+        prompt,
+        systemInstruction: "You are a smart shopping price analyst.",
       });
-
-      const aiSummary = completion.choices?.[0]?.message?.content?.trim() || summary;
-      return res.json({ summary: aiSummary });
-    } catch (openaiErr) {
-      console.warn("OpenAI price insights error, using local fallback:", openaiErr.message);
+      return res.json({ summary: aiSummary.trim() });
+    } catch (aiErr) {
+      console.warn("AI price insights error, using local fallback:", aiErr.message);
       return res.json({ summary });
     }
   } catch (error) {
@@ -474,7 +447,7 @@ export const reviewSummarizer = async (req, res) => {
       }
     }
 
-    if (isApiKeyPlaceholder()) {
+    if (!isAiProviderAvailable()) {
       console.log("Using local review summary simulation.");
       return res.json(fallbackSummary);
     }
@@ -500,16 +473,12 @@ Do not include markdown blocks, code fences, or any headers.
 `;
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a precise JSON compiler. Output raw JSON only." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.2,
+      const raw = await generateContent({
+        prompt,
+        systemInstruction: "You are a precise JSON compiler. Output raw JSON only.",
+        isJson: true,
       });
 
-      const raw = (completion.choices?.[0]?.message?.content || "{}").trim();
       const cleanRaw = raw.replace(/```json/g, "").replace(/```/g, "").trim();
       const parsed = JSON.parse(cleanRaw);
 
@@ -517,8 +486,8 @@ Do not include markdown blocks, code fences, or any headers.
         return res.json(parsed);
       }
       return res.json(fallbackSummary);
-    } catch (openaiErr) {
-      console.warn("OpenAI review summarizer error, using local fallback:", openaiErr.message);
+    } catch (aiErr) {
+      console.warn("AI review summarizer error, using local fallback:", aiErr.message);
       return res.json(fallbackSummary);
     }
   } catch (error) {
@@ -586,7 +555,7 @@ export const aiStylist = async (req, res) => {
         .map((item) => item.product);
     };
 
-    if (isApiKeyPlaceholder()) {
+    if (!isAiProviderAvailable()) {
       console.log("Using local AI Stylist simulation.");
       return res.json(getLocalSuggestions());
     }
@@ -608,16 +577,12 @@ Do not return markdown code blocks, explanation, or notes.
 `;
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are a professional styling cross-sell JSON generator." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.4,
+      const raw = await generateContent({
+        prompt,
+        systemInstruction: "You are a professional styling cross-sell JSON generator.",
+        isJson: true,
       });
 
-      const raw = (completion.choices?.[0]?.message?.content || "[]").trim();
       const cleanRaw = raw.replace(/```json/g, "").replace(/```/g, "").trim();
       const suggestedIds = JSON.parse(cleanRaw);
 
@@ -626,8 +591,8 @@ Do not return markdown code blocks, explanation, or notes.
         return res.json(matches);
       }
       return res.json(getLocalSuggestions());
-    } catch (openaiErr) {
-      console.warn("OpenAI stylist error, using local fallback:", openaiErr.message);
+    } catch (aiErr) {
+      console.warn("AI stylist error, using local fallback:", aiErr.message);
       return res.json(getLocalSuggestions());
     }
   } catch (error) {

@@ -1,14 +1,6 @@
 // backend/controllers/aiController.js
 
-import OpenAI from "openai";
-
-/*
-  Initialize OpenAI client with API key from environment.
- */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAIAPIKEY || "dummy-key",
-  timeout: 4000, // 4 seconds timeout
-});
+import { generateContent } from "../utils/aiClient.js";
 
 /**
   Generate high-quality mock product content locally.
@@ -101,10 +93,14 @@ export const generateProductContent = async (req, res) => {
       });
     }
 
-    // Check if the API key is the default placeholder, empty, or dummy-key
+    const geminiKey = process.env.GEMINI_API_KEY || process.env.GEMINIAPIKEY;
+    const isGeminiAvailable = geminiKey && geminiKey !== "yourgeminiapikeyhere" && geminiKey !== "dummy-key" && !global.isGeminiQuotaExceeded;
+    
     const apiKey = process.env.OPENAIAPIKEY || "";
-    if (!apiKey || apiKey === "youropenaiapikeyhere" || apiKey.startsWith("youropen")) {
-      console.log("OpenAI API Key is placeholder/missing. Falling back to local AI simulation.");
+    const isOpenAiAvailable = apiKey && apiKey !== "youropenaiapikeyhere" && !apiKey.startsWith("youropen") && apiKey !== "dummy-key" && !global.isOpenAiQuotaExceeded;
+
+    if (!isGeminiAvailable && !isOpenAiAvailable) {
+      console.log("No valid AI provider API key found (or quota exceeded). Falling back to local AI simulation.");
       const mockResult = generateMockContent(productName, productType, audience, tone, keywords);
       return res.json({
         ...mockResult,
@@ -137,24 +133,11 @@ Do not include code fences or any explanation.
 `.trim();
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a helpful assistant that only returns valid JSON for ecommerce marketers.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.8,
-        max_tokens: 600,
+      const raw = await generateContent({
+        prompt,
+        systemInstruction: "You are a helpful assistant that only returns valid JSON for ecommerce marketers.",
+        isJson: true,
       });
-
-      const raw = completion.choices?.[0]?.message?.content || "{}";
 
       let parsed;
       try {
@@ -183,13 +166,13 @@ Do not include code fences or any explanation.
         tags,
         captions,
       });
-    } catch (openaiError) {
-      console.warn("OpenAI API call failed. Falling back to local AI simulation. Error:", openaiError.message);
+    } catch (aiError) {
+      console.warn("AI API call failed. Falling back to local AI simulation. Error:", aiError.message);
       const mockResult = generateMockContent(productName, productType, audience, tone, keywords);
       return res.json({
         ...mockResult,
         isSimulated: true,
-        errorMsg: openaiError.message
+        errorMsg: aiError.message
       });
     }
   } catch (error) {
