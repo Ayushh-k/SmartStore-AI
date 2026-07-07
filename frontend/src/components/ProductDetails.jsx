@@ -354,18 +354,18 @@ const ProductDetails = ({
                       Select Size *
                     </span>
                     <div className="flex flex-wrap gap-2">
-                      {product.sizes.map((size) => (
+                      {product.sizes.map((sizeObj) => (
                         <button
-                          key={size}
+                          key={sizeObj.size || sizeObj._id}
                           type="button"
-                          onClick={() => setSelectedSize(size)}
+                          onClick={() => setSelectedSize(sizeObj.size)}
                           className={`px-3 py-1 rounded text-xs font-semibold border transition-all cursor-pointer ${
-                            selectedSize === size
+                            selectedSize === sizeObj.size
                               ? "bg-primary border-primary text-slate-100"
                               : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700"
                           }`}
                         >
-                          {size}
+                          {sizeObj.size}
                         </button>
                       ))}
                     </div>

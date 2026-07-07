@@ -205,14 +205,14 @@ const UserProfile = () => {
     setSuccessMessage("");
     try {
       // Add to cart with default variations if any
-      const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : "";
+      const defaultSize = product.sizes && product.sizes.length > 0 ? product.sizes[0].size : "";
       const defaultColor = product.colors && product.colors.length > 0 ? product.colors[0] : "";
 
       await api.post("/api/store/cart", {
         productId: product._id,
         quantity: 1,
-        size: defaultSize,
-        color: defaultColor
+        selectedSize: defaultSize,
+        selectedColor: defaultColor
       });
 
       // Remove from wishlist
