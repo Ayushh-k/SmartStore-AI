@@ -265,7 +265,9 @@ const GlobalProducts = () => {
                         <div className="flex flex-wrap gap-1.5">
                           {activeProductDetails.sizes && activeProductDetails.sizes.length > 0 ? (
                             activeProductDetails.sizes.map((s) => (
-                              <span key={s} className="px-2 py-0.5 border border-neutral-200 dark:border-neutral-800 text-[10px] uppercase">{s}</span>
+                              <span key={typeof s === "object" ? (s.size || s._id) : s} className="px-2 py-0.5 border border-neutral-200 dark:border-neutral-800 text-[10px] uppercase">
+                                {typeof s === "object" ? s.size : s}
+                              </span>
                             ))
                           ) : (
                             <span className="text-[10px] text-neutral-500 italic">No sizes specified</span>
