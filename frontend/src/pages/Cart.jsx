@@ -363,7 +363,7 @@ const Cart = () => {
                           <div>
                             <h4 className="text-xs font-bold text-black dark:text-white line-clamp-1">{prod.name}</h4>
                             <p className="text-[9px] tracking-wider uppercase font-semibold text-neutral-450 mt-0.5">
-                              Size: {sItem.selectedSize || "—"} {sItem.selectedColor && `| Color: ${sItem.selectedColor}`}
+                              Size: {typeof sItem.selectedSize === "object" ? (sItem.selectedSize.size || "—") : (sItem.selectedSize || "—")} {sItem.selectedColor && `| Color: ${sItem.selectedColor}`}
                             </p>
                           </div>
                           <span className="text-xs font-bold text-black dark:text-white">{formatCurrency(prod.price)}</span>
@@ -512,7 +512,7 @@ const Cart = () => {
                           {/* Selected Variant Info */}
                           {(item.selectedSize || item.selectedColor) && (
                             <p className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-neutral-400 mt-1">
-                              Size: {item.selectedSize || "—"} {item.selectedColor && `| Color: ${item.selectedColor}`}
+                              Size: {typeof item.selectedSize === "object" ? (item.selectedSize.size || "—") : (item.selectedSize || "—")} {item.selectedColor && `| Color: ${item.selectedColor}`}
                             </p>
                           )}
 
@@ -597,7 +597,7 @@ const Cart = () => {
                             <div>
                               <h4 className="text-xs font-bold text-black dark:text-white line-clamp-1">{prod.name}</h4>
                               <p className="text-[9px] tracking-wider uppercase font-semibold text-neutral-450 mt-0.5">
-                                Size: {sItem.selectedSize || "—"} {sItem.selectedColor && `| Color: ${sItem.selectedColor}`}
+                                Size: {typeof sItem.selectedSize === "object" ? (sItem.selectedSize.size || "—") : (sItem.selectedSize || "—")} {sItem.selectedColor && `| Color: ${sItem.selectedColor}`}
                               </p>
                             </div>
                             <span className="text-xs font-bold text-black dark:text-white">{formatCurrency(prod.price)}</span>

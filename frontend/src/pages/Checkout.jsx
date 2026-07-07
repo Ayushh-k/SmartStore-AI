@@ -681,7 +681,7 @@ const Checkout = () => {
                       <div className="flex flex-wrap gap-1.5 text-[9px] pt-0.5">
                         {item.selectedSize && (
                           <span className="bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded-none font-semibold uppercase tracking-wider">
-                            Size: {item.selectedSize}
+                            Size: {typeof item.selectedSize === "object" ? item.selectedSize.size : item.selectedSize}
                           </span>
                         )}
                         {item.selectedColor && (

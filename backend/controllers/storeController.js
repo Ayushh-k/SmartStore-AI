@@ -58,8 +58,16 @@ export const getPublicProduct = async (req, res) => {
  */
 export const addToCart = async (req, res) => {
   try {
-    const { productId, quantity, selectedSize = "", selectedColor = "" } = req.body;
+    let { productId, quantity, selectedSize = "", selectedColor = "" } = req.body;
     const qty = Number(quantity) || 1;
+
+    // Normalize size/color if they were sent as objects
+    if (selectedSize && typeof selectedSize === "object") {
+      selectedSize = selectedSize.size || "";
+    }
+    if (selectedColor && typeof selectedColor === "object") {
+      selectedColor = selectedColor.color || "";
+    }
 
     if (!productId) {
       return res.status(400).json({ message: "Product ID is required." });
@@ -375,7 +383,15 @@ export const batchUpdateCart = async (req, res) => {
     }
 
     for (const item of items) {
-      const { id, q, selectedSize = "", selectedColor = "" } = item;
+      let { id, q, selectedSize = "", selectedColor = "" } = item;
+      
+      // Normalize size/color if they were sent as objects
+      if (selectedSize && typeof selectedSize === "object") {
+        selectedSize = selectedSize.size || "";
+      }
+      if (selectedColor && typeof selectedColor === "object") {
+        selectedColor = selectedColor.color || "";
+      }
       const qty = Number(q) || 1;
       
       // Verify product exists

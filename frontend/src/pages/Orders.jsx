@@ -293,7 +293,7 @@ const Orders = () => {
                                 </h5>
                                 <p className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500 dark:text-neutral-400">
                                   Qty: {item.quantity}{" "}
-                                  {item.selectedSize && `| Size: ${item.selectedSize}`}{" "}
+                                  {item.selectedSize && `| Size: ${typeof item.selectedSize === "object" ? item.selectedSize.size : item.selectedSize}`}{" "}
                                   {item.selectedColor && `| Color: ${item.selectedColor}`}
                                 </p>
                                 <p className="text-xs font-bold text-black dark:text-white mt-1">

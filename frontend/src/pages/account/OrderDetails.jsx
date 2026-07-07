@@ -238,7 +238,7 @@ const OrderDetails = () => {
                         <div className="space-y-1 text-left">
                           <h4 className="text-xs font-bold text-black dark:text-white leading-snug">{product.name}</h4>
                           <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono leading-relaxed">
-                            Qty: {item.quantity} {item.selectedSize && `| Size: ${item.selectedSize}`} {item.selectedColor && `| Color: ${item.selectedColor}`}
+                            Qty: {item.quantity} {item.selectedSize && `| Size: ${typeof item.selectedSize === "object" ? item.selectedSize.size : item.selectedSize}`} {item.selectedColor && `| Color: ${item.selectedColor}`}
                           </p>
                           <p className="text-xs font-bold text-black dark:text-white mt-1 font-mono">
                             {formatCurrency(item.priceAtPurchase || product.price)}
